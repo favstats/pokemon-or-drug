@@ -1,0 +1,265 @@
+/* Pokemon or Drug - Global Styles */
+/* Playful & Cartoony Theme */
+
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap');
+
+/* CSS Variables */
+:root {
+  /* Pokemon colors */
+  --pokemon-yellow: #FFCB05;
+  --pokemon-blue: #3B4CCA;
+  --pokemon-red: #FF0000;
+  
+  /* Drug/Pharma colors */
+  --drug-pink: #FF6B9D;
+  --drug-purple: #9B59B6;
+  --drug-teal: #1ABC9C;
+  
+  /* UI colors */
+  --success-green: #2ecc71;
+  --danger-red: #e74c3c;
+  --warning-yellow: #f39c12;
+  
+  /* Background */
+  --bg-dark: #1a1a2e;
+  --bg-gradient: linear-gradient(150deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%);
+  
+  /* Text */
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+}
+
+/* Reset & Base */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Fredoka', 'Comic Sans MS', cursive, sans-serif;
+  background: var(--bg-gradient);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* Fun animated background with shapes */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 15% 85%, rgba(255, 203, 5, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 85% 15%, rgba(255, 107, 157, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(59, 76, 202, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Floating background shapes */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.03) 0%, transparent 10%),
+    radial-gradient(circle at 80% 70%, rgba(255,255,255,0.03) 0%, transparent 10%),
+    radial-gradient(circle at 60% 20%, rgba(255,255,255,0.02) 0%, transparent 8%),
+    radial-gradient(circle at 30% 80%, rgba(255,255,255,0.02) 0%, transparent 8%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+/* Typography - Cartoony */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.5px;
+}
+
+/* Buttons base - More rounded and bouncy */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: all 0.2s ease;
+  border-radius: 20px;
+}
+
+button:hover {
+  transform: translateY(-2px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+button:focus-visible {
+  outline: 3px solid var(--pokemon-yellow);
+  outline-offset: 2px;
+}
+
+/* Links */
+a {
+  color: var(--pokemon-yellow);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: #f39c12;
+}
+
+/* Selection */
+::selection {
+  background: var(--pokemon-yellow);
+  color: var(--bg-dark);
+}
+
+/* Scrollbar - Rounded */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, var(--pokemon-yellow), var(--drug-pink));
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #f39c12, var(--drug-purple));
+}
+
+/* Utility Classes */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Fun bounce animation */
+.animate-bounce {
+  animation: bounce 0.6s ease infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Wobble animation */
+.animate-wobble {
+  animation: wobble 1s ease-in-out infinite;
+}
+
+@keyframes wobble {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+/* Pop animation */
+@keyframes pop {
+  0% { transform: scale(0); }
+  70% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.animate-pop {
+  animation: pop 0.4s ease;
+}
+
+/* Spin animation */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Glassmorphism utilities - Softer */
+.glass {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(12px);
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, var(--pokemon-yellow), var(--drug-pink));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Card style - More rounded */
+.card {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 28px;
+  padding: 1.5rem;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Input styles - Rounded */
+input, select, textarea {
+  font-family: inherit;
+  border-radius: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--pokemon-yellow);
+  box-shadow: 0 0 0 3px rgba(255, 203, 5, 0.2);
+}

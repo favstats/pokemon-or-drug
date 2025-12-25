@@ -1,0 +1,272 @@
+.gameover-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.gameover-content {
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+}
+
+/* Header */
+.gameover-header {
+  margin-bottom: 2.5rem;
+}
+
+.trophy-icon {
+  font-size: 4rem;
+  color: var(--pokemon-yellow);
+  filter: drop-shadow(0 5px 20px rgba(255, 203, 5, 0.5));
+  animation: trophy-bounce 2s ease-in-out infinite;
+}
+
+@keyframes trophy-bounce {
+  0%, 100% { transform: translateY(0) rotate(-5deg); }
+  50% { transform: translateY(-10px) rotate(5deg); }
+}
+
+.gameover-header h1 {
+  font-size: 3rem;
+  margin: 1rem 0 0.5rem;
+  background: linear-gradient(135deg, #fff, var(--pokemon-yellow));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.winner-text {
+  font-size: 1.5rem;
+  color: var(--pokemon-yellow);
+  font-weight: 700;
+}
+
+.winner-text svg {
+  color: #f39c12;
+}
+
+/* Scoreboard */
+.final-scoreboard {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.player-row {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-radius: 16px;
+  margin-bottom: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+}
+
+.player-row:last-child {
+  margin-bottom: 0;
+}
+
+.player-row.gold {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 203, 5, 0.1));
+  border: 2px solid rgba(255, 215, 0, 0.5);
+}
+
+.player-row.silver {
+  background: linear-gradient(135deg, rgba(192, 192, 192, 0.2), rgba(192, 192, 192, 0.1));
+  border: 2px solid rgba(192, 192, 192, 0.3);
+}
+
+.player-row.bronze {
+  background: linear-gradient(135deg, rgba(205, 127, 50, 0.2), rgba(205, 127, 50, 0.1));
+  border: 2px solid rgba(205, 127, 50, 0.3);
+}
+
+.player-row.eliminated {
+  opacity: 0.6;
+}
+
+.rank {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 80px;
+}
+
+.medal-icon {
+  font-size: 1.5rem;
+}
+
+.medal-icon.gold { color: #FFD700; }
+.medal-icon.silver { color: #C0C0C0; }
+.medal-icon.bronze { color: #CD7F32; }
+
+.rank-number {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.player-info {
+  flex: 1;
+  text-align: left;
+}
+
+.player-name {
+  font-size: 1.3rem;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.player-stats {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.85rem;
+}
+
+.player-stats .stat {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.player-stats .correct {
+  color: var(--success-green);
+}
+
+.player-stats .wrong {
+  color: var(--danger-red);
+}
+
+.player-stats .streak {
+  color: #f39c12;
+}
+
+.player-score {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--pokemon-yellow);
+}
+
+/* Game Stats */
+.game-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.stat-box {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem 1.5rem;
+  border-radius: 16px;
+  text-align: center;
+}
+
+.stat-value {
+  display: block;
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--pokemon-yellow);
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Action Buttons */
+.gameover-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 20px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: box-shadow 0.3s ease;
+}
+
+.action-btn.primary {
+  background: linear-gradient(135deg, var(--success-green), #27ae60);
+  color: white;
+}
+
+.action-btn.primary:hover {
+  box-shadow: 0 10px 30px rgba(46, 204, 113, 0.4);
+}
+
+.action-btn.secondary {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.action-btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .gameover-header h1 {
+    font-size: 2.5rem;
+  }
+  
+  .player-row {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .rank {
+    min-width: auto;
+  }
+  
+  .player-info {
+    order: 3;
+    width: 100%;
+    text-align: center;
+    margin-top: 0.5rem;
+  }
+  
+  .player-stats {
+    justify-content: center;
+  }
+  
+  .game-stats {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .stat-box {
+    flex: 1;
+    min-width: 100px;
+  }
+  
+  .gameover-actions {
+    flex-direction: column;
+  }
+  
+  .action-btn {
+    justify-content: center;
+  }
+}
+
