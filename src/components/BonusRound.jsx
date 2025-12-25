@@ -24,6 +24,7 @@ function BonusRound() {
   const [selectedItems, setSelectedItems] = useState(new Set());
   const [showIntro, setShowIntro] = useState(true);
   const timedOutRef = useRef(false);
+  const revealSoundPlayed = useRef(false);
 
   const currentPlayer = state.players[state.currentPlayerIndex];
   const bonusData = state.bonusRound.data;
@@ -39,6 +40,23 @@ function BonusRound() {
       return () => clearTimeout(introTimer);
     }
   }, [state.gameStatus, showIntro, play]);
+
+  // Play sound on reveal
+  useEffect(() => {
+    if (state.gameStatus === 'bonusReveal' && !revealSoundPlayed.current && state.bonusResult) {
+      revealSoundPlayed.current = true;
+      const result = state.bonusResult;
+      if (result.isCorrect) {
+        play('correct');
+      } else if (result.isPartial) {
+        play('select'); // Neutral sound for partial
+      } else {
+        play('wrong');
+      }
+    } else if (state.gameStatus === 'bonus') {
+      revealSoundPlayed.current = false;
+    }
+  }, [state.gameStatus, state.bonusResult, play]);
 
   // Reset state when bonus round starts
   useEffect(() => {
@@ -183,24 +201,6 @@ function BonusRound() {
       </div>
     );
   }
-
-  // Play sound on reveal
-  const revealSoundPlayed = useRef(false);
-  useEffect(() => {
-    if (state.gameStatus === 'bonusReveal' && !revealSoundPlayed.current) {
-      revealSoundPlayed.current = true;
-      const result = state.bonusResult;
-      if (result.isCorrect) {
-        play('correct');
-      } else if (result.isPartial) {
-        play('select'); // Neutral sound for partial
-      } else {
-        play('wrong');
-      }
-    } else if (state.gameStatus === 'bonus') {
-      revealSoundPlayed.current = false;
-    }
-  }, [state.gameStatus, state.bonusResult, play]);
 
   // Show reveal screen
   if (state.gameStatus === 'bonusReveal') {
