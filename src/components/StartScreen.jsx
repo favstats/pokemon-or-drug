@@ -333,7 +333,7 @@ function StartScreen() {
             </div>
             
             <div className="about-version">
-              <p>Version 1.0 • 2024</p>
+              <p>Version 1.0 • 2025</p>
             </div>
           </div>
           
