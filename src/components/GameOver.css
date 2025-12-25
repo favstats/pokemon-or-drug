@@ -307,6 +307,17 @@
   background: rgba(255, 255, 255, 0.25);
 }
 
+/* Custom settings notice */
+.custom-settings-notice {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   .gameover-screen {

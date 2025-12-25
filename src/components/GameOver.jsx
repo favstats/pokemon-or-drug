@@ -29,6 +29,13 @@ function GameOver() {
   const rankedPlayers = [...state.players].sort((a, b) => b.score - a.score);
   const winner = rankedPlayers[0];
   const isMultiplayer = state.gameMode === 'multiplayer';
+  
+  // Check if using default settings (eligible for global leaderboard)
+  const isDefaultSettings = 
+    state.settings.totalRounds === 10 &&
+    state.settings.livesPerPlayer === 3 &&
+    state.settings.timerDuration === 15 &&
+    state.settings.bonusProbability === 25;
 
   // Save scores once (local + global if enabled)
   useEffect(() => {
@@ -43,8 +50,14 @@ function GameOver() {
           mode: state.gameMode
         });
         
-        // Submit to global leaderboard (if sharing is enabled)
-        if (state.settings.shareGlobally) {
+        // Submit to global leaderboard (if sharing is enabled AND using default settings)
+        const isDefaultSettings = 
+          state.settings.totalRounds === 10 &&
+          state.settings.livesPerPlayer === 3 &&
+          state.settings.timerDuration === 15 &&
+          state.settings.bonusProbability === 25;
+        
+        if (state.settings.shareGlobally && isDefaultSettings) {
           actions.submitToGlobalLeaderboard({
             name: player.name,
             score: player.score,
@@ -296,6 +309,17 @@ function GameOver() {
             <FontAwesomeIcon icon={faHome} /> Main Menu
           </motion.button>
         </motion.div>
+        
+        {!isDefaultSettings && state.settings.shareGlobally && (
+          <motion.p 
+            className="custom-settings-notice"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2 }}
+          >
+            Custom settings — not eligible for global leaderboard
+          </motion.p>
+        )}
       </motion.div>
     </motion.div>
   );
