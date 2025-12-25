@@ -5,25 +5,21 @@ import { trickyPokemonNames } from '../data/pokemonService';
 // Bonus round types
 const BONUS_TYPES = ['oddOneOut', 'selectAll', 'namePokemon'];
 
-// Pre-generate all questions at import time
+// Pre-generate all questions with good variety (not too many of same type in a row)
 const generateQuestions = () => {
-  const questions = [];
-  
-  // Add Pokemon questions
-  const shuffledPokemon = [...trickyPokemonNames].sort(() => Math.random() - 0.5);
-  for (const name of shuffledPokemon) {
-    questions.push({
+  // Create separate pools
+  const pokemonPool = [...trickyPokemonNames]
+    .sort(() => Math.random() - 0.5)
+    .map(name => ({
       id: `pokemon-${name}`,
       name,
       type: 'pokemon',
       imageUrl: null,
-    });
-  }
+    }));
   
-  // Add Drug questions  
-  const shuffledDrugs = [...drugNames].sort(() => Math.random() - 0.5);
-  for (const drug of shuffledDrugs) {
-    questions.push({
+  const drugPool = [...drugNames]
+    .sort(() => Math.random() - 0.5)
+    .map(drug => ({
       id: `drug-${drug.name}`,
       name: drug.name,
       type: 'drug',
@@ -32,11 +28,62 @@ const generateQuestions = () => {
       description: drug.description,
       pillShape: drug.pillShape,
       pillColor: drug.pillColor,
-    });
+    }));
+  
+  // Interleave with soft variety - allow streaks but gently encourage switching
+  const questions = [];
+  let pokemonIdx = 0;
+  let drugIdx = 0;
+  let consecutiveCount = 0;
+  let lastType = null;
+  
+  while (pokemonIdx < pokemonPool.length || drugIdx < drugPool.length) {
+    const hasPokemon = pokemonIdx < pokemonPool.length;
+    const hasDrug = drugIdx < drugPool.length;
+    
+    let pickPokemon;
+    
+    if (!hasPokemon) {
+      pickPokemon = false;
+    } else if (!hasDrug) {
+      pickPokemon = true;
+    } else {
+      // Both available - soft bias that increases with consecutive same-type
+      // Base 50/50, but after each consecutive same type, increase chance to switch
+      // After 2: 60% switch, after 3: 75% switch, after 4+: 90% switch
+      let switchBias = 0.5;
+      if (consecutiveCount >= 4) switchBias = 0.9;
+      else if (consecutiveCount >= 3) switchBias = 0.75;
+      else if (consecutiveCount >= 2) switchBias = 0.6;
+      
+      if (lastType === 'pokemon') {
+        // Last was pokemon, switchBias = chance to pick drug
+        pickPokemon = Math.random() >= switchBias;
+      } else if (lastType === 'drug') {
+        // Last was drug, switchBias = chance to pick pokemon
+        pickPokemon = Math.random() < switchBias;
+      } else {
+        // First pick - pure random
+        pickPokemon = Math.random() < 0.5;
+      }
+    }
+    
+    const newType = pickPokemon ? 'pokemon' : 'drug';
+    if (newType === lastType) {
+      consecutiveCount++;
+    } else {
+      consecutiveCount = 1;
+      lastType = newType;
+    }
+    
+    if (pickPokemon) {
+      questions.push(pokemonPool[pokemonIdx++]);
+    } else {
+      questions.push(drugPool[drugIdx++]);
+    }
   }
   
-  // Shuffle all
-  return questions.sort(() => Math.random() - 0.5);
+  return questions;
 };
 
 // Generate bonus round data based on type

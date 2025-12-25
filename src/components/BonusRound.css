@@ -1,11 +1,15 @@
 .bonus-round {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 1.5rem;
+  padding-bottom: 3rem;
   position: relative;
   background: radial-gradient(ellipse at center, rgba(255, 215, 0, 0.15) 0%, transparent 70%);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Intro Animation */
