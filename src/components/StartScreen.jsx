@@ -180,6 +180,8 @@ function StartScreen() {
                     )}
                   </div>
                 ))
+              ) : state.globalScoresLoading ? (
+                <p className="loading-scores"><FontAwesomeIcon icon={faSync} spin /> Loading scores...</p>
               ) : (
                 <p className="no-scores">No global scores yet! Be the first!</p>
               )}

@@ -184,7 +184,7 @@ const initialState = {
   questionIndex: 0,
   highScores: JSON.parse(localStorage.getItem('pord_highscores') || '[]'),
   globalScores: [],
-  globalScoresLoading: false,
+  globalScoresLoading: true, // Start as loading
   // Bonus round state
   bonusRound: {
     active: false,
