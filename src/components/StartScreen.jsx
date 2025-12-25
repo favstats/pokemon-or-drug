@@ -17,7 +17,9 @@ import {
   faHome,
   faSync,
   faToggleOn,
-  faToggleOff
+  faToggleOff,
+  faInfoCircle,
+  faEnvelope
 } from '@fortawesome/free-solid-svg-icons';
 import { useGame } from '../context/GameContext';
 import { useSound } from '../context/SoundContext';
@@ -29,6 +31,7 @@ function StartScreen() {
   const [playerNames, setPlayerNames] = useState(['', '']);
   const [showSettings, setShowSettings] = useState(false);
   const [showScoreboard, setShowScoreboard] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
   const [scoreTab, setScoreTab] = useState('global'); // 'global' or 'local'
 
   const handleModeSelect = (mode) => {
@@ -104,10 +107,22 @@ function StartScreen() {
           onClick={() => {
             setShowSettings(!showSettings);
             setShowScoreboard(false);
+            setShowAbout(false);
           }}
           title="Settings"
         >
           <FontAwesomeIcon icon={faCog} />
+        </button>
+        <button 
+          className="about-toggle" 
+          onClick={() => {
+            setShowAbout(!showAbout);
+            setShowSettings(false);
+            setShowScoreboard(false);
+          }}
+          title="About"
+        >
+          <FontAwesomeIcon icon={faInfoCircle} />
         </button>
         <button 
           className="mute-toggle" 
@@ -295,6 +310,33 @@ function StartScreen() {
 
           <button className="back-btn full-width" onClick={() => setShowSettings(false)}>
             <FontAwesomeIcon icon={faChevronLeft} /> Save & Back
+          </button>
+        </div>
+      ) : showAbout ? (
+        <div className="settings-panel about-panel">
+          <h2><FontAwesomeIcon icon={faInfoCircle} /> About</h2>
+          
+          <div className="about-content">
+            <div className="about-game">
+              <h3>🎮 Pokemon or Drug?</h3>
+              <p>A fun trivia game where you guess if a name belongs to a Pokémon or a pharmaceutical drug!</p>
+            </div>
+            
+            <div className="about-creator">
+              <h3>👨‍💻 Created by</h3>
+              <p className="creator-name">Fabio Votta</p>
+              <a href="mailto:fabio.votta@gmail.com" className="creator-email">
+                <FontAwesomeIcon icon={faEnvelope} /> fabio.votta@gmail.com
+              </a>
+            </div>
+            
+            <div className="about-version">
+              <p>Version 1.0 • 2024</p>
+            </div>
+          </div>
+          
+          <button className="back-btn full-width" onClick={() => setShowAbout(false)}>
+            <FontAwesomeIcon icon={faChevronLeft} /> Back
           </button>
         </div>
       ) : !state.gameMode ? (
