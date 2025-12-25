@@ -14,21 +14,40 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import confetti from 'canvas-confetti';
 import { useGame } from '../context/GameContext';
+import { useSound } from '../context/SoundContext';
 import './GameOver.css';
 
 function GameOver() {
   const { state, actions } = useGame();
+  const { play } = useSound();
   const confettiFired = useRef(false);
+  const scoresSaved = useRef(false);
 
   // Sort players by score
   const rankedPlayers = [...state.players].sort((a, b) => b.score - a.score);
   const winner = rankedPlayers[0];
   const isMultiplayer = state.gameMode === 'multiplayer';
 
+  // Save scores once
+  useEffect(() => {
+    if (!scoresSaved.current) {
+      scoresSaved.current = true;
+      state.players.forEach(player => {
+        actions.saveScore({
+          name: player.name,
+          score: player.score,
+          date: new Date().toISOString(),
+          mode: state.gameMode
+        });
+      });
+    }
+  }, []);
+
   // Subtle celebration confetti for winner
   useEffect(() => {
     if (!confettiFired.current) {
       confettiFired.current = true;
+      play('gameOver');
       
       // Subtle celebration - just a few bursts
       const colors = ['#FFCB05', '#FF6B9D', '#3B4CCA'];
@@ -62,7 +81,13 @@ function GameOver() {
     }
   }, []);
 
-  const handlePlayAgain = async () => {
+  const handlePlayAgain = () => {
+    play('start');
+    actions.playAgain();
+  };
+
+  const handleMainMenu = () => {
+    play('select');
     actions.resetGame();
   };
 
@@ -188,6 +213,27 @@ function GameOver() {
           </div>
         </motion.div>
 
+        {/* High Scores Leaderboard */}
+        {state.highScores.length > 0 && (
+          <motion.div 
+            className="highscores-section"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.9 }}
+          >
+            <h3><FontAwesomeIcon icon={faTrophy} /> High Scores</h3>
+            <div className="highscores-list">
+              {state.highScores.slice(0, 5).map((entry, index) => (
+                <div key={index} className={`highscore-entry ${index < 3 ? getMedalClass(index) : ''}`}>
+                  <span className="hs-rank">#{index + 1}</span>
+                  <span className="hs-name">{entry.name}</span>
+                  <span className="hs-score">{entry.score}</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
         {/* Action Buttons */}
         <motion.div 
           className="gameover-actions"
@@ -205,7 +251,7 @@ function GameOver() {
           </motion.button>
           <motion.button
             className="action-btn secondary"
-            onClick={handlePlayAgain}
+            onClick={handleMainMenu}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >

@@ -7,15 +7,19 @@ import {
   faBolt, 
   faForward,
   faCapsules,
-  faStar
+  faStar,
+  faVolumeUp,
+  faVolumeMute
 } from '@fortawesome/free-solid-svg-icons';
 import { useGame } from '../context/GameContext';
+import { useSound } from '../context/SoundContext';
 import { fetchPokemonDetails } from '../data/pokemonService';
 import './GameScreen.css';
 
 function GameScreen() {
   const { state, actions } = useGame();
-  const [timer, setTimer] = useState(15);
+  const { play, isMuted, toggleMute } = useSound();
+  const [timer, setTimer] = useState(state.settings.timerDuration);
   const [pokemonImage, setPokemonImage] = useState(null);
   const timedOutRef = useRef(false);
 
@@ -25,7 +29,7 @@ function GameScreen() {
   // Reset timer when question changes
   useEffect(() => {
     if (state.gameStatus === 'playing' && question) {
-      setTimer(15);
+      setTimer(state.settings.timerDuration);
       setPokemonImage(null);
       timedOutRef.current = false;
       
@@ -51,10 +55,11 @@ function GameScreen() {
   const handleTimeout = useCallback(() => {
     if (!timedOutRef.current) {
       timedOutRef.current = true;
+      play('wrong');
       const timeTaken = Date.now() - (state.questionStartTime || Date.now());
       actions.submitAnswer('timeout', timeTaken);
     }
-  }, [actions, state.questionStartTime]);
+  }, [actions, state.questionStartTime, play]);
 
   // Timer countdown
   useEffect(() => {
@@ -76,6 +81,10 @@ function GameScreen() {
 
   const handleAnswer = (answer) => {
     if (state.gameStatus !== 'playing' || !question) return;
+    
+    const isCorrect = answer === question.type;
+    play(isCorrect ? 'correct' : 'wrong');
+
     // Make sure Pokemon image is stored before submitting
     if (question.type === 'pokemon' && pokemonImage) {
       question.imageUrl = pokemonImage;
@@ -86,6 +95,7 @@ function GameScreen() {
 
   const handleSkip = () => {
     if (state.powerUps.skip > 0) {
+      play('powerup');
       actions.skipQuestion();
     }
   };
@@ -100,6 +110,14 @@ function GameScreen() {
 
   return (
     <div className="game-screen">
+      <button 
+        className="mute-toggle-game" 
+        onClick={toggleMute}
+        title={isMuted ? "Unmute" : "Mute"}
+      >
+        <FontAwesomeIcon icon={isMuted ? faVolumeMute : faVolumeUp} />
+      </button>
+
       {/* Header */}
       <motion.header 
         className="game-header"
@@ -108,14 +126,14 @@ function GameScreen() {
       >
         <div className="round-info">
           <span className="round-label">Round</span>
-          <span className="round-number">{state.currentRound}/{state.totalRounds}</span>
+          <span className="round-number">{state.currentRound}/{state.settings.totalRounds}</span>
         </div>
 
         <div className="current-player">
           <span className="player-turn">{currentPlayer.name}'s Turn</span>
           <div className="player-stats">
             <div className="lives">
-              {[...Array(3)].map((_, i) => (
+              {[...Array(state.settings.livesPerPlayer)].map((_, i) => (
                 <FontAwesomeIcon 
                   key={i}
                   icon={faHeart}
@@ -160,7 +178,7 @@ function GameScreen() {
             cy="50"
             r="45"
             style={{
-              strokeDashoffset: 283 - (283 * timer) / 15,
+              strokeDashoffset: 283 - (283 * timer) / state.settings.timerDuration,
               stroke: getTimerColor(),
             }}
           />
@@ -231,7 +249,10 @@ function GameScreen() {
         </button>
         <button 
           className={`powerup-btn ${state.powerUps.extraLife === 0 ? 'disabled' : ''}`}
-          onClick={() => actions.usePowerUp('extraLife')}
+          onClick={() => {
+            play('powerup');
+            actions.usePowerUp('extraLife');
+          }}
           disabled={state.powerUps.extraLife === 0}
         >
           <FontAwesomeIcon icon={faBolt} />

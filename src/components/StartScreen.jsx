@@ -1,14 +1,32 @@
 import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faUsers, faPlay, faPlus, faMinus, faGamepad } from '@fortawesome/free-solid-svg-icons';
+import { 
+  faUser, 
+  faUsers, 
+  faPlay, 
+  faPlus, 
+  faMinus, 
+  faGamepad, 
+  faVolumeUp, 
+  faVolumeMute, 
+  faCog, 
+  faChevronLeft,
+  faTrophy,
+  faTrash
+} from '@fortawesome/free-solid-svg-icons';
 import { useGame } from '../context/GameContext';
+import { useSound } from '../context/SoundContext';
 import './StartScreen.css';
 
 function StartScreen() {
   const { state, actions } = useGame();
+  const { play, isMuted, toggleMute } = useSound();
   const [playerNames, setPlayerNames] = useState(['Player 1', 'Player 2']);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showScoreboard, setShowScoreboard] = useState(false);
 
   const handleModeSelect = (mode) => {
+    play('select');
     if (mode === 'single') {
       setPlayerNames(['Player']);
     }
@@ -16,16 +34,19 @@ function StartScreen() {
   };
 
   const handleBack = () => {
+    play('select');
     actions.setGameMode(null);
   };
 
   const handleAddPlayer = () => {
+    play('select');
     if (playerNames.length < 4) {
       setPlayerNames([...playerNames, `Player ${playerNames.length + 1}`]);
     }
   };
 
   const handleRemovePlayer = (index) => {
+    play('select');
     if (playerNames.length > 2) {
       const newNames = playerNames.filter((_, i) => i !== index);
       setPlayerNames(newNames);
@@ -39,12 +60,55 @@ function StartScreen() {
   };
 
   const handleStartGame = async () => {
+    play('start');
     actions.setPlayers(playerNames);
     actions.startGame();
   };
 
+  const handleSettingChange = (key, value) => {
+    play('select');
+    actions.updateSettings({ [key]: value });
+  };
+
+  const handleClearScores = () => {
+    if (window.confirm('Are you sure you want to clear all high scores?')) {
+      play('select');
+      actions.clearScores();
+    }
+  };
+
   return (
     <div className="start-screen">
+      <div className="top-controls">
+        <button 
+          className="scoreboard-toggle" 
+          onClick={() => {
+            setShowScoreboard(!showScoreboard);
+            setShowSettings(false);
+          }}
+          title="High Scores"
+        >
+          <FontAwesomeIcon icon={faTrophy} />
+        </button>
+        <button 
+          className="settings-toggle" 
+          onClick={() => {
+            setShowSettings(!showSettings);
+            setShowScoreboard(false);
+          }}
+          title="Settings"
+        >
+          <FontAwesomeIcon icon={faCog} />
+        </button>
+        <button 
+          className="mute-toggle" 
+          onClick={toggleMute}
+          title={isMuted ? "Unmute" : "Mute"}
+        >
+          <FontAwesomeIcon icon={isMuted ? faVolumeMute : faVolumeUp} />
+        </button>
+      </div>
+
       <div className="title-container">
         <h1 className="game-title">
           <span className="title-pokemon">Pokémon</span>
@@ -55,7 +119,122 @@ function StartScreen() {
         <p className="game-subtitle">Can you tell the difference?</p>
       </div>
 
-      {!state.gameMode ? (
+      {showScoreboard ? (
+        <div className="settings-panel scoreboard-panel">
+          <h2><FontAwesomeIcon icon={faTrophy} /> High Scores</h2>
+          
+          <div className="highscore-list">
+            {state.highScores.length > 0 ? (
+              state.highScores.map((entry, index) => (
+                <div key={index} className="highscore-item">
+                  <span className="highscore-rank">#{index + 1}</span>
+                  <span className="highscore-name">{entry.name}</span>
+                  <span className="highscore-val">{entry.score}</span>
+                </div>
+              ))
+            ) : (
+              <p className="no-scores">No scores saved yet!</p>
+            )}
+          </div>
+
+          <div className="scoreboard-actions">
+            <button className="back-btn" onClick={() => setShowScoreboard(false)}>
+              <FontAwesomeIcon icon={faChevronLeft} /> Back
+            </button>
+            {state.highScores.length > 0 && (
+              <button className="clear-btn" onClick={handleClearScores}>
+                <FontAwesomeIcon icon={faTrash} /> Clear
+              </button>
+            )}
+          </div>
+        </div>
+      ) : showSettings ? (
+        <div className="settings-panel">
+          <h2><FontAwesomeIcon icon={faCog} /> Game Settings</h2>
+          
+          <div className="settings-group">
+            <div className="setting-item">
+              <label>Rounds</label>
+              <div className="setting-controls">
+                <button 
+                  onClick={() => handleSettingChange('totalRounds', Math.max(5, state.settings.totalRounds - 5))}
+                  disabled={state.settings.totalRounds <= 5}
+                >
+                  <FontAwesomeIcon icon={faMinus} />
+                </button>
+                <span className="setting-value">{state.settings.totalRounds}</span>
+                <button 
+                  onClick={() => handleSettingChange('totalRounds', Math.min(50, state.settings.totalRounds + 5))}
+                  disabled={state.settings.totalRounds >= 50}
+                >
+                  <FontAwesomeIcon icon={faPlus} />
+                </button>
+              </div>
+            </div>
+
+            <div className="setting-item">
+              <label>Lives</label>
+              <div className="setting-controls">
+                <button 
+                  onClick={() => handleSettingChange('livesPerPlayer', Math.max(1, state.settings.livesPerPlayer - 1))}
+                  disabled={state.settings.livesPerPlayer <= 1}
+                >
+                  <FontAwesomeIcon icon={faMinus} />
+                </button>
+                <span className="setting-value">{state.settings.livesPerPlayer}</span>
+                <button 
+                  onClick={() => handleSettingChange('livesPerPlayer', Math.min(10, state.settings.livesPerPlayer + 1))}
+                  disabled={state.settings.livesPerPlayer >= 10}
+                >
+                  <FontAwesomeIcon icon={faPlus} />
+                </button>
+              </div>
+            </div>
+
+            <div className="setting-item">
+              <label>Timer (sec)</label>
+              <div className="setting-controls">
+                <button 
+                  onClick={() => handleSettingChange('timerDuration', Math.max(5, state.settings.timerDuration - 5))}
+                  disabled={state.settings.timerDuration <= 5}
+                >
+                  <FontAwesomeIcon icon={faMinus} />
+                </button>
+                <span className="setting-value">{state.settings.timerDuration}</span>
+                <button 
+                  onClick={() => handleSettingChange('timerDuration', Math.min(60, state.settings.timerDuration + 5))}
+                  disabled={state.settings.timerDuration >= 60}
+                >
+                  <FontAwesomeIcon icon={faPlus} />
+                </button>
+              </div>
+            </div>
+
+            <div className="setting-item">
+              <label>Bonus %</label>
+              <div className="setting-controls">
+                <button 
+                  onClick={() => handleSettingChange('bonusProbability', Math.max(0, state.settings.bonusProbability - 5))}
+                  disabled={state.settings.bonusProbability <= 0}
+                >
+                  <FontAwesomeIcon icon={faMinus} />
+                </button>
+                <span className="setting-value">{state.settings.bonusProbability}%</span>
+                <button 
+                  onClick={() => handleSettingChange('bonusProbability', Math.min(100, state.settings.bonusProbability + 5))}
+                  disabled={state.settings.bonusProbability >= 100}
+                >
+                  <FontAwesomeIcon icon={faPlus} />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <button className="back-btn full-width" onClick={() => setShowSettings(false)}>
+            <FontAwesomeIcon icon={faChevronLeft} /> Save & Back
+          </button>
+        </div>
+      ) : !state.gameMode ? (
         <div className="mode-selection">
           <h2>Choose Game Mode</h2>
           <div className="mode-buttons">

@@ -1,9 +1,9 @@
-import { AnimatePresence } from 'framer-motion';
 import { GameProvider, useGame } from './context/GameContext';
 import StartScreen from './components/StartScreen';
 import GameScreen from './components/GameScreen';
 import RevealCard from './components/RevealCard';
 import GameOver from './components/GameOver';
+import BonusRound from './components/BonusRound';
 import './styles/global.css';
 
 function GameContent() {
@@ -19,6 +19,8 @@ function GameContent() {
           <RevealCard />
         </>
       )}
+      {/* Bonus round states */}
+      {(state.gameStatus === 'bonus' || state.gameStatus === 'bonusReveal') && <BonusRound />}
       {state.gameStatus === 'gameover' && <GameOver />}
     </div>
   );
