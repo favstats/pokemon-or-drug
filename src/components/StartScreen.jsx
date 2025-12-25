@@ -26,7 +26,7 @@ import './StartScreen.css';
 function StartScreen() {
   const { state, actions } = useGame();
   const { play, isMuted, toggleMute } = useSound();
-  const [playerNames, setPlayerNames] = useState(['Player 1', 'Player 2']);
+  const [playerNames, setPlayerNames] = useState(['', '']);
   const [showSettings, setShowSettings] = useState(false);
   const [showScoreboard, setShowScoreboard] = useState(false);
   const [scoreTab, setScoreTab] = useState('global'); // 'global' or 'local'
@@ -34,7 +34,7 @@ function StartScreen() {
   const handleModeSelect = (mode) => {
     play('select');
     if (mode === 'single') {
-      setPlayerNames(['Player']);
+      setPlayerNames(['']);
     }
     actions.setGameMode(mode);
   };
@@ -47,9 +47,12 @@ function StartScreen() {
   const handleAddPlayer = () => {
     play('select');
     if (playerNames.length < 4) {
-      setPlayerNames([...playerNames, `Player ${playerNames.length + 1}`]);
+      setPlayerNames([...playerNames, '']);
     }
   };
+
+  // Check if all player names are filled
+  const allNamesValid = playerNames.every(name => name.trim().length > 0);
 
   const handleRemovePlayer = (index) => {
     play('select');
@@ -331,7 +334,7 @@ function StartScreen() {
                   type="text"
                   value={name}
                   onChange={(e) => handleNameChange(index, e.target.value)}
-                  placeholder={`Player ${index + 1}`}
+                  placeholder={`Enter your name...`}
                   maxLength={15}
                 />
                 {state.gameMode === 'multiplayer' && playerNames.length > 2 && (
@@ -365,8 +368,9 @@ function StartScreen() {
             <button
               className="start-btn"
               onClick={handleStartGame}
+              disabled={!allNamesValid}
             >
-              <FontAwesomeIcon icon={faPlay} /> Start Game
+              <FontAwesomeIcon icon={faPlay} /> {allNamesValid ? 'Start Game' : 'Enter Name(s)'}
             </button>
           </div>
         </div>
