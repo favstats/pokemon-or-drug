@@ -18,7 +18,7 @@
   z-index: 100;
 }
 
-.mute-toggle, .settings-toggle, .scoreboard-toggle {
+.mute-toggle, .settings-toggle, .scoreboard-toggle, .about-toggle {
   width: 45px;
   height: 45px;
   border-radius: 50%;
@@ -189,26 +189,6 @@
   color: rgba(255, 255, 255, 0.3);
 }
 
-/* About Toggle Button */
-.about-toggle {
-  position: absolute;
-  top: 1rem;
-  right: 4rem;
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
-  color: white;
-  font-size: 1.5rem;
-  padding: 0.75rem;
-  border-radius: 50%;
-  cursor: pointer;
-  z-index: 10;
-  transition: all 0.2s ease;
-}
-
-.about-toggle:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: none;
-}
 
 /* About Panel */
 .about-panel {
