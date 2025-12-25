@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
@@ -24,6 +24,7 @@ function GameOver() {
   const { play } = useSound();
   const confettiFired = useRef(false);
   const scoresSaved = useRef(false);
+  const [scoreTab, setScoreTab] = useState('global');
 
   // Sort players by score
   const rankedPlayers = [...state.players].sort((a, b) => b.score - a.score);
@@ -69,6 +70,9 @@ function GameOver() {
           });
         }
       });
+      
+      // Refresh global scores to show updated leaderboard
+      actions.loadGlobalScores();
     }
   }, []);
 
@@ -264,26 +268,63 @@ function GameOver() {
           })()}
         </motion.div>
 
-        {/* High Scores Leaderboard */}
-        {state.highScores.length > 0 && (
-          <motion.div 
-            className="highscores-section"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.9 }}
-          >
-            <h3><FontAwesomeIcon icon={faTrophy} /> High Scores</h3>
-            <div className="highscores-list">
-              {state.highScores.slice(0, 5).map((entry, index) => (
-                <div key={index} className={`highscore-entry ${index < 3 ? getMedalClass(index) : ''}`}>
-                  <span className="hs-rank">#{index + 1}</span>
-                  <span className="hs-name">{entry.name}</span>
-                  <span className="hs-score">{entry.score}</span>
-                </div>
-              ))}
+        {/* High Scores with Tabs */}
+        <motion.div 
+          className="highscores-section"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.9 }}
+        >
+          <div className="highscores-header">
+            <h3><FontAwesomeIcon icon={faTrophy} /> Leaderboard</h3>
+            <div className="score-tabs">
+              <button 
+                className={`score-tab ${scoreTab === 'global' ? 'active' : ''}`}
+                onClick={() => setScoreTab('global')}
+              >
+                Global
+              </button>
+              <button 
+                className={`score-tab ${scoreTab === 'local' ? 'active' : ''}`}
+                onClick={() => setScoreTab('local')}
+              >
+                Local
+              </button>
             </div>
-          </motion.div>
-        )}
+          </div>
+          <div className="highscores-list">
+            {scoreTab === 'global' ? (
+              state.globalScoresLoading ? (
+                <div className="loading-scores">Loading...</div>
+              ) : state.globalScores.length > 0 ? (
+                state.globalScores.slice(0, 5).map((entry, index) => (
+                  <div key={index} className={`highscore-entry ${index < 3 ? getMedalClass(index) : ''}`}>
+                    <span className="hs-rank">#{index + 1}</span>
+                    <span className="hs-name">{entry.name}</span>
+                    <span className="hs-score">{entry.score}</span>
+                    {entry.accuracy !== undefined && (
+                      <span className="hs-accuracy">{entry.accuracy}%</span>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="no-scores">No global scores yet!</div>
+              )
+            ) : (
+              state.highScores.length > 0 ? (
+                state.highScores.slice(0, 5).map((entry, index) => (
+                  <div key={index} className={`highscore-entry ${index < 3 ? getMedalClass(index) : ''}`}>
+                    <span className="hs-rank">#{index + 1}</span>
+                    <span className="hs-name">{entry.name}</span>
+                    <span className="hs-score">{entry.score}</span>
+                  </div>
+                ))
+              ) : (
+                <div className="no-scores">No local scores yet!</div>
+              )
+            )}
+          </div>
+        </motion.div>
 
         {/* Action Buttons */}
         <motion.div 

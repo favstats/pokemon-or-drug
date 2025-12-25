@@ -318,6 +318,63 @@
   text-align: center;
 }
 
+/* Loading/no scores */
+.highscores-list .loading-scores,
+.highscores-list .no-scores {
+  padding: 1rem;
+  text-align: center;
+  opacity: 0.6;
+  font-size: 0.9rem;
+}
+
+.hs-accuracy {
+  font-size: 0.75rem;
+  color: var(--pokemon-yellow);
+  opacity: 0.8;
+}
+
+/* Highscores header with tabs */
+.highscores-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.highscores-header h3 {
+  margin: 0;
+}
+
+.score-tabs {
+  display: flex;
+  gap: 0.25rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.25rem;
+  border-radius: 8px;
+}
+
+.score-tab {
+  padding: 0.4rem 0.75rem;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8rem;
+  font-family: inherit;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.score-tab:hover {
+  color: white;
+  transform: none;
+}
+
+.score-tab.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   .gameover-screen {
