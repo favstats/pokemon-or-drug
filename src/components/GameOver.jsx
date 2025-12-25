@@ -30,16 +30,28 @@ function GameOver() {
   const winner = rankedPlayers[0];
   const isMultiplayer = state.gameMode === 'multiplayer';
 
-  // Save scores once
+  // Save scores once (local + global)
   useEffect(() => {
     if (!scoresSaved.current) {
       scoresSaved.current = true;
       state.players.forEach(player => {
+        // Save to local storage
         actions.saveScore({
           name: player.name,
           score: player.score,
           date: new Date().toISOString(),
           mode: state.gameMode
+        });
+        
+        // Submit to global leaderboard
+        actions.submitToGlobalLeaderboard({
+          name: player.name,
+          score: player.score,
+          accuracy: player.correctAnswers + player.wrongAnswers > 0
+            ? Math.round((player.correctAnswers / (player.correctAnswers + player.wrongAnswers)) * 100)
+            : 0,
+          avgSpeed: player.avgResponseTime ? Math.round(player.avgResponseTime) : null,
+          mode: state.gameMode,
         });
       });
     }

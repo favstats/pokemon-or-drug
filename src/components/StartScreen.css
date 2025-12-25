@@ -73,12 +73,78 @@
 .highscore-val {
   font-weight: 800;
   color: var(--success-green);
+  min-width: 50px;
+  text-align: right;
 }
 
-.no-scores {
+.highscore-accuracy {
+  font-size: 0.8rem;
+  color: var(--pokemon-yellow);
+  margin-left: 0.5rem;
+  opacity: 0.8;
+}
+
+.no-scores,
+.loading-scores {
   opacity: 0.6;
   font-style: italic;
   margin: 2rem 0;
+  text-align: center;
+}
+
+/* Score Tabs */
+.score-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 0.25rem;
+  border-radius: 12px;
+}
+
+.score-tab {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.score-tab:hover {
+  color: white;
+  transform: none;
+}
+
+.score-tab.active {
+  background: linear-gradient(135deg, var(--pokemon-yellow), #f39c12);
+  color: #1a1a2e;
+}
+
+.refresh-btn {
+  background: rgba(46, 204, 113, 0.2);
+  color: var(--success-green);
+  border: 1px solid rgba(46, 204, 113, 0.3);
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.refresh-btn:hover {
+  background: rgba(46, 204, 113, 0.3);
 }
 
 .scoreboard-actions {

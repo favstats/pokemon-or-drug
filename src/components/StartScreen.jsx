@@ -12,7 +12,10 @@ import {
   faCog, 
   faChevronLeft,
   faTrophy,
-  faTrash
+  faTrash,
+  faGlobe,
+  faHome,
+  faSync
 } from '@fortawesome/free-solid-svg-icons';
 import { useGame } from '../context/GameContext';
 import { useSound } from '../context/SoundContext';
@@ -24,6 +27,7 @@ function StartScreen() {
   const [playerNames, setPlayerNames] = useState(['Player 1', 'Player 2']);
   const [showSettings, setShowSettings] = useState(false);
   const [showScoreboard, setShowScoreboard] = useState(false);
+  const [scoreTab, setScoreTab] = useState('global'); // 'global' or 'local'
 
   const handleModeSelect = (mode) => {
     play('select');
@@ -123,25 +127,66 @@ function StartScreen() {
         <div className="settings-panel scoreboard-panel">
           <h2><FontAwesomeIcon icon={faTrophy} /> High Scores</h2>
           
-          <div className="highscore-list">
-            {state.highScores.length > 0 ? (
-              state.highScores.map((entry, index) => (
-                <div key={index} className="highscore-item">
-                  <span className="highscore-rank">#{index + 1}</span>
-                  <span className="highscore-name">{entry.name}</span>
-                  <span className="highscore-val">{entry.score}</span>
-                </div>
-              ))
-            ) : (
-              <p className="no-scores">No scores saved yet!</p>
-            )}
+          <div className="score-tabs">
+            <button 
+              className={`score-tab ${scoreTab === 'global' ? 'active' : ''}`}
+              onClick={() => setScoreTab('global')}
+            >
+              <FontAwesomeIcon icon={faGlobe} /> Global
+            </button>
+            <button 
+              className={`score-tab ${scoreTab === 'local' ? 'active' : ''}`}
+              onClick={() => setScoreTab('local')}
+            >
+              <FontAwesomeIcon icon={faHome} /> Local
+            </button>
           </div>
+          
+          {scoreTab === 'global' ? (
+            <div className="highscore-list">
+              {state.globalScoresLoading ? (
+                <p className="loading-scores"><FontAwesomeIcon icon={faSync} spin /> Loading...</p>
+              ) : state.globalScores.length > 0 ? (
+                state.globalScores.slice(0, 10).map((entry, index) => (
+                  <div key={entry.id || index} className="highscore-item">
+                    <span className="highscore-rank">#{index + 1}</span>
+                    <span className="highscore-name">{entry.name}</span>
+                    <span className="highscore-val">{entry.score}</span>
+                    {entry.accuracy !== undefined && (
+                      <span className="highscore-accuracy">{entry.accuracy}%</span>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <p className="no-scores">No global scores yet! Be the first!</p>
+              )}
+            </div>
+          ) : (
+            <div className="highscore-list">
+              {state.highScores.length > 0 ? (
+                state.highScores.map((entry, index) => (
+                  <div key={index} className="highscore-item">
+                    <span className="highscore-rank">#{index + 1}</span>
+                    <span className="highscore-name">{entry.name}</span>
+                    <span className="highscore-val">{entry.score}</span>
+                  </div>
+                ))
+              ) : (
+                <p className="no-scores">No local scores saved yet!</p>
+              )}
+            </div>
+          )}
 
           <div className="scoreboard-actions">
             <button className="back-btn" onClick={() => setShowScoreboard(false)}>
               <FontAwesomeIcon icon={faChevronLeft} /> Back
             </button>
-            {state.highScores.length > 0 && (
+            {scoreTab === 'global' && (
+              <button className="refresh-btn" onClick={() => actions.loadGlobalScores()}>
+                <FontAwesomeIcon icon={faSync} /> Refresh
+              </button>
+            )}
+            {scoreTab === 'local' && state.highScores.length > 0 && (
               <button className="clear-btn" onClick={handleClearScores}>
                 <FontAwesomeIcon icon={faTrash} /> Clear
               </button>

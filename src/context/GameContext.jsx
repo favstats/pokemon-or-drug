@@ -1,6 +1,7 @@
-import { createContext, useContext, useReducer, useMemo } from 'react';
+import { createContext, useContext, useReducer, useMemo, useEffect } from 'react';
 import { drugNames } from '../data/drugs';
 import { trickyPokemonNames } from '../data/pokemonService';
+import { fetchGlobalScores, submitGlobalScore } from '../data/globalScoreService';
 
 // Bonus round types
 const BONUS_TYPES = ['oddOneOut', 'selectAll', 'namePokemon'];
@@ -30,12 +31,10 @@ const generateQuestions = () => {
       pillColor: drug.pillColor,
     }));
   
-  // Interleave with soft variety - allow streaks but gently encourage switching
+  // True 50/50 random selection - pick randomly from either pool
   const questions = [];
   let pokemonIdx = 0;
   let drugIdx = 0;
-  let consecutiveCount = 0;
-  let lastType = null;
   
   while (pokemonIdx < pokemonPool.length || drugIdx < drugPool.length) {
     const hasPokemon = pokemonIdx < pokemonPool.length;
@@ -48,32 +47,8 @@ const generateQuestions = () => {
     } else if (!hasDrug) {
       pickPokemon = true;
     } else {
-      // Both available - soft bias that increases with consecutive same-type
-      // Base 50/50, but after each consecutive same type, increase chance to switch
-      // After 2: 60% switch, after 3: 75% switch, after 4+: 90% switch
-      let switchBias = 0.5;
-      if (consecutiveCount >= 4) switchBias = 0.9;
-      else if (consecutiveCount >= 3) switchBias = 0.75;
-      else if (consecutiveCount >= 2) switchBias = 0.6;
-      
-      if (lastType === 'pokemon') {
-        // Last was pokemon, switchBias = chance to pick drug
-        pickPokemon = Math.random() >= switchBias;
-      } else if (lastType === 'drug') {
-        // Last was drug, switchBias = chance to pick pokemon
-        pickPokemon = Math.random() < switchBias;
-      } else {
-        // First pick - pure random
-        pickPokemon = Math.random() < 0.5;
-      }
-    }
-    
-    const newType = pickPokemon ? 'pokemon' : 'drug';
-    if (newType === lastType) {
-      consecutiveCount++;
-    } else {
-      consecutiveCount = 1;
-      lastType = newType;
+      // Both available - pure 50/50 random
+      pickPokemon = Math.random() < 0.5;
     }
     
     if (pickPokemon) {
@@ -207,6 +182,8 @@ const initialState = {
   questions: [],
   questionIndex: 0,
   highScores: JSON.parse(localStorage.getItem('pord_highscores') || '[]'),
+  globalScores: [],
+  globalScoresLoading: false,
   // Bonus round state
   bonusRound: {
     active: false,
@@ -238,6 +215,9 @@ const ACTIONS = {
   END_BONUS_ROUND: 'END_BONUS_ROUND',
   // Ready screen action
   START_PLAYING: 'START_PLAYING',
+  // Global scores
+  SET_GLOBAL_SCORES: 'SET_GLOBAL_SCORES',
+  SET_GLOBAL_LOADING: 'SET_GLOBAL_LOADING',
 };
 
 // Reducer
@@ -741,6 +721,19 @@ function gameReducer(state, action) {
       };
     }
     
+    case ACTIONS.SET_GLOBAL_SCORES:
+      return {
+        ...state,
+        globalScores: action.payload,
+        globalScoresLoading: false,
+      };
+    
+    case ACTIONS.SET_GLOBAL_LOADING:
+      return {
+        ...state,
+        globalScoresLoading: action.payload,
+      };
+    
     default:
       return state;
   }
@@ -785,7 +778,24 @@ export function GameProvider({ children }) {
     },
     endBonusRound: () => dispatch({ type: ACTIONS.END_BONUS_ROUND }),
     startPlaying: () => dispatch({ type: ACTIONS.START_PLAYING }),
+    // Global scores
+    loadGlobalScores: async () => {
+      dispatch({ type: ACTIONS.SET_GLOBAL_LOADING, payload: true });
+      const scores = await fetchGlobalScores();
+      dispatch({ type: ACTIONS.SET_GLOBAL_SCORES, payload: scores });
+    },
+    submitToGlobalLeaderboard: async (scoreData) => {
+      const updatedScores = await submitGlobalScore(scoreData);
+      dispatch({ type: ACTIONS.SET_GLOBAL_SCORES, payload: updatedScores });
+    },
   }), [actions, dispatch]);
+
+  // Fetch global scores on mount
+  useEffect(() => {
+    fetchGlobalScores().then(scores => {
+      dispatch({ type: ACTIONS.SET_GLOBAL_SCORES, payload: scores });
+    });
+  }, []);
   
   const contextValue = useMemo(() => ({
     state,
