@@ -184,22 +184,42 @@ function BonusRound() {
     );
   }
 
+  // Play sound on reveal
+  const revealSoundPlayed = useRef(false);
+  useEffect(() => {
+    if (state.gameStatus === 'bonusReveal' && !revealSoundPlayed.current) {
+      revealSoundPlayed.current = true;
+      const result = state.bonusResult;
+      if (result.isCorrect) {
+        play('correct');
+      } else if (result.isPartial) {
+        play('select'); // Neutral sound for partial
+      } else {
+        play('wrong');
+      }
+    } else if (state.gameStatus === 'bonus') {
+      revealSoundPlayed.current = false;
+    }
+  }, [state.gameStatus, state.bonusResult, play]);
+
   // Show reveal screen
   if (state.gameStatus === 'bonusReveal') {
     const result = state.bonusResult;
+    const resultClass = result.isCorrect ? 'correct' : result.isPartial ? 'partial' : 'wrong';
+    const resultMessage = result.isCorrect ? 'Perfect!' : result.isPartial ? 'Partial!' : 'Not Quite!';
     
     return (
       <div className="bonus-round bonus-reveal">
         <motion.div
-          className={`bonus-reveal-content ${result.isCorrect ? 'correct' : 'wrong'}`}
+          className={`bonus-reveal-content ${resultClass}`}
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', damping: 12 }}
         >
           <div className="reveal-icon">
-            <FontAwesomeIcon icon={result.isCorrect ? faCheck : faTimes} />
+            <FontAwesomeIcon icon={result.isCorrect ? faCheck : result.isPartial ? faStar : faTimes} />
           </div>
-          <h2>{result.isCorrect ? 'Awesome!' : 'Not Quite!'}</h2>
+          <h2>{resultMessage}</h2>
           
           {bonusType === 'oddOneOut' && (
             <p className="reveal-answer">

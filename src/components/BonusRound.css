@@ -405,6 +405,11 @@
   box-shadow: 0 0 40px rgba(231, 76, 60, 0.3);
 }
 
+.bonus-reveal-content.partial {
+  border: 3px solid var(--pokemon-yellow);
+  box-shadow: 0 0 40px rgba(255, 203, 5, 0.3);
+}
+
 .reveal-icon {
   width: 80px;
   height: 80px;
@@ -422,6 +427,11 @@
 
 .bonus-reveal-content.wrong .reveal-icon {
   background: var(--danger-red);
+}
+
+.bonus-reveal-content.partial .reveal-icon {
+  background: var(--pokemon-yellow);
+  color: #1a1a2e;
 }
 
 .bonus-reveal-content h2 {
@@ -494,8 +504,16 @@
 .points-earned {
   font-size: 2rem;
   font-weight: 800;
-  color: var(--success-green);
   margin-bottom: 1.5rem;
+}
+
+.bonus-reveal-content.correct .points-earned,
+.bonus-reveal-content.partial .points-earned {
+  color: var(--success-green);
+}
+
+.bonus-reveal-content.wrong .points-earned {
+  color: var(--danger-red);
 }
 
 .continue-btn {

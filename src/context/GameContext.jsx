@@ -564,6 +564,7 @@ function gameReducer(state, action) {
       const { answer, timeTaken } = action.payload;
       const bonusData = state.bonusRound.data;
       let isCorrect = false;
+      let isPartial = false;
       let points = 0;
       
       switch (state.bonusRound.type) {
@@ -573,6 +574,9 @@ function gameReducer(state, action) {
             points = 200; // 2x base
             const speedBonus = Math.max(0, 50 - Math.floor(timeTaken / 100));
             points += speedBonus;
+          } else {
+            // Wrong answer: -100 (2x penalty)
+            points = -100;
           }
           break;
         }
@@ -597,12 +601,21 @@ function gameReducer(state, action) {
           // Count missed selections
           const missedSelections = bonusData.correctAnswers.length - correctSelections;
           
-          // Calculate points: +40 per correct, -20 per wrong, -20 per missed
-          points = (correctSelections * 40) - (wrongSelections * 20) - (missedSelections * 20);
-          points = Math.max(0, points);
+          // Calculate points: 
+          // +80 per correct selection (2x base of 40)
+          // -100 per wrong selection (2x penalty)
+          // Missed selections just reduce your bonus (no extra penalty)
+          points = (correctSelections * 80) - (wrongSelections * 100);
           
-          // Consider it correct if they got more right than wrong
+          // Determine status
           isCorrect = correctSelections === bonusData.correctAnswers.length && wrongSelections === 0;
+          isPartial = !isCorrect && correctSelections > 0 && wrongSelections === 0;
+          
+          // Speed bonus only if perfect
+          if (isCorrect) {
+            const speedBonus = Math.max(0, 50 - Math.floor(timeTaken / 100));
+            points += speedBonus;
+          }
           break;
         }
         
@@ -612,6 +625,9 @@ function gameReducer(state, action) {
             points = 200; // 2x base
             const speedBonus = Math.max(0, 50 - Math.floor(timeTaken / 100));
             points += speedBonus;
+          } else {
+            // Wrong answer: -100 (2x penalty)
+            points = -100;
           }
           break;
         }
@@ -635,6 +651,7 @@ function gameReducer(state, action) {
         gameStatus: 'bonusReveal',
         bonusResult: {
           isCorrect,
+          isPartial,
           points,
           answer,
         },
