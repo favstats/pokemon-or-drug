@@ -335,6 +335,12 @@
   opacity: 0.8;
 }
 
+.hs-speed {
+  font-size: 0.75rem;
+  color: var(--success-green);
+  opacity: 0.8;
+}
+
 /* Highscores header with tabs */
 .highscores-header {
   display: flex;

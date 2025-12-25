@@ -324,6 +324,23 @@ function StartScreen() {
               <p>A fun trivia game where you guess if a name belongs to a Pokémon or a pharmaceutical drug!</p>
             </div>
             
+            <div className="about-scoring">
+              <h3>📊 Scoring</h3>
+              <ul className="scoring-list">
+                <li><strong>Correct answer:</strong> +100 pts</li>
+                <li><strong>Speed bonus:</strong> up to +50 pts (faster = more)</li>
+                <li><strong>Streak bonus:</strong> +10 pts per streak</li>
+                <li><strong>Wrong answer:</strong> -50 pts</li>
+                <li><strong>Bonus rounds:</strong> 2x points!</li>
+              </ul>
+            </div>
+            
+            <div className="about-data">
+              <h3>📚 Data Sources</h3>
+              <p>Pokémon names from <a href="https://pokeapi.co" target="_blank" rel="noopener noreferrer">PokéAPI</a></p>
+              <p>Drug names from FDA approved pharmaceuticals</p>
+            </div>
+            
             <div className="about-creator">
               <h3>👨‍💻 Created by</h3>
               <p className="creator-name">Fabio Votta</p>

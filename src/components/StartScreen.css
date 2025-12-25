@@ -243,6 +243,45 @@
   font-size: 0.85rem;
 }
 
+.about-scoring,
+.about-data {
+  text-align: left;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1rem;
+  border-radius: 12px;
+}
+
+.about-scoring h3,
+.about-data h3 {
+  margin-bottom: 0.75rem;
+}
+
+.scoring-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.scoring-list li {
+  padding: 0.25rem 0;
+  opacity: 0.9;
+}
+
+.about-data p {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+}
+
+.about-data a {
+  color: var(--pokemon-yellow);
+  text-decoration: none;
+}
+
+.about-data a:hover {
+  text-decoration: underline;
+}
+
 /* Loading scores */
 .loading-scores {
   text-align: center;

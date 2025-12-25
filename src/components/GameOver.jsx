@@ -305,6 +305,9 @@ function GameOver() {
                     {entry.accuracy !== undefined && (
                       <span className="hs-accuracy">{entry.accuracy}%</span>
                     )}
+                    {entry.avgSpeed && (
+                      <span className="hs-speed">{(entry.avgSpeed / 1000).toFixed(1)}s</span>
+                    )}
                   </div>
                 ))
               ) : (
