@@ -160,6 +160,9 @@ function StartScreen() {
                     {entry.accuracy !== undefined && (
                       <span className="highscore-accuracy">{entry.accuracy}%</span>
                     )}
+                    {entry.avgSpeed && (
+                      <span className="highscore-speed">{(entry.avgSpeed / 1000).toFixed(1)}s</span>
+                    )}
                   </div>
                 ))
               ) : (

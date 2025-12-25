@@ -35,6 +35,7 @@ export async function submitGlobalScore(scoreData) {
         name: scoreData.name,
         score: scoreData.score,
         accuracy: scoreData.accuracy || 0,
+        avgSpeed: scoreData.avgSpeed || null,
       }),
     });
     
