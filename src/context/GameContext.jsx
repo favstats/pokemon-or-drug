@@ -167,6 +167,7 @@ const initialState = {
     livesPerPlayer: 3,
     timerDuration: 15,
     bonusProbability: 25, // percentage chance for bonus round
+    shareGlobally: true, // share scores on global leaderboard
   },
   currentRound: 0,
   currentQuestion: null,

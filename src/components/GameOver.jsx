@@ -30,7 +30,7 @@ function GameOver() {
   const winner = rankedPlayers[0];
   const isMultiplayer = state.gameMode === 'multiplayer';
 
-  // Save scores once (local + global)
+  // Save scores once (local + global if enabled)
   useEffect(() => {
     if (!scoresSaved.current) {
       scoresSaved.current = true;
@@ -43,16 +43,18 @@ function GameOver() {
           mode: state.gameMode
         });
         
-        // Submit to global leaderboard
-        actions.submitToGlobalLeaderboard({
-          name: player.name,
-          score: player.score,
-          accuracy: player.correctAnswers + player.wrongAnswers > 0
-            ? Math.round((player.correctAnswers / (player.correctAnswers + player.wrongAnswers)) * 100)
-            : 0,
-          avgSpeed: player.avgResponseTime ? Math.round(player.avgResponseTime) : null,
-          mode: state.gameMode,
-        });
+        // Submit to global leaderboard (if sharing is enabled)
+        if (state.settings.shareGlobally) {
+          actions.submitToGlobalLeaderboard({
+            name: player.name,
+            score: player.score,
+            accuracy: player.correctAnswers + player.wrongAnswers > 0
+              ? Math.round((player.correctAnswers / (player.correctAnswers + player.wrongAnswers)) * 100)
+              : 0,
+            avgSpeed: player.avgResponseTime ? Math.round(player.avgResponseTime) : null,
+            mode: state.gameMode,
+          });
+        }
       });
     }
   }, []);

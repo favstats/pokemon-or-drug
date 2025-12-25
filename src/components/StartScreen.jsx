@@ -15,7 +15,9 @@ import {
   faTrash,
   faGlobe,
   faHome,
-  faSync
+  faSync,
+  faToggleOn,
+  faToggleOff
 } from '@fortawesome/free-solid-svg-icons';
 import { useGame } from '../context/GameContext';
 import { useSound } from '../context/SoundContext';
@@ -272,6 +274,16 @@ function StartScreen() {
                   <FontAwesomeIcon icon={faPlus} />
                 </button>
               </div>
+            </div>
+
+            <div className="setting-item toggle-setting">
+              <label><FontAwesomeIcon icon={faGlobe} /> Share scores globally</label>
+              <button 
+                className={`toggle-btn ${state.settings.shareGlobally ? 'on' : 'off'}`}
+                onClick={() => handleSettingChange('shareGlobally', !state.settings.shareGlobally)}
+              >
+                <FontAwesomeIcon icon={state.settings.shareGlobally ? faToggleOn : faToggleOff} />
+              </button>
             </div>
           </div>
 

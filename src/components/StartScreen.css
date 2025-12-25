@@ -147,6 +147,41 @@
   background: rgba(46, 204, 113, 0.3);
 }
 
+/* Toggle Setting */
+.toggle-setting {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1rem;
+  margin-top: 0.5rem;
+}
+
+.toggle-setting label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toggle-btn {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.toggle-btn:hover {
+  transform: none;
+}
+
+.toggle-btn.on {
+  color: var(--success-green);
+}
+
+.toggle-btn.off {
+  color: rgba(255, 255, 255, 0.3);
+}
+
 .scoreboard-actions {
   display: flex;
   gap: 1rem;
