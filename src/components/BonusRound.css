@@ -36,6 +36,45 @@
   margin: 1rem 0;
 }
 
+/* Player Ready Banner */
+.player-ready-banner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1rem;
+  animation: pulse-scale 1s ease infinite alternate;
+}
+
+@keyframes pulse-scale {
+  from { transform: scale(1); }
+  to { transform: scale(1.05); }
+}
+
+.ready-label {
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.ready-player-name {
+  font-size: 3.5rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #fff, var(--pokemon-yellow), #fff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  animation: shimmer 2s linear infinite;
+  background-size: 200% 100%;
+}
+
+@keyframes shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
 .bonus-intro-content h1 {
   font-size: 3.5rem;
   font-weight: 900;
@@ -115,11 +154,23 @@
   text-align: center;
 }
 
+.turn-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.7;
+  display: block;
+}
+
 .player-turn {
-  font-size: 1.3rem;
-  font-weight: 700;
+  font-size: 2rem;
+  font-weight: 900;
   display: block;
   margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #fff, var(--pokemon-yellow));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .player-stats {

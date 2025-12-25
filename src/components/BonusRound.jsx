@@ -190,6 +190,15 @@ function BonusRound() {
           animate={{ scale: 1, rotate: 0 }}
           transition={{ type: 'spring', damping: 10 }}
         >
+          <motion.div 
+            className="player-ready-banner"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <span className="ready-label">GET READY</span>
+            <span className="ready-player-name">{currentPlayer.name}!</span>
+          </motion.div>
           <div className="bonus-sparkles">✨</div>
           <FontAwesomeIcon icon={faGift} className="bonus-icon" />
           <h1>BONUS ROUND!</h1>
@@ -288,6 +297,7 @@ function BonusRound() {
         </div>
 
         <div className="current-player">
+          <span className="turn-label">Playing:</span>
           <span className="player-turn">{currentPlayer.name}</span>
           <div className="player-stats">
             <div className="lives">

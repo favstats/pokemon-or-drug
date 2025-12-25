@@ -4,6 +4,7 @@ import GameScreen from './components/GameScreen';
 import RevealCard from './components/RevealCard';
 import GameOver from './components/GameOver';
 import BonusRound from './components/BonusRound';
+import ReadyScreen from './components/ReadyScreen';
 import './styles/global.css';
 
 function GameContent() {
@@ -12,6 +13,7 @@ function GameContent() {
   return (
     <div className="app">
       {state.gameStatus === 'idle' && <StartScreen />}
+      {state.gameStatus === 'ready' && <ReadyScreen />}
       {state.gameStatus === 'playing' && <GameScreen />}
       {state.gameStatus === 'reveal' && (
         <>

@@ -189,6 +189,8 @@ const ACTIONS = {
   TRIGGER_BONUS_ROUND: 'TRIGGER_BONUS_ROUND',
   SUBMIT_BONUS_ANSWER: 'SUBMIT_BONUS_ANSWER',
   END_BONUS_ROUND: 'END_BONUS_ROUND',
+  // Ready screen action
+  START_PLAYING: 'START_PLAYING',
 };
 
 // Reducer
@@ -445,16 +447,27 @@ function gameReducer(state, action) {
       const nextQuestionIndex = state.questionIndex;
       const nextQuestion = state.questions[nextQuestionIndex % state.questions.length];
       
+      // Show "Ready Player" screen when player changes in multiplayer
+      const showReadyScreen = state.gameMode === 'multiplayer' && actualNextIndex !== state.currentPlayerIndex;
+      
       return {
         ...state,
         currentRound: nextRound,
         currentPlayerIndex: actualNextIndex,
-        gameStatus: 'playing',
+        gameStatus: showReadyScreen ? 'ready' : 'playing',
         currentQuestion: nextQuestion,
         questionIndex: nextQuestionIndex + 1,
-        questionStartTime: Date.now(),
+        questionStartTime: showReadyScreen ? null : Date.now(),
         lastAnswer: null,
         isCorrect: null,
+      };
+    }
+    
+    case ACTIONS.START_PLAYING: {
+      return {
+        ...state,
+        gameStatus: 'playing',
+        questionStartTime: Date.now(),
       };
     }
     
@@ -724,6 +737,7 @@ export function GameProvider({ children }) {
       dispatch({ type: ACTIONS.SUBMIT_BONUS_ANSWER, payload: { answer, timeTaken } });
     },
     endBonusRound: () => dispatch({ type: ACTIONS.END_BONUS_ROUND }),
+    startPlaying: () => dispatch({ type: ACTIONS.START_PLAYING }),
   }), [actions, dispatch]);
   
   const contextValue = useMemo(() => ({

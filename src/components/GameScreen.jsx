@@ -131,7 +131,10 @@ function GameScreen() {
         </div>
 
         <div className="current-player">
-          <span className="player-turn">{currentPlayer.name}'s Turn</span>
+          <div className="player-turn-wrapper">
+            <span className="turn-label">Current Turn</span>
+            <span className="player-turn">{currentPlayer.name}</span>
+          </div>
           <div className="player-stats">
             <div className="lives">
               {[...Array(state.settings.livesPerPlayer)].map((_, i) => (

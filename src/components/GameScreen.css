@@ -66,11 +66,33 @@
   text-align: center;
 }
 
-.player-turn {
-  font-size: 1.3rem;
-  font-weight: 700;
-  display: block;
+.player-turn-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   margin-bottom: 0.5rem;
+}
+
+.turn-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.7;
+}
+
+.player-turn {
+  font-size: 2.2rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #fff, var(--pokemon-yellow));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: player-pulse 2s ease infinite;
+}
+
+@keyframes player-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.02); }
 }
 
 .player-stats {
