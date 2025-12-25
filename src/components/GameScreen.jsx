@@ -9,7 +9,8 @@ import {
   faCapsules,
   faStar,
   faVolumeUp,
-  faVolumeMute
+  faVolumeMute,
+  faStopwatch
 } from '@fortawesome/free-solid-svg-icons';
 import { useGame } from '../context/GameContext';
 import { useSound } from '../context/SoundContext';
@@ -145,6 +146,12 @@ function GameScreen() {
               <FontAwesomeIcon icon={faStar} />
               <span>{currentPlayer.score}</span>
             </div>
+            {currentPlayer.avgResponseTime !== null && (
+              <div className="speed-stat">
+                <FontAwesomeIcon icon={faStopwatch} />
+                <span>{(currentPlayer.avgResponseTime / 1000).toFixed(1)}s avg</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -275,6 +282,9 @@ function GameScreen() {
             >
               <span className="mini-name">{player.name}</span>
               <span className="mini-score">{player.score}</span>
+              {player.avgResponseTime !== null && (
+                <span className="mini-speed">{(player.avgResponseTime / 1000).toFixed(1)}s</span>
+              )}
             </div>
           ))}
         </motion.div>

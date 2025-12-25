@@ -361,6 +361,26 @@
   color: var(--pokemon-yellow);
 }
 
+.mini-speed {
+  font-size: 0.7rem;
+  opacity: 0.7;
+  color: var(--success-green);
+}
+
+/* Speed stat in player stats */
+.speed-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--success-green);
+  opacity: 0.9;
+}
+
+.speed-stat svg {
+  font-size: 0.8rem;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   .game-header {

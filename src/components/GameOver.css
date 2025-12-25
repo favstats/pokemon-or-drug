@@ -147,6 +147,14 @@
   color: #f39c12;
 }
 
+.player-stats .speed {
+  color: var(--success-green);
+}
+
+.player-stats .fastest {
+  color: #9b59b6;
+}
+
 .player-score {
   display: flex;
   align-items: center;
@@ -183,6 +191,10 @@
   color: rgba(255, 255, 255, 0.7);
   text-transform: uppercase;
   letter-spacing: 1px;
+}
+
+.stat-box.fastest-stat .stat-value {
+  color: #9b59b6;
 }
 
 /* High Scores Section */

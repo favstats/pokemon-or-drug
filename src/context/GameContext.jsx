@@ -150,6 +150,8 @@ const initialState = {
   currentQuestion: null,
   questionStartTime: null,
   lastAnswer: null,
+  lastTimeTaken: null,
+  lastSpeedBonus: 0,
   isCorrect: null,
   powerUps: {
     skip: 1,
@@ -258,6 +260,9 @@ function gameReducer(state, action) {
           streak: 0,
           correctAnswers: 0,
           wrongAnswers: 0,
+          responseTimes: [],
+          fastestResponse: null,
+          avgResponseTime: null,
         })),
       };
     
@@ -313,11 +318,14 @@ function gameReducer(state, action) {
       const isCorrect = answer === state.currentQuestion.type;
       
       let points = 0;
+      let speedBonus = 0;
       let newStreak = state.players[state.currentPlayerIndex].streak;
       
       if (isCorrect) {
         points = 100;
-        const speedBonus = Math.max(0, 50 - Math.floor(timeTaken / 100));
+        // Speed bonus: faster = more points (max 50 bonus for < 1 second, scales down)
+        // Under 1s = +50, under 2s = +40, under 3s = +30, etc.
+        speedBonus = Math.max(0, 50 - Math.floor(timeTaken / 100));
         points += speedBonus;
         newStreak += 1;
         if (newStreak >= 10) points = Math.floor(points * 3);
@@ -332,6 +340,19 @@ function gameReducer(state, action) {
       
       const updatedPlayers = state.players.map((player, index) => {
         if (index === state.currentPlayerIndex) {
+          // Track response times (only for correct answers to measure skill)
+          const newResponseTimes = isCorrect 
+            ? [...player.responseTimes, timeTaken]
+            : player.responseTimes;
+          
+          const fastestResponse = isCorrect
+            ? (player.fastestResponse === null ? timeTaken : Math.min(player.fastestResponse, timeTaken))
+            : player.fastestResponse;
+          
+          const avgResponseTime = newResponseTimes.length > 0
+            ? Math.round(newResponseTimes.reduce((a, b) => a + b, 0) / newResponseTimes.length)
+            : null;
+          
           return {
             ...player,
             score: Math.max(0, player.score + points),
@@ -339,6 +360,9 @@ function gameReducer(state, action) {
             streak: newStreak,
             correctAnswers: isCorrect ? player.correctAnswers + 1 : player.correctAnswers,
             wrongAnswers: isCorrect ? player.wrongAnswers : player.wrongAnswers + 1,
+            responseTimes: newResponseTimes,
+            fastestResponse,
+            avgResponseTime,
           };
         }
         return player;
@@ -348,6 +372,8 @@ function gameReducer(state, action) {
         ...state,
         players: updatedPlayers,
         lastAnswer: answer,
+        lastTimeTaken: timeTaken,
+        lastSpeedBonus: isCorrect ? speedBonus : 0,
         isCorrect,
         gameStatus: 'reveal',
       };
@@ -494,6 +520,9 @@ function gameReducer(state, action) {
           streak: 0,
           correctAnswers: 0,
           wrongAnswers: 0,
+          responseTimes: [],
+          fastestResponse: null,
+          avgResponseTime: null,
         })),
         // Reset power-ups
         powerUps: {

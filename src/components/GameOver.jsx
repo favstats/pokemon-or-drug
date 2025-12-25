@@ -10,7 +10,9 @@ import {
   faCheck,
   faTimes,
   faFire,
-  faCrown
+  faCrown,
+  faStopwatch,
+  faBolt
 } from '@fortawesome/free-solid-svg-icons';
 import confetti from 'canvas-confetti';
 import { useGame } from '../context/GameContext';
@@ -174,6 +176,16 @@ function GameOver() {
                       <FontAwesomeIcon icon={faFire} /> Best: {player.streak}
                     </span>
                   )}
+                  {player.avgResponseTime !== null && (
+                    <span className="stat speed">
+                      <FontAwesomeIcon icon={faStopwatch} /> {(player.avgResponseTime / 1000).toFixed(2)}s avg
+                    </span>
+                  )}
+                  {player.fastestResponse !== null && (
+                    <span className="stat fastest">
+                      <FontAwesomeIcon icon={faBolt} /> {(player.fastestResponse / 1000).toFixed(2)}s best
+                    </span>
+                  )}
                 </div>
               </div>
               
@@ -211,6 +223,18 @@ function GameOver() {
             </span>
             <span className="stat-label">Accuracy</span>
           </div>
+          {(() => {
+            const allFastest = rankedPlayers
+              .filter(p => p.fastestResponse !== null)
+              .map(p => p.fastestResponse);
+            const fastest = allFastest.length > 0 ? Math.min(...allFastest) : null;
+            return fastest !== null ? (
+              <div className="stat-box fastest-stat">
+                <span className="stat-value">{(fastest / 1000).toFixed(2)}s</span>
+                <span className="stat-label">Fastest Click</span>
+              </div>
+            ) : null;
+          })()}
         </motion.div>
 
         {/* High Scores Leaderboard */}
