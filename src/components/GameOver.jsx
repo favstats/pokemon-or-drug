@@ -12,11 +12,13 @@ import {
   faFire,
   faCrown,
   faStopwatch,
-  faBolt
+  faBolt,
+  faShareAlt
 } from '@fortawesome/free-solid-svg-icons';
 import confetti from 'canvas-confetti';
 import { useGame, LEAGUES } from '../context/GameContext';
 import { useSound } from '../context/SoundContext';
+import ShareModal from './ShareModal';
 import './GameOver.css';
 
 // Import badge SVGs
@@ -39,6 +41,7 @@ function GameOver() {
   const scoresSaved = useRef(false);
   const [scoreTab, setScoreTab] = useState('global');
   const [leagueFilter, setLeagueFilter] = useState(state.selectedLeague || 'all');
+  const [showShareModal, setShowShareModal] = useState(false);
 
   // Sort players by score
   const rankedPlayers = [...state.players].sort((a, b) => b.score - a.score);
@@ -388,6 +391,14 @@ function GameOver() {
           transition={{ delay: 1 }}
         >
           <motion.button
+            className="action-btn share"
+            onClick={() => { play('select'); setShowShareModal(true); }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <FontAwesomeIcon icon={faShareAlt} /> Share
+          </motion.button>
+          <motion.button
             className="action-btn primary"
             onClick={handlePlayAgain}
             whileHover={{ scale: 1.05 }}
@@ -416,6 +427,29 @@ function GameOver() {
           </motion.p>
         )}
       </motion.div>
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        playerData={{
+          name: winner.name,
+          icon: winner.icon,
+          score: winner.score,
+          accuracy: winner.correctAnswers + winner.wrongAnswers > 0
+            ? Math.round((winner.correctAnswers / (winner.correctAnswers + winner.wrongAnswers)) * 100)
+            : 0,
+          avgSpeed: winner.avgResponseTime,
+          correctAnswers: winner.correctAnswers,
+          wrongAnswers: winner.wrongAnswers,
+          streak: winner.streak,
+        }}
+        gameData={{
+          league: state.selectedLeague,
+          gameMode: state.gameMode,
+          totalRounds: state.settings.totalRounds,
+        }}
+      />
     </motion.div>
   );
 }

@@ -1,0 +1,364 @@
+.share-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.share-modal {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 24px;
+  padding: 1.5rem;
+  max-width: 420px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  border: 2px solid rgba(255, 203, 5, 0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: rotate(90deg);
+}
+
+/* Tabs */
+.share-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.share-tab {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.6);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.share-tab:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.share-tab.active {
+  background: var(--pokemon-yellow);
+  color: #1a1a2e;
+}
+
+/* Score Card Preview */
+.score-card-preview {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.score-card-image {
+  width: 100%;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.download-card-btn {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 0.75rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  font-family: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s ease;
+}
+
+.download-card-btn:hover {
+  background: var(--pokemon-yellow);
+  color: #1a1a2e;
+}
+
+/* Share Buttons */
+.share-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.share-btn {
+  padding: 0.875rem 1rem;
+  border: none;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  color: white;
+}
+
+.share-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+.share-btn.twitter {
+  background: #1DA1F2;
+}
+
+.share-btn.bluesky {
+  background: #0085ff;
+}
+
+.share-btn.whatsapp {
+  background: #25D366;
+}
+
+.share-btn.telegram {
+  background: #0088cc;
+}
+
+.share-btn.copy {
+  background: rgba(255, 255, 255, 0.15);
+  grid-column: span 2;
+}
+
+.share-btn.copy:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.share-btn.copy.copied {
+  background: #4ade80;
+}
+
+/* Challenge Content */
+.challenge-content {
+  text-align: center;
+}
+
+.challenge-content h3 {
+  font-size: 1.4rem;
+  color: var(--pokemon-yellow);
+  margin-bottom: 0.5rem;
+}
+
+.challenge-content > p {
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 1rem;
+}
+
+.qr-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+}
+
+.challenge-link {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.challenge-link input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-family: inherit;
+  font-size: 0.85rem;
+}
+
+.challenge-link input:focus {
+  outline: 2px solid var(--pokemon-yellow);
+}
+
+.challenge-link button {
+  width: 44px;
+  border: none;
+  border-radius: 10px;
+  background: var(--pokemon-yellow);
+  color: #1a1a2e;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.challenge-link button:hover {
+  transform: scale(1.05);
+}
+
+.challenge-text {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+}
+
+.challenge-text strong {
+  color: var(--pokemon-yellow);
+}
+
+/* Support Section */
+.support-section {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.support-section > span {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85rem;
+}
+
+.support-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.support-btn {
+  padding: 0.5rem 0.875rem;
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.support-btn:hover {
+  transform: translateY(-2px);
+}
+
+.support-btn.coffee {
+  background: #FFDD00;
+  color: #000;
+}
+
+.support-btn.paypal {
+  background: #0070ba;
+  color: white;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 480px) {
+  .share-modal {
+    padding: 1.25rem;
+    padding-top: 3rem;
+    border-radius: 20px;
+    max-height: 85vh;
+  }
+
+  .share-tabs {
+    margin-bottom: 1rem;
+  }
+
+  .share-tab {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .share-buttons {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .share-btn {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.8rem;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .share-btn svg {
+    font-size: 1.2rem;
+  }
+
+  .share-btn.copy {
+    flex-direction: row;
+  }
+
+  .qr-container {
+    padding: 0.75rem;
+  }
+
+  .qr-container svg {
+    width: 140px !important;
+    height: 140px !important;
+  }
+
+  .challenge-link input {
+    font-size: 0.75rem;
+    padding: 0.6rem 0.75rem;
+  }
+
+  .support-section {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .download-card-btn {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.75rem;
+  }
+}
+

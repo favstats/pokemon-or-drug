@@ -18,6 +18,7 @@
     "@fortawesome/react-fontawesome": "^3.1.1",
     "canvas-confetti": "^1.9.4",
     "framer-motion": "^12.23.26",
+    "qrcode.react": "^4.2.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "use-sound": "^5.0.0"

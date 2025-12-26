@@ -304,6 +304,15 @@
   transition: box-shadow 0.3s ease;
 }
 
+.action-btn.share {
+  background: linear-gradient(135deg, #1DA1F2, #0d8ecf);
+  color: white;
+}
+
+.action-btn.share:hover {
+  box-shadow: 0 10px 30px rgba(29, 161, 242, 0.4);
+}
+
 .action-btn.primary {
   background: linear-gradient(135deg, var(--success-green), #27ae60);
   color: white;
