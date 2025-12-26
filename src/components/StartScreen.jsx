@@ -402,7 +402,7 @@ function StartScreen() {
           <div className="about-content">
             <div className="about-game">
               <h3><FontAwesomeIcon icon={faGamepad} /> Pokemon or Pill?</h3>
-              <p>A fun trivia game where you guess if a name belongs to a Pokémon or a pharmaceutical drug!</p>
+              <p>A fun trivia game where you guess if a name belongs to a Pokémon or a pharmaceutical pill!</p>
             </div>
             
             <div className="about-scoring">

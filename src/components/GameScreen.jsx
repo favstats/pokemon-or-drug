@@ -241,7 +241,7 @@ function GameScreen() {
           transition={{ delay: 0.3 }}
         >
           <FontAwesomeIcon icon={faCapsules} className="btn-icon" />
-          <span className="btn-text">Drug</span>
+          <span className="btn-text">Pill</span>
         </motion.button>
       </div>
 
