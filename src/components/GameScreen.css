@@ -1,14 +1,17 @@
 .game-screen {
   min-height: 100vh;
   min-height: 100dvh; /* Dynamic viewport height for mobile */
+  height: auto; /* Allow content to grow beyond viewport */
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 1.5rem;
   padding-bottom: 2rem;
   position: relative;
-  overflow-y: auto;
+  overflow-y: visible; /* Let parent handle scrolling */
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-y; /* Ensure vertical scrolling works on touch devices */
 }
 
 .mute-toggle-game {
@@ -424,8 +427,11 @@
 /* Responsive */
 @media (max-width: 600px) {
   .game-screen {
-    padding: 1rem;
-    padding-bottom: 6rem; /* Extra space at bottom for scrolling */
+    padding: 0.75rem;
+    padding-bottom: 3rem; /* Extra space at bottom for scrolling */
+    min-height: auto; /* Don't force minimum height on mobile */
+    height: auto;
+    overflow: visible; /* Let body handle scrolling */
   }
   
   .game-header {

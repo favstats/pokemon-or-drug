@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
@@ -14,7 +14,8 @@ import {
   faStopwatch,
   faBolt,
   faShareAlt,
-  faCoffee
+  faCoffee,
+  faChartLine
 } from '@fortawesome/free-solid-svg-icons';
 import { faPaypal } from '@fortawesome/free-brands-svg-icons';
 import confetti from 'canvas-confetti';
@@ -36,6 +37,63 @@ const badgeImages = {
   earth: EarthBadge,
 };
 
+// Bell Curve Component
+function BellCurve({ percentile, label, color }) {
+  // Generate bell curve points
+  const points = [];
+  for (let x = -3; x <= 3; x += 0.1) {
+    const y = Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI);
+    points.push({ x, y });
+  }
+  
+  // Convert percentile (0-100) to x position (-3 to 3)
+  const playerX = ((percentile / 100) * 6) - 3;
+  const playerY = Math.exp(-0.5 * playerX * playerX) / Math.sqrt(2 * Math.PI);
+  
+  // SVG dimensions
+  const width = 280;
+  const height = 100;
+  const padding = 10;
+  
+  const scaleX = (x) => ((x + 3) / 6) * (width - 2 * padding) + padding;
+  const scaleY = (y) => height - padding - (y / 0.4) * (height - 2 * padding);
+  
+  const pathD = points.map((p, i) => 
+    `${i === 0 ? 'M' : 'L'} ${scaleX(p.x).toFixed(1)} ${scaleY(p.y).toFixed(1)}`
+  ).join(' ');
+  
+  // Fill area under curve FROM player position to the RIGHT (the "top" zone you're in)
+  const fillPoints = points.filter(p => p.x >= playerX);
+  const fillD = `M ${scaleX(playerX).toFixed(1)} ${height - padding} ` +
+    `L ${scaleX(playerX).toFixed(1)} ${scaleY(playerY).toFixed(1)} ` +
+    fillPoints.map((p) => 
+      `L ${scaleX(p.x).toFixed(1)} ${scaleY(p.y).toFixed(1)}`
+    ).join(' ') + 
+    ` L ${scaleX(3)} ${height - padding} Z`;
+
+  return (
+    <div className="bell-curve-container">
+      <div className="bell-curve-label">{label}</div>
+      <svg width={width} height={height} className="bell-curve-svg">
+        {/* Filled area - the "top X%" you're in */}
+        <path d={fillD} fill={color} opacity="0.3" />
+        {/* Curve line */}
+        <path d={pathD} fill="none" stroke={color} strokeWidth="2" />
+        {/* Player position marker */}
+        <circle cx={scaleX(playerX)} cy={scaleY(playerY)} r="6" fill={color} />
+        <line 
+          x1={scaleX(playerX)} y1={scaleY(playerY)} 
+          x2={scaleX(playerX)} y2={height - padding} 
+          stroke={color} strokeWidth="2" strokeDasharray="4"
+        />
+      </svg>
+      <div className="percentile-value" style={{ color }}>
+        Top {Math.round(100 - percentile)}%
+      </div>
+    </div>
+  );
+}
+
 function GameOver() {
   const { state, actions } = useGame();
   const { play } = useSound();
@@ -44,6 +102,55 @@ function GameOver() {
   const [scoreTab, setScoreTab] = useState('global');
   const [leagueFilter, setLeagueFilter] = useState(state.selectedLeague || 'all');
   const [showShareModal, setShowShareModal] = useState(false);
+  
+  // Calculate percentiles from global scores
+  const playerStats = useMemo(() => {
+    const player = [...state.players].sort((a, b) => b.score - a.score)[0];
+    const scores = state.globalScores;
+    
+    if (!player) {
+      return { scorePercentile: 50, speedPercentile: 50, totalPlayers: 0, loading: false };
+    }
+    
+    if (!scores.length) {
+      return { 
+        scorePercentile: 50, 
+        speedPercentile: 50, 
+        totalPlayers: 0, 
+        loading: state.globalScoresLoading,
+        playerScore: player.score,
+        playerSpeed: player.avgResponseTime,
+      };
+    }
+    
+    // Use all scores - we compare against everyone
+    const leagueScores = scores;
+    
+    // Calculate score percentile
+    const scoresBelowPlayer = leagueScores.filter(s => s.score < player.score).length;
+    const scorePercentile = (scoresBelowPlayer / leagueScores.length) * 100;
+    
+    // Calculate speed percentile (lower is better, so invert)
+    const speedScores = leagueScores.filter(s => s.avgSpeed && s.avgSpeed > 0);
+    let speedPercentile = 50;
+    if (speedScores.length > 0 && player.avgResponseTime) {
+      const fasterThanPlayer = speedScores.filter(s => s.avgSpeed > player.avgResponseTime).length;
+      speedPercentile = (fasterThanPlayer / speedScores.length) * 100;
+    }
+    
+    return { 
+      scorePercentile, 
+      speedPercentile, 
+      totalPlayers: leagueScores.length,
+      playerScore: player.score,
+      playerSpeed: player.avgResponseTime,
+      avgScore: Math.round(leagueScores.reduce((a, b) => a + b.score, 0) / leagueScores.length),
+      avgSpeed: speedScores.length > 0 
+        ? Math.round(speedScores.reduce((a, b) => a + b.avgSpeed, 0) / speedScores.length) 
+        : null,
+      loading: false,
+    };
+  }, [state.globalScores, state.globalScoresLoading, state.players]);
 
   // Sort players by score
   const rankedPlayers = [...state.players].sort((a, b) => b.score - a.score);
@@ -52,6 +159,11 @@ function GameOver() {
   
   // Check if playing a league (eligible for global leaderboard)
   const isLeagueGame = state.selectedLeague !== null;
+
+  // Load all global scores for stats comparison
+  useEffect(() => {
+    actions.loadGlobalScores(null);
+  }, []);
 
   // Save scores once (local + global if enabled)
   useEffect(() => {
@@ -98,8 +210,7 @@ function GameOver() {
         }
       });
       
-      // Refresh global scores to show updated leaderboard (for current league)
-      actions.loadGlobalScores(state.selectedLeague);
+      // Note: Global scores are already loaded in a separate useEffect
     }
   }, []);
 
@@ -207,66 +318,55 @@ function GameOver() {
           {rankedPlayers.map((player, index) => (
             <motion.div 
               key={player.id}
-              className={`player-row ${getMedalClass(index)} ${player.lives === 0 ? 'eliminated' : ''}`}
+              className={`player-card ${getMedalClass(index)} ${player.lives === 0 ? 'eliminated' : ''}`}
               initial={{ x: -50, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.5 + index * 0.15 }}
             >
-              {/* Top row: rank, name, score, share */}
-              <div className="player-header">
-                <div className="rank">
+              {/* Share button */}
+              <button 
+                className="card-share-btn"
+                onClick={() => {
+                  play('select');
+                  setShowShareModal(true);
+                }}
+                title="Share score"
+              >
+                <FontAwesomeIcon icon={faShareAlt} />
+              </button>
+
+              {/* Rank badge - only show for multiplayer */}
+              {rankedPlayers.length > 1 && (
+                <div className="card-rank">
                   <FontAwesomeIcon 
                     icon={getMedalIcon(index)} 
-                    className={`medal-icon ${getMedalClass(index)}`}
+                    className={`rank-icon ${getMedalClass(index)}`}
                   />
-                  <span className="rank-number">#{index + 1}</span>
+                  <span>#{index + 1}</span>
                 </div>
-                
-                <span className="player-name">
-                  <span className="player-icon">{player.icon || '🎮'}</span>
-                  {player.name}
-                </span>
-                
-                <div className="player-score">
-                  <FontAwesomeIcon icon={faStar} />
-                  <span>{player.score}</span>
-                </div>
-                
-                <button 
-                  className="player-share-btn"
-                  onClick={() => {
-                    play('select');
-                    // Set the winner to this player for the share modal
-                    setShowShareModal(true);
-                  }}
-                  title="Share score"
-                >
-                  <FontAwesomeIcon icon={faShareAlt} />
-                </button>
+              )}
+
+              {/* Player name tab */}
+              <div className="card-name-tab">
+                <span className="card-icon">{player.icon || '🎮'}</span>
+                <span>{player.name}</span>
               </div>
-              
+
+              {/* Big centered score */}
+              <div className="card-score">{player.score}</div>
+              <div className="card-score-label">POINTS</div>
+
               {/* Stats row */}
-              <div className="player-stats">
-                <span className="stat correct">
-                  <FontAwesomeIcon icon={faCheck} /> {player.correctAnswers}
+              <div className="card-stats">
+                <span className="card-stat correct">✓ {player.correctAnswers} correct</span>
+                <span className="card-stat wrong">✗ {player.wrongAnswers} wrong</span>
+                <span className="card-stat accuracy">
+                  {player.correctAnswers + player.wrongAnswers > 0 
+                    ? Math.round((player.correctAnswers / (player.correctAnswers + player.wrongAnswers)) * 100)
+                    : 0}% accuracy
                 </span>
-                <span className="stat wrong">
-                  <FontAwesomeIcon icon={faTimes} /> {player.wrongAnswers}
-                </span>
-                {player.streak > 0 && (
-                  <span className="stat streak">
-                    <FontAwesomeIcon icon={faFire} /> {player.streak}
-                  </span>
-                )}
                 {player.avgResponseTime !== null && (
-                  <span className="stat speed">
-                    <FontAwesomeIcon icon={faStopwatch} /> {(player.avgResponseTime / 1000).toFixed(2)}s
-                  </span>
-                )}
-                {player.fastestResponse !== null && (
-                  <span className="stat fastest">
-                    <FontAwesomeIcon icon={faBolt} /> {(player.fastestResponse / 1000).toFixed(2)}s
-                  </span>
+                  <span className="card-stat speed">⚡ {(player.avgResponseTime / 1000).toFixed(1)}s avg</span>
                 )}
               </div>
             </motion.div>
@@ -335,8 +435,15 @@ function GameOver() {
               >
                 Local
               </button>
+              <button 
+                className={`score-tab ${scoreTab === 'stats' ? 'active' : ''}`}
+                onClick={() => { setScoreTab('stats'); actions.loadGlobalScores(null); }}
+              >
+                <FontAwesomeIcon icon={faChartLine} /> Stats
+              </button>
             </div>
           </div>
+          
           {scoreTab === 'global' && (
             <div className="league-filter-tabs">
               <button 
@@ -357,8 +464,61 @@ function GameOver() {
               ))}
             </div>
           )}
+          
           <div className="highscores-list">
-            {scoreTab === 'global' ? (
+            {scoreTab === 'stats' ? (
+              <div className="stats-comparison">
+                {playerStats.loading ? (
+                  <div className="loading-scores">Loading stats...</div>
+                ) : playerStats.totalPlayers > 0 ? (
+                  <>
+                    <div className="stats-intro">
+                      <span className="stats-count">
+                        Compared to <strong>{playerStats.totalPlayers}</strong> players globally
+                      </span>
+                    </div>
+                    <div className="bell-curves">
+                      <BellCurve 
+                        percentile={playerStats.scorePercentile}
+                        label="Score"
+                        color="#FFCB05"
+                      />
+                      {playerStats.playerSpeed && (
+                        <BellCurve 
+                          percentile={playerStats.speedPercentile}
+                          label="Speed"
+                          color="#60a5fa"
+                        />
+                      )}
+                    </div>
+                    <div className="stats-details">
+                      <div className="stat-compare">
+                        <span className="compare-label">Your Score</span>
+                        <span className="compare-value yours">{playerStats.playerScore}</span>
+                        <span className="compare-vs">vs</span>
+                        <span className="compare-value avg">{playerStats.avgScore} avg</span>
+                      </div>
+                      {playerStats.avgSpeed && playerStats.playerSpeed && (
+                        <div className="stat-compare">
+                          <span className="compare-label">Your Speed</span>
+                          <span className="compare-value yours">{(playerStats.playerSpeed / 1000).toFixed(2)}s</span>
+                          <span className="compare-vs">vs</span>
+                          <span className="compare-value avg">{(playerStats.avgSpeed / 1000).toFixed(2)}s avg</span>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <div className="no-stats-yet">
+                    <p>No global data to compare yet.</p>
+                    <p className="your-score-preview">Your score: <strong>{playerStats.playerScore}</strong></p>
+                    {playerStats.playerSpeed && (
+                      <p className="your-score-preview">Your speed: <strong>{(playerStats.playerSpeed / 1000).toFixed(2)}s</strong></p>
+                    )}
+                  </div>
+                )}
+              </div>
+            ) : scoreTab === 'global' ? (
               state.globalScoresLoading ? (
                 <div className="loading-scores">Loading...</div>
               ) : state.globalScores.length > 0 ? (

@@ -39,6 +39,11 @@
 html {
   font-size: 16px;
   scroll-behavior: smooth;
+  /* Ensure scrolling works on mobile */
+  height: auto;
+  min-height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 body {
@@ -46,10 +51,14 @@ body {
   background: var(--bg-gradient);
   color: var(--text-primary);
   min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height for mobile */
+  height: auto; /* Allow body to grow with content */
   line-height: 1.5;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: auto !important; /* Force scrolling to work */
   -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  touch-action: pan-y; /* Allow vertical panning/scrolling on touch */
+  position: relative;
 }
 
 /* Fun animated background with shapes */
@@ -88,6 +97,18 @@ body::after {
 #root {
   position: relative;
   z-index: 1;
+  min-height: 100vh;
+  min-height: 100dvh;
+  height: auto; /* Allow to grow with content */
+  overflow: visible; /* Don't block scrolling */
+}
+
+/* Ensure app container doesn't block scrolling */
+.app {
+  min-height: 100vh;
+  min-height: 100dvh;
+  height: auto;
+  overflow: visible;
 }
 
 /* Typography - Cartoony */
