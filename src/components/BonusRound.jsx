@@ -197,7 +197,10 @@ function BonusRound() {
             transition={{ delay: 0.3 }}
           >
             <span className="ready-label">GET READY</span>
-            <span className="ready-player-name">{currentPlayer.name}!</span>
+            <span className="ready-player-name">
+              <span className="ready-icon">{currentPlayer.icon || '🎮'}</span>
+              {currentPlayer.name}!
+            </span>
           </motion.div>
           <div className="bonus-sparkles">✨</div>
           <FontAwesomeIcon icon={faGift} className="bonus-icon" />
@@ -298,7 +301,10 @@ function BonusRound() {
 
         <div className="current-player">
           <span className="turn-label">Playing:</span>
-          <span className="player-turn">{currentPlayer.name}</span>
+          <span className="player-turn">
+            <span className="player-icon">{currentPlayer.icon || '🎮'}</span>
+            {currentPlayer.name}
+          </span>
           <div className="player-stats">
             <div className="lives">
               {[...Array(state.settings.livesPerPlayer)].map((_, i) => (

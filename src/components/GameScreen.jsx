@@ -133,7 +133,10 @@ function GameScreen() {
         <div className="current-player">
           <div className="player-turn-wrapper">
             <span className="turn-label">Current Turn</span>
-            <span className="player-turn">{currentPlayer.name}</span>
+            <span className="player-turn">
+              <span className="player-icon">{currentPlayer.icon || '🎮'}</span>
+              {currentPlayer.name}
+            </span>
           </div>
           <div className="player-stats">
             <div className="lives">
@@ -283,7 +286,10 @@ function GameScreen() {
               key={player.id}
               className={`mini-player ${index === state.currentPlayerIndex ? 'active' : ''} ${player.lives === 0 ? 'eliminated' : ''}`}
             >
-              <span className="mini-name">{player.name}</span>
+              <span className="mini-name">
+                <span className="mini-icon">{player.icon || '🎮'}</span>
+                {player.name}
+              </span>
               <span className="mini-score">{player.score}</span>
               {player.avgResponseTime !== null && (
                 <span className="mini-speed">{(player.avgResponseTime / 1000).toFixed(1)}s</span>

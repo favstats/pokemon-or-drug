@@ -40,6 +40,22 @@
   animation: shimmer 2s linear infinite;
   margin-bottom: 1.5rem;
   text-shadow: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.ready-icon {
+  font-size: 4rem;
+  -webkit-text-fill-color: initial;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+  animation: iconBounce 1s ease infinite;
+}
+
+@keyframes iconBounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
 }
 
 @keyframes shimmer {

@@ -68,6 +68,13 @@
   flex: 1;
   text-align: left;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.highscore-icon {
+  font-size: 1.1rem;
 }
 
 .highscore-val {
@@ -89,6 +96,55 @@
   color: var(--success-green);
   margin-left: 0.5rem;
   opacity: 0.8;
+}
+
+/* League Filter Tabs */
+.league-filter-tabs {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.league-filter-tab {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.6);
+  font-family: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.league-filter-tab:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  transform: none;
+}
+
+.league-filter-tab.active {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.filter-badge {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.score-badge {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  margin-right: 0.25rem;
 }
 
 .no-scores,
@@ -264,9 +320,23 @@
 }
 
 .scoring-list li {
-  padding: 0.25rem 0;
+  padding: 0.4rem 0;
   opacity: 0.9;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
+
+.scoring-list li svg {
+  width: 1rem;
+  flex-shrink: 0;
+}
+
+.icon-correct { color: #4ade80; }
+.icon-speed { color: #fbbf24; }
+.icon-streak { color: #f97316; }
+.icon-wrong { color: #f87171; }
+.icon-bonus { color: #a78bfa; }
 
 .about-data p {
   margin: 0.25rem 0;
@@ -343,6 +413,25 @@
   border: 2px solid rgba(255, 255, 255, 0.1);
   animation: slideUp 0.4s ease-out;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+.settings-notice {
+  background: rgba(255, 203, 5, 0.15);
+  border: 1px solid rgba(255, 203, 5, 0.3);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #ffd54f;
+  line-height: 1.4;
+}
+
+.settings-notice svg {
+  margin-right: 0.4rem;
+}
+
+.settings-notice strong {
+  color: #ffeb3b;
 }
 
 .settings-group {
@@ -467,12 +556,9 @@
 }
 
 .title-question {
-  color: var(--pokemon-yellow);
-  text-shadow: 
-    3px 3px 0 var(--pokemon-blue),
-    -1px -1px 0 var(--pokemon-blue),
-    1px -1px 0 var(--pokemon-blue),
-    -1px 1px 0 var(--pokemon-blue);
+  color: white;
+  opacity: 0.8;
+  text-shadow: none;
   margin-left: -5px;
 }
 
@@ -587,7 +673,7 @@
 .player-input-row {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
   background: rgba(255, 255, 255, 0.15);
   padding: 0.75rem 1rem;
   border-radius: 16px;
@@ -598,6 +684,86 @@
   font-size: 1.2rem;
   color: var(--pokemon-yellow);
   min-width: 35px;
+}
+
+/* Icon Picker */
+.icon-picker-container {
+  position: relative;
+}
+
+.icon-select-btn {
+  width: 48px;
+  height: 48px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.icon-select-btn:hover {
+  border-color: var(--pokemon-yellow);
+  background: rgba(255, 203, 5, 0.2);
+  transform: scale(1.05);
+}
+
+.icon-picker-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 8px;
+  background: rgba(30, 30, 50, 0.98);
+  border: 2px solid var(--pokemon-yellow);
+  border-radius: 16px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 4px;
+  z-index: 100;
+  max-width: 340px;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  animation: dropdownFadeIn 0.2s ease;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.icon-option {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.icon-option:hover {
+  background: rgba(255, 203, 5, 0.3);
+  transform: scale(1.15);
+}
+
+.icon-option.selected {
+  background: var(--pokemon-yellow);
+  border-radius: 8px;
 }
 
 .player-input-row input {

@@ -1,5 +1,6 @@
 import { GameProvider, useGame } from './context/GameContext';
 import StartScreen from './components/StartScreen';
+import LeagueSelect from './components/LeagueSelect';
 import GameScreen from './components/GameScreen';
 import RevealCard from './components/RevealCard';
 import GameOver from './components/GameOver';
@@ -13,6 +14,7 @@ function GameContent() {
   return (
     <div className="app">
       {state.gameStatus === 'idle' && <StartScreen />}
+      {state.gameStatus === 'leagueSelect' && <LeagueSelect />}
       {state.gameStatus === 'ready' && <ReadyScreen />}
       {state.gameStatus === 'playing' && <GameScreen />}
       {state.gameStatus === 'reveal' && (

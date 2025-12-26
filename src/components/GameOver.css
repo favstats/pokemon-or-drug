@@ -125,8 +125,15 @@
 .player-name {
   font-size: 1.3rem;
   font-weight: 700;
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
   margin-bottom: 0.25rem;
+}
+
+.player-icon {
+  font-size: 1.4rem;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
 }
 
 .player-stats {
@@ -262,6 +269,13 @@
   flex: 1;
   text-align: left;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.hs-icon {
+  font-size: 1.1rem;
 }
 
 .hs-score {
@@ -339,6 +353,56 @@
   font-size: 0.75rem;
   color: var(--success-green);
   opacity: 0.8;
+}
+
+/* League Filter Tabs */
+.league-filter-tabs {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.league-filter-tab {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.6);
+  font-family: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.league-filter-tab:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  transform: none;
+}
+
+.league-filter-tab.active {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.filter-badge {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.score-badge {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  margin-right: 0.25rem;
+  flex-shrink: 0;
 }
 
 /* Highscores header with tabs */

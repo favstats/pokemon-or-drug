@@ -6,6 +6,70 @@ import { fetchGlobalScores, submitGlobalScore } from '../data/globalScoreService
 // Bonus round types
 const BONUS_TYPES = ['oddOneOut', 'selectAll', 'namePokemon'];
 
+// League definitions (Kanto Gym Badge theme)
+export const LEAGUES = {
+  boulder: {
+    id: 'boulder',
+    name: 'Boulder Badge',
+    badge: 'Boulder Badge',
+    gymLeader: 'Brock',
+    arena: 'Pewter City Gym',
+    difficulty: 'Easy',
+    color: '#8B8B8B',
+    settings: {
+      totalRounds: 10,
+      livesPerPlayer: 5,
+      timerDuration: 20,
+      bonusProbability: 30,
+    },
+  },
+  cascade: {
+    id: 'cascade',
+    name: 'Cascade Badge',
+    badge: 'Cascade Badge',
+    gymLeader: 'Misty',
+    arena: 'Cerulean City Gym',
+    difficulty: 'Medium',
+    color: '#6890F0',
+    settings: {
+      totalRounds: 15,
+      livesPerPlayer: 3,
+      timerDuration: 15,
+      bonusProbability: 20,
+    },
+  },
+  volcano: {
+    id: 'volcano',
+    name: 'Volcano Badge',
+    badge: 'Volcano Badge',
+    gymLeader: 'Blaine',
+    arena: 'Cinnabar Island Gym',
+    difficulty: 'Hard',
+    color: '#F08030',
+    settings: {
+      totalRounds: 20,
+      livesPerPlayer: 2,
+      timerDuration: 12,
+      bonusProbability: 10,
+    },
+  },
+  earth: {
+    id: 'earth',
+    name: 'Earth Badge',
+    badge: 'Earth Badge',
+    gymLeader: 'Giovanni',
+    arena: 'Viridian City Gym',
+    difficulty: 'Extreme',
+    color: '#E0C068',
+    settings: {
+      totalRounds: 30,
+      livesPerPlayer: 0, // No life loss - play all rounds
+      timerDuration: 10,
+      bonusProbability: 0,
+    },
+  },
+};
+
 // Pre-generate all questions with good variety (not too many of same type in a row)
 const generateQuestions = () => {
   // Create separate pools
@@ -160,6 +224,7 @@ const generateBonusRoundData = (type, questions, questionIndex) => {
 const initialState = {
   gameMode: null,
   gameStatus: 'idle',
+  selectedLeague: null, // null = unranked, or league id ('boulder', 'cascade', 'volcano', 'earth')
   players: [],
   currentPlayerIndex: 0,
   settings: {
@@ -193,11 +258,20 @@ const initialState = {
     lastBonusType: null,
   },
   bonusResult: null,
+  // Game metadata
+  gameMetadata: {
+    gameId: null,
+    startTime: null,
+    endTime: null,
+    totalLivesLost: 0,
+  },
 };
 
 // Action types
 const ACTIONS = {
   SET_GAME_MODE: 'SET_GAME_MODE',
+  SET_LEAGUE: 'SET_LEAGUE',
+  GO_TO_LEAGUE_SELECT: 'GO_TO_LEAGUE_SELECT',
   SET_PLAYERS: 'SET_PLAYERS',
   UPDATE_SETTINGS: 'UPDATE_SETTINGS',
   START_GAME: 'START_GAME',
@@ -270,6 +344,34 @@ function gameReducer(state, action) {
         gameMode: action.payload,
       };
     
+    case ACTIONS.SET_LEAGUE: {
+      const leagueId = action.payload;
+      if (leagueId === null) {
+        // Unranked mode - keep default settings
+        return {
+          ...state,
+          selectedLeague: null,
+        };
+      }
+      // Apply league settings
+      const league = LEAGUES[leagueId];
+      if (!league) return state;
+      return {
+        ...state,
+        selectedLeague: leagueId,
+        settings: {
+          ...state.settings,
+          ...league.settings,
+        },
+      };
+    }
+    
+    case ACTIONS.GO_TO_LEAGUE_SELECT:
+      return {
+        ...state,
+        gameStatus: 'leagueSelect',
+      };
+    
     case ACTIONS.UPDATE_SETTINGS:
       return {
         ...state,
@@ -280,25 +382,32 @@ function gameReducer(state, action) {
       };
     
     case ACTIONS.SET_PLAYERS:
+      // Payload can be array of strings (names) or array of {name, icon} objects
       return {
         ...state,
-        players: action.payload.map((name, index) => ({
-          id: index,
-          name,
-          score: 0,
-          lives: state.settings.livesPerPlayer,
-          streak: 0,
-          correctAnswers: 0,
-          wrongAnswers: 0,
-          responseTimes: [],
-          fastestResponse: null,
-          avgResponseTime: null,
-        })),
+        players: action.payload.map((playerData, index) => {
+          const isObject = typeof playerData === 'object';
+          return {
+            id: index,
+            name: isObject ? playerData.name : playerData,
+            icon: isObject ? playerData.icon : '🎮',
+            score: 0,
+            lives: state.settings.livesPerPlayer,
+            streak: 0,
+            correctAnswers: 0,
+            wrongAnswers: 0,
+            responseTimes: [],
+            fastestResponse: null,
+            avgResponseTime: null,
+          };
+        }),
       };
     
     case ACTIONS.START_GAME: {
       const questions = generateQuestions();
       const firstQuestion = questions[0];
+      // Generate a unique game ID
+      const gameId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       return {
         ...state,
         gameStatus: 'playing',
@@ -310,6 +419,12 @@ function gameReducer(state, action) {
         questionStartTime: Date.now(),
         lastAnswer: null,
         isCorrect: null,
+        gameMetadata: {
+          gameId,
+          startTime: Date.now(),
+          endTime: null,
+          totalLivesLost: 0,
+        },
       };
     }
     
@@ -406,6 +521,10 @@ function gameReducer(state, action) {
         lastSpeedBonus: isCorrect ? speedBonus : 0,
         isCorrect,
         gameStatus: 'reveal',
+        gameMetadata: {
+          ...state.gameMetadata,
+          totalLivesLost: isCorrect ? state.gameMetadata.totalLivesLost : state.gameMetadata.totalLivesLost + 1,
+        },
       };
     }
     
@@ -417,6 +536,10 @@ function gameReducer(state, action) {
         return {
           ...state,
           gameStatus: 'gameover',
+          gameMetadata: {
+            ...state.gameMetadata,
+            endTime: Date.now(),
+          },
         };
       }
       
@@ -432,6 +555,10 @@ function gameReducer(state, action) {
         return {
           ...state,
           gameStatus: 'gameover',
+          gameMetadata: {
+            ...state.gameMetadata,
+            endTime: Date.now(),
+          },
         };
       }
       
@@ -539,7 +666,7 @@ function gameReducer(state, action) {
       // Restart with same players and settings
       const questions = generateQuestions();
       const firstQuestion = questions[0];
-      const playerNames = state.players.map(p => p.name);
+      const playerData = state.players.map(p => ({ name: p.name, icon: p.icon }));
       
       return {
         ...state,
@@ -552,10 +679,11 @@ function gameReducer(state, action) {
         questionStartTime: Date.now(),
         lastAnswer: null,
         isCorrect: null,
-        // Reset players but keep their names
-        players: playerNames.map((name, index) => ({
+        // Reset players but keep their names and icons
+        players: playerData.map((player, index) => ({
           id: index,
-          name,
+          name: player.name,
+          icon: player.icon,
           score: 0,
           lives: state.settings.livesPerPlayer,
           streak: 0,
@@ -578,6 +706,13 @@ function gameReducer(state, action) {
           lastBonusType: state.bonusRound.lastBonusType, // Keep variety
         },
         bonusResult: null,
+        // New game metadata for the new game
+        gameMetadata: {
+          gameId: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          startTime: Date.now(),
+          endTime: null,
+          totalLivesLost: 0,
+        },
       };
     }
     
@@ -749,6 +884,8 @@ export function GameProvider({ children }) {
   
   const actions = useMemo(() => ({
     setGameMode: (mode) => dispatch({ type: ACTIONS.SET_GAME_MODE, payload: mode }),
+    setLeague: (leagueId) => dispatch({ type: ACTIONS.SET_LEAGUE, payload: leagueId }),
+    goToLeagueSelect: () => dispatch({ type: ACTIONS.GO_TO_LEAGUE_SELECT }),
     setPlayers: (players) => dispatch({ type: ACTIONS.SET_PLAYERS, payload: players }),
     updateSettings: (settings) => dispatch({ type: ACTIONS.UPDATE_SETTINGS, payload: settings }),
     saveScore: (scoreData) => dispatch({ type: ACTIONS.SAVE_SCORE, payload: scoreData }),
@@ -780,9 +917,9 @@ export function GameProvider({ children }) {
     endBonusRound: () => dispatch({ type: ACTIONS.END_BONUS_ROUND }),
     startPlaying: () => dispatch({ type: ACTIONS.START_PLAYING }),
     // Global scores
-    loadGlobalScores: async () => {
+    loadGlobalScores: async (league = null) => {
       dispatch({ type: ACTIONS.SET_GLOBAL_LOADING, payload: true });
-      const scores = await fetchGlobalScores();
+      const scores = await fetchGlobalScores(false, league);
       dispatch({ type: ACTIONS.SET_GLOBAL_SCORES, payload: scores });
     },
     submitToGlobalLeaderboard: async (scoreData) => {

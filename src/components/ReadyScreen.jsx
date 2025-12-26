@@ -61,6 +61,7 @@ function ReadyScreen() {
           animate={{ scale: 1 }}
           transition={{ type: 'spring', damping: 10, delay: 0.4 }}
         >
+          <span className="ready-icon">{currentPlayer.icon || '🎮'}</span>
           {currentPlayer.name}
         </motion.div>
         

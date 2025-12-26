@@ -15,29 +15,65 @@ import {
   faTrash,
   faGlobe,
   faHome,
+  faCheck,
+  faBolt,
+  faFire,
+  faTimes,
+  faGift,
+  faChartBar,
+  faBook,
+  faCode,
   faSync,
   faToggleOn,
   faToggleOff,
   faInfoCircle,
   faEnvelope
 } from '@fortawesome/free-solid-svg-icons';
-import { useGame } from '../context/GameContext';
+import { useGame, LEAGUES } from '../context/GameContext';
 import { useSound } from '../context/SoundContext';
+
+// Import badge SVGs
+import BoulderBadge from '../assets/badges/boulder.svg';
+import CascadeBadge from '../assets/badges/cascade.svg';
+import VolcanoBadge from '../assets/badges/volcano.svg';
+import EarthBadge from '../assets/badges/earth.svg';
+
+const badgeImages = {
+  boulder: BoulderBadge,
+  cascade: CascadeBadge,
+  volcano: VolcanoBadge,
+  earth: EarthBadge,
+};
 import './StartScreen.css';
+
+// Player icon options - cool mix of flags and fun icons
+const PLAYER_ICONS = [
+  // Flags
+  '🇺🇸', '🇬🇧', '🇩🇪', '🇫🇷', '🇪🇸', '🇮🇹', '🇳🇱', '🇧🇪', '🇦🇹', '🇨🇭',
+  '🇵🇱', '🇸🇪', '🇳🇴', '🇩🇰', '🇫🇮', '🇵🇹', '🇬🇷', '🇮🇪', '🇨🇿', '🇭🇺',
+  '🇯🇵', '🇰🇷', '🇨🇳', '🇮🇳', '🇧🇷', '🇲🇽', '🇦🇷', '🇨🇦', '🇦🇺', '🇳🇿',
+  // Fun icons
+  '⚡', '🔥', '💎', '🌟', '🎯', '🚀', '👑', '🦊', '🐉', '🦁',
+  '🐺', '🦅', '🐙', '🦈', '🐍', '🎮', '💊', '🧬', '⚗️', '🔮',
+];
 
 function StartScreen() {
   const { state, actions } = useGame();
   const { play, isMuted, toggleMute } = useSound();
   const [playerNames, setPlayerNames] = useState(['', '']);
+  const [playerIcons, setPlayerIcons] = useState(['🎮', '🎮']);
+  const [showIconPicker, setShowIconPicker] = useState(null); // index of player or null
   const [showSettings, setShowSettings] = useState(false);
   const [showScoreboard, setShowScoreboard] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
   const [scoreTab, setScoreTab] = useState('global'); // 'global' or 'local'
+  const [leagueFilter, setLeagueFilter] = useState('all'); // 'all' or league id
 
   const handleModeSelect = (mode) => {
     play('select');
     if (mode === 'single') {
       setPlayerNames(['']);
+      setPlayerIcons(['🎮']);
     }
     actions.setGameMode(mode);
   };
@@ -51,6 +87,7 @@ function StartScreen() {
     play('select');
     if (playerNames.length < 4) {
       setPlayerNames([...playerNames, '']);
+      setPlayerIcons([...playerIcons, '🎮']);
     }
   };
 
@@ -61,8 +98,18 @@ function StartScreen() {
     play('select');
     if (playerNames.length > 2) {
       const newNames = playerNames.filter((_, i) => i !== index);
+      const newIcons = playerIcons.filter((_, i) => i !== index);
       setPlayerNames(newNames);
+      setPlayerIcons(newIcons);
     }
+  };
+
+  const handleIconSelect = (playerIndex, icon) => {
+    play('select');
+    const newIcons = [...playerIcons];
+    newIcons[playerIndex] = icon;
+    setPlayerIcons(newIcons);
+    setShowIconPicker(null);
   };
 
   const handleNameChange = (index, name) => {
@@ -72,9 +119,15 @@ function StartScreen() {
   };
 
   const handleStartGame = async () => {
-    play('start');
-    actions.setPlayers(playerNames);
-    actions.startGame();
+    play('select');
+    // Pass players with their names and icons
+    const playersWithIcons = playerNames.map((name, index) => ({
+      name,
+      icon: playerIcons[index] || '🎮'
+    }));
+    actions.setPlayers(playersWithIcons);
+    // Go to league selection instead of directly starting
+    actions.goToLeagueSelect();
   };
 
   const handleSettingChange = (key, value) => {
@@ -163,29 +216,53 @@ function StartScreen() {
           </div>
           
           {scoreTab === 'global' ? (
-            <div className="highscore-list">
-              {state.globalScoresLoading ? (
-                <p className="loading-scores"><FontAwesomeIcon icon={faSync} spin /> Loading...</p>
-              ) : state.globalScores.length > 0 ? (
-                state.globalScores.slice(0, 10).map((entry, index) => (
-                  <div key={entry.id || index} className="highscore-item">
-                    <span className="highscore-rank">#{index + 1}</span>
-                    <span className="highscore-name">{entry.name}</span>
-                    <span className="highscore-val">{entry.score}</span>
-                    {entry.accuracy !== undefined && (
-                      <span className="highscore-accuracy">{entry.accuracy}%</span>
-                    )}
-                    {entry.avgSpeed && (
-                      <span className="highscore-speed">{(entry.avgSpeed / 1000).toFixed(1)}s</span>
-                    )}
-                  </div>
-                ))
-              ) : state.globalScoresLoading ? (
-                <p className="loading-scores"><FontAwesomeIcon icon={faSync} spin /> Loading scores...</p>
-              ) : (
-                <p className="no-scores">No global scores yet! Be the first!</p>
-              )}
-            </div>
+            <>
+              <div className="league-filter-tabs">
+                <button 
+                  className={`league-filter-tab ${leagueFilter === 'all' ? 'active' : ''}`}
+                  onClick={() => { setLeagueFilter('all'); actions.loadGlobalScores(null); }}
+                >
+                  All
+                </button>
+                {Object.keys(LEAGUES).map(leagueId => (
+                  <button 
+                    key={leagueId}
+                    className={`league-filter-tab ${leagueFilter === leagueId ? 'active' : ''}`}
+                    onClick={() => { setLeagueFilter(leagueId); actions.loadGlobalScores(leagueId); }}
+                    title={LEAGUES[leagueId].name}
+                  >
+                    <img src={badgeImages[leagueId]} alt={LEAGUES[leagueId].badge} className="filter-badge" />
+                  </button>
+                ))}
+              </div>
+              <div className="highscore-list">
+                {state.globalScoresLoading ? (
+                  <p className="loading-scores"><FontAwesomeIcon icon={faSync} spin /> Loading...</p>
+                ) : state.globalScores.length > 0 ? (
+                  state.globalScores.slice(0, 10).map((entry, index) => (
+                    <div key={entry.id || index} className="highscore-item">
+                      <span className="highscore-rank">#{index + 1}</span>
+                      {entry.league && badgeImages[entry.league] && (
+                        <img src={badgeImages[entry.league]} alt="" className="score-badge" />
+                      )}
+                      <span className="highscore-name">
+                        {entry.icon && <span className="highscore-icon">{entry.icon}</span>}
+                        {entry.name}
+                      </span>
+                      <span className="highscore-val">{entry.score}</span>
+                      {entry.accuracy !== undefined && (
+                        <span className="highscore-accuracy">{entry.accuracy}%</span>
+                      )}
+                      {entry.avgSpeed && (
+                        <span className="highscore-speed">{(entry.avgSpeed / 1000).toFixed(1)}s</span>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <p className="no-scores">No scores yet! Be the first!</p>
+                )}
+              </div>
+            </>
           ) : (
             <div className="highscore-list">
               {state.highScores.length > 0 ? (
@@ -220,7 +297,11 @@ function StartScreen() {
         </div>
       ) : showSettings ? (
         <div className="settings-panel">
-          <h2><FontAwesomeIcon icon={faCog} /> Game Settings</h2>
+          <h2><FontAwesomeIcon icon={faCog} /> Unranked Settings</h2>
+          <p className="settings-notice">
+            <FontAwesomeIcon icon={faInfoCircle} /> These settings only apply to <strong>Unranked</strong> mode. 
+            Badge challenges have fixed settings.
+          </p>
           
           <div className="settings-group">
             <div className="setting-item">
@@ -320,29 +401,29 @@ function StartScreen() {
           
           <div className="about-content">
             <div className="about-game">
-              <h3>🎮 Pokemon or Drug?</h3>
+              <h3><FontAwesomeIcon icon={faGamepad} /> Pokemon or Drug?</h3>
               <p>A fun trivia game where you guess if a name belongs to a Pokémon or a pharmaceutical drug!</p>
             </div>
             
             <div className="about-scoring">
-              <h3>📊 Scoring</h3>
+              <h3><FontAwesomeIcon icon={faChartBar} /> Scoring</h3>
               <ul className="scoring-list">
-                <li><strong>Correct answer:</strong> +100 pts</li>
-                <li><strong>Speed bonus:</strong> up to +50 pts (faster = more)</li>
-                <li><strong>Streak bonus:</strong> +10 pts per streak</li>
-                <li><strong>Wrong answer:</strong> -50 pts</li>
-                <li><strong>Bonus rounds:</strong> 2x points!</li>
+                <li><FontAwesomeIcon icon={faCheck} className="icon-correct" /> <strong>Correct answer:</strong> +100 pts</li>
+                <li><FontAwesomeIcon icon={faBolt} className="icon-speed" /> <strong>Speed bonus:</strong> up to +50 pts (faster = more)</li>
+                <li><FontAwesomeIcon icon={faFire} className="icon-streak" /> <strong>Streak bonus:</strong> +10 pts per streak</li>
+                <li><FontAwesomeIcon icon={faTimes} className="icon-wrong" /> <strong>Wrong answer:</strong> -50 pts</li>
+                <li><FontAwesomeIcon icon={faGift} className="icon-bonus" /> <strong>Bonus rounds:</strong> 2x points!</li>
               </ul>
             </div>
             
             <div className="about-data">
-              <h3>📚 Data Sources</h3>
+              <h3><FontAwesomeIcon icon={faBook} /> Data Sources</h3>
               <p>Pokémon names from <a href="https://pokeapi.co" target="_blank" rel="noopener noreferrer">PokéAPI</a></p>
               <p>Drug names from FDA approved pharmaceuticals</p>
             </div>
             
             <div className="about-creator">
-              <h3>👨‍💻 Created by</h3>
+              <h3><FontAwesomeIcon icon={faCode} /> Created by</h3>
               <p className="creator-name">Fabio Votta</p>
               <a href="mailto:fabio.votta@gmail.com" className="creator-email">
                 <FontAwesomeIcon icon={faEnvelope} /> fabio.votta@gmail.com
@@ -393,7 +474,28 @@ function StartScreen() {
                 key={index}
                 className="player-input-row"
               >
-                <span className="player-number">P{index + 1}</span>
+                <div className="icon-picker-container">
+                  <button 
+                    className="icon-select-btn"
+                    onClick={() => setShowIconPicker(showIconPicker === index ? null : index)}
+                    title="Choose your icon"
+                  >
+                    {playerIcons[index] || '🎮'}
+                  </button>
+                  {showIconPicker === index && (
+                    <div className="icon-picker-dropdown">
+                      {PLAYER_ICONS.map((icon) => (
+                        <button
+                          key={icon}
+                          className={`icon-option ${playerIcons[index] === icon ? 'selected' : ''}`}
+                          onClick={() => handleIconSelect(index, icon)}
+                        >
+                          {icon}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <input
                   type="text"
                   value={name}

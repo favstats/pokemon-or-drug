@@ -92,6 +92,20 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   animation: player-pulse 2s ease infinite;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.player-icon {
+  font-size: 1.8rem;
+  -webkit-text-fill-color: initial;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.mini-icon {
+  margin-right: 0.3rem;
+  font-size: 0.9rem;
 }
 
 @keyframes player-pulse {

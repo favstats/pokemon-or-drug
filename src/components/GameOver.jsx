@@ -15,9 +15,22 @@ import {
   faBolt
 } from '@fortawesome/free-solid-svg-icons';
 import confetti from 'canvas-confetti';
-import { useGame } from '../context/GameContext';
+import { useGame, LEAGUES } from '../context/GameContext';
 import { useSound } from '../context/SoundContext';
 import './GameOver.css';
+
+// Import badge SVGs
+import BoulderBadge from '../assets/badges/boulder.svg';
+import CascadeBadge from '../assets/badges/cascade.svg';
+import VolcanoBadge from '../assets/badges/volcano.svg';
+import EarthBadge from '../assets/badges/earth.svg';
+
+const badgeImages = {
+  boulder: BoulderBadge,
+  cascade: CascadeBadge,
+  volcano: VolcanoBadge,
+  earth: EarthBadge,
+};
 
 function GameOver() {
   const { state, actions } = useGame();
@@ -25,18 +38,15 @@ function GameOver() {
   const confettiFired = useRef(false);
   const scoresSaved = useRef(false);
   const [scoreTab, setScoreTab] = useState('global');
+  const [leagueFilter, setLeagueFilter] = useState(state.selectedLeague || 'all');
 
   // Sort players by score
   const rankedPlayers = [...state.players].sort((a, b) => b.score - a.score);
   const winner = rankedPlayers[0];
   const isMultiplayer = state.gameMode === 'multiplayer';
   
-  // Check if using default settings (eligible for global leaderboard)
-  const isDefaultSettings = 
-    state.settings.totalRounds === 10 &&
-    state.settings.livesPerPlayer === 3 &&
-    state.settings.timerDuration === 15 &&
-    state.settings.bonusProbability === 25;
+  // Check if playing a league (eligible for global leaderboard)
+  const isLeagueGame = state.selectedLeague !== null;
 
   // Save scores once (local + global if enabled)
   useEffect(() => {
@@ -51,28 +61,40 @@ function GameOver() {
           mode: state.gameMode
         });
         
-        // Submit to global leaderboard (if sharing is enabled AND using default settings)
-        const isDefaultSettings = 
-          state.settings.totalRounds === 10 &&
-          state.settings.livesPerPlayer === 3 &&
-          state.settings.timerDuration === 15 &&
-          state.settings.bonusProbability === 25;
-        
-        if (state.settings.shareGlobally && isDefaultSettings) {
+        // Submit to global leaderboard (if sharing is enabled AND playing a league)
+        if (state.settings.shareGlobally && state.selectedLeague) {
+          // Calculate game duration
+          const gameDuration = state.gameMetadata?.endTime && state.gameMetadata?.startTime
+            ? state.gameMetadata.endTime - state.gameMetadata.startTime
+            : null;
+          
           actions.submitToGlobalLeaderboard({
+            // Core score data
             name: player.name,
+            icon: player.icon || '🎮',
             score: player.score,
             accuracy: player.correctAnswers + player.wrongAnswers > 0
               ? Math.round((player.correctAnswers / (player.correctAnswers + player.wrongAnswers)) * 100)
               : 0,
             avgSpeed: player.avgResponseTime ? Math.round(player.avgResponseTime) : null,
-            mode: state.gameMode,
+            league: state.selectedLeague,
+            // Game metadata
+            gameId: state.gameMetadata?.gameId || null,
+            gameDuration: gameDuration,
+            playerCount: state.players.length,
+            livesLost: state.gameMetadata?.totalLivesLost || 0,
+            totalRounds: state.settings.totalRounds,
+            bonusRoundsPlayed: state.bonusRound?.lastBonusType ? 1 : 0, // Simplified tracking
+            correctAnswers: player.correctAnswers,
+            wrongAnswers: player.wrongAnswers,
+            bestStreak: player.streak,
+            gameMode: state.gameMode,
           });
         }
       });
       
-      // Refresh global scores to show updated leaderboard
-      actions.loadGlobalScores();
+      // Refresh global scores to show updated leaderboard (for current league)
+      actions.loadGlobalScores(state.selectedLeague);
     }
   }, []);
 
@@ -194,7 +216,10 @@ function GameOver() {
               </div>
               
               <div className="player-info">
-                <span className="player-name">{player.name}</span>
+                <span className="player-name">
+                  <span className="player-icon">{player.icon || '🎮'}</span>
+                  {player.name}
+                </span>
                 <div className="player-stats">
                   <span className="stat correct">
                     <FontAwesomeIcon icon={faCheck} /> {player.correctAnswers}
@@ -292,6 +317,26 @@ function GameOver() {
               </button>
             </div>
           </div>
+          {scoreTab === 'global' && (
+            <div className="league-filter-tabs">
+              <button 
+                className={`league-filter-tab ${leagueFilter === 'all' ? 'active' : ''}`}
+                onClick={() => { setLeagueFilter('all'); actions.loadGlobalScores(null); }}
+              >
+                All
+              </button>
+              {Object.keys(LEAGUES).map(leagueId => (
+                <button 
+                  key={leagueId}
+                  className={`league-filter-tab ${leagueFilter === leagueId ? 'active' : ''}`}
+                  onClick={() => { setLeagueFilter(leagueId); actions.loadGlobalScores(leagueId); }}
+                  title={LEAGUES[leagueId].name}
+                >
+                  <img src={badgeImages[leagueId]} alt={LEAGUES[leagueId].badge} className="filter-badge" />
+                </button>
+              ))}
+            </div>
+          )}
           <div className="highscores-list">
             {scoreTab === 'global' ? (
               state.globalScoresLoading ? (
@@ -300,7 +345,13 @@ function GameOver() {
                 state.globalScores.slice(0, 5).map((entry, index) => (
                   <div key={index} className={`highscore-entry ${index < 3 ? getMedalClass(index) : ''}`}>
                     <span className="hs-rank">#{index + 1}</span>
-                    <span className="hs-name">{entry.name}</span>
+                    {entry.league && badgeImages[entry.league] && (
+                      <img src={badgeImages[entry.league]} alt="" className="score-badge" />
+                    )}
+                    <span className="hs-name">
+                      {entry.icon && <span className="hs-icon">{entry.icon}</span>}
+                      {entry.name}
+                    </span>
                     <span className="hs-score">{entry.score}</span>
                     {entry.accuracy !== undefined && (
                       <span className="hs-accuracy">{entry.accuracy}%</span>
@@ -311,7 +362,7 @@ function GameOver() {
                   </div>
                 ))
               ) : (
-                <div className="no-scores">No global scores yet!</div>
+                <div className="no-scores">No scores yet!</div>
               )
             ) : (
               state.highScores.length > 0 ? (
@@ -354,14 +405,14 @@ function GameOver() {
           </motion.button>
         </motion.div>
         
-        {!isDefaultSettings && state.settings.shareGlobally && (
+        {!isLeagueGame && state.settings.shareGlobally && (
           <motion.p 
             className="custom-settings-notice"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.2 }}
           >
-            Custom settings — not eligible for global leaderboard
+            Unranked game — not on global leaderboard
           </motion.p>
         )}
       </motion.div>

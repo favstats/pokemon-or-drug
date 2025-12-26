@@ -1,0 +1,340 @@
+.league-select {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.league-content {
+  max-width: 900px;
+  width: 100%;
+  text-align: center;
+}
+
+.league-content h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #fff, var(--pokemon-yellow));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.league-subtitle {
+  opacity: 0.7;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+/* League Grid */
+.league-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+/* League Card */
+.league-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.league-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--league-color);
+}
+
+.league-card:hover {
+  border-color: var(--league-color);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Badge */
+.badge-container {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.4));
+}
+
+.badge-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* League Info */
+.league-info {
+  text-align: center;
+}
+
+.league-info h3 {
+  font-size: 1.4rem;
+  margin: 0 0 0.25rem;
+  color: white;
+}
+
+.gym-leader {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin: 0 0 0.25rem;
+}
+
+.gym-arena {
+  font-size: 0.8rem;
+  opacity: 0.6;
+  margin: 0 0 0.5rem;
+  font-style: italic;
+}
+
+/* Difficulty Badge */
+.difficulty-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.difficulty-boulder {
+  background: rgba(139, 139, 139, 0.3);
+  color: #B0B0B0;
+}
+
+.difficulty-cascade {
+  background: rgba(104, 144, 240, 0.3);
+  color: #8AB0FF;
+}
+
+.difficulty-volcano {
+  background: rgba(240, 128, 48, 0.3);
+  color: #FFA060;
+}
+
+.difficulty-earth {
+  background: rgba(224, 192, 104, 0.3);
+  color: #F0D080;
+}
+
+/* League Stats */
+.league-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  width: 100%;
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.league-stats .stat {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.league-stats .stat svg {
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+
+/* Actions */
+.league-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.unranked-section {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.unranked-btn {
+  padding: 1rem 2rem;
+  border: 2px dashed rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.unranked-btn:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: white;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.unranked-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.unranked-settings-preview {
+  font-style: italic;
+}
+
+.edit-settings-btn {
+  padding: 0.3rem 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.75rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.edit-settings-btn:hover {
+  border-color: var(--pokemon-yellow);
+  color: var(--pokemon-yellow);
+}
+
+.unranked-settings-panel {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  overflow: hidden;
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.setting-row label {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 80px;
+}
+
+.setting-row label svg {
+  color: var(--pokemon-yellow);
+  font-size: 0.9rem;
+}
+
+.setting-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.setting-controls button {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.setting-controls button:hover {
+  background: var(--pokemon-yellow);
+  color: #1a1a2e;
+}
+
+.setting-controls span {
+  min-width: 40px;
+  text-align: center;
+  font-weight: 600;
+  color: white;
+}
+
+.back-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  transform: none;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  .league-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .league-content h1 {
+    font-size: 2rem;
+  }
+  
+  .badge-container {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .league-info h3 {
+    font-size: 1.2rem;
+  }
+}
+

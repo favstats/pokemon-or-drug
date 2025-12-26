@@ -72,6 +72,16 @@
   text-shadow: none;
   animation: shimmer 2s linear infinite;
   background-size: 200% 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.ready-icon {
+  font-size: 3rem;
+  -webkit-text-fill-color: initial;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3));
 }
 
 @keyframes shimmer {
@@ -169,12 +179,21 @@
 .player-turn {
   font-size: 2rem;
   font-weight: 900;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
   margin-bottom: 0.5rem;
   background: linear-gradient(135deg, #fff, var(--pokemon-yellow));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+.player-icon {
+  font-size: 1.6rem;
+  -webkit-text-fill-color: initial;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
 }
 
 .player-stats {
