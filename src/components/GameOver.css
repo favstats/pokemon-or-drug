@@ -459,26 +459,35 @@
 /* Responsive */
 @media (max-width: 600px) {
   .gameover-screen {
-    padding: 1rem 0.75rem;
+    padding: 1rem 0.5rem;
     padding-bottom: 3rem;
   }
   
+  .gameover-content {
+    padding: 0 0.25rem;
+  }
+  
   .gameover-header h1 {
-    font-size: 2rem;
+    font-size: 1.75rem;
   }
   
   .gameover-header {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.25rem;
   }
   
   .trophy-icon {
     font-size: 2.5rem;
   }
   
+  .winner-text {
+    font-size: 1.2rem;
+  }
+  
+  /* Player row - full width card layout */
   .player-row {
     flex-direction: column;
-    gap: 0.5rem;
-    padding: 1rem;
+    gap: 0.75rem;
+    padding: 1rem 0.75rem;
   }
   
   .rank {
@@ -492,65 +501,122 @@
   }
   
   .player-name {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
+    justify-content: center;
+    margin-bottom: 0.5rem;
   }
   
+  /* Stats as 2x2 or 2x3 grid */
   .player-stats {
-    justify-content: center;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.5rem;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
+    width: 100%;
   }
   
   .player-stats .stat {
-    padding: 0.2rem 0.5rem;
-    background: rgba(255,255,255,0.1);
-    border-radius: 10px;
+    padding: 0.4rem 0.5rem;
+    background: rgba(255,255,255,0.08);
+    border-radius: 8px;
+    justify-content: center;
+    flex-direction: column;
+    gap: 0.1rem;
   }
   
   .player-score {
-    font-size: 1.2rem;
+    font-size: 1.4rem;
+    margin-top: 0.25rem;
   }
   
   .final-scoreboard {
-    padding: 1rem;
-    margin-bottom: 1.5rem;
+    padding: 0.75rem;
+    margin-bottom: 1.25rem;
+    border-radius: 16px;
   }
   
+  /* Game stats - 2x2 grid */
   .game-stats {
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
   }
   
   .stat-box {
-    flex: 1;
-    min-width: 90px;
-    padding: 0.75rem 1rem;
+    padding: 0.75rem 0.5rem;
+    border-radius: 12px;
   }
   
   .stat-value {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
   }
   
   .stat-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.5px;
+  }
+  
+  /* Highscores section */
+  .highscores-section {
+    padding: 0.75rem;
+    margin-bottom: 1.25rem;
+    border-radius: 16px;
+  }
+  
+  .highscores-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .highscores-header h3 {
+    font-size: 1rem;
+  }
+  
+  .score-tabs {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .highscore-entry {
+    padding: 0.6rem 0.75rem;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+  }
+  
+  .hs-rank {
+    min-width: 28px;
+  }
+  
+  .hs-accuracy,
+  .hs-speed {
     font-size: 0.7rem;
   }
   
-  .highscores-section {
-    padding: 1rem;
-    margin-bottom: 1.5rem;
+  .league-filter-tabs {
+    gap: 0.2rem;
   }
   
+  .league-filter-tab {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.7rem;
+  }
+  
+  .filter-badge {
+    width: 20px;
+    height: 20px;
+  }
+  
+  /* Action buttons */
   .gameover-actions {
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.6rem;
   }
   
   .action-btn {
     justify-content: center;
-    padding: 0.875rem 1.5rem;
-    font-size: 1rem;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.95rem;
   }
 }
 
