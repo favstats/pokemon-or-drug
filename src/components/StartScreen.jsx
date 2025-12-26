@@ -190,7 +190,7 @@ function StartScreen() {
         <h1 className="game-title">
           <span className="title-pokemon">Pokémon</span>
           <span className="title-or">or</span>
-          <span className="title-drug">Drug</span>
+          <span className="title-drug">Pill</span>
           <span className="title-question">?</span>
         </h1>
         <p className="game-subtitle">Can you tell the difference?</p>
@@ -401,7 +401,7 @@ function StartScreen() {
           
           <div className="about-content">
             <div className="about-game">
-              <h3><FontAwesomeIcon icon={faGamepad} /> Pokemon or Drug?</h3>
+              <h3><FontAwesomeIcon icon={faGamepad} /> Pokemon or Pill?</h3>
               <p>A fun trivia game where you guess if a name belongs to a Pokémon or a pharmaceutical drug!</p>
             </div>
             
@@ -419,7 +419,7 @@ function StartScreen() {
             <div className="about-data">
               <h3><FontAwesomeIcon icon={faBook} /> Data Sources</h3>
               <p>Pokémon names from <a href="https://pokeapi.co" target="_blank" rel="noopener noreferrer">PokéAPI</a></p>
-              <p>Drug names from FDA approved pharmaceuticals</p>
+              <p>Pill names from FDA approved pharmaceuticals</p>
             </div>
             
             <div className="about-creator">

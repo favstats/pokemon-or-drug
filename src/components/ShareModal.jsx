@@ -54,7 +54,7 @@ function ShareModal({ isOpen, onClose, playerData, gameData }) {
   const getShareText = () => {
     const leagueName = league ? `${league.charAt(0).toUpperCase() + league.slice(1)} Badge` : 'Unranked';
     const emoji = score >= 1000 ? '🏆' : score >= 500 ? '⭐' : '🎮';
-    return `${emoji} I scored ${score} points in Pokemon or Drug! (${leagueName})\n\n` +
+    return `${emoji} I scored ${score} points in Pokemon or Pill! (${leagueName})\n\n` +
            `✅ ${correctAnswers} correct | ❌ ${wrongAnswers} wrong | 🎯 ${accuracy}% accuracy\n\n` +
            `Can you beat my score? 👇\n${GAME_URL}`;
   };
@@ -105,7 +105,7 @@ function ShareModal({ isOpen, onClose, playerData, gameData }) {
     ctx.fillStyle = '#FFCB05';
     ctx.font = 'bold 38px system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Pokemon or Drug?', w / 2, 50);
+    ctx.fillText('Pokemon or Pill?', w / 2, 50);
     ctx.shadowBlur = 0;
     ctx.shadowOffsetY = 0;
 
@@ -235,7 +235,7 @@ function ShareModal({ isOpen, onClose, playerData, gameData }) {
   const handleDownloadCard = () => {
     if (!scoreCardUrl) return;
     const link = document.createElement('a');
-    link.download = `pokemon-or-drug-score-${score}.png`;
+    link.download = `pokemon-or-pill-score-${score}.png`;
     link.href = scoreCardUrl;
     link.click();
   };
