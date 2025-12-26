@@ -15,7 +15,8 @@ import {
   faBolt,
   faShareAlt,
   faCoffee,
-  faChartLine
+  faChartLine,
+  faHeartBroken
 } from '@fortawesome/free-solid-svg-icons';
 import { faPaypal } from '@fortawesome/free-brands-svg-icons';
 import confetti from 'canvas-confetti';
@@ -104,9 +105,13 @@ function GameOver() {
   const [showShareModal, setShowShareModal] = useState(false);
   const [sharePlayer, setSharePlayer] = useState(null); // Which player to share
   
-  // Calculate percentiles from global scores
+  // Sort players by score
+  const rankedPlayers = [...state.players].sort((a, b) => b.score - a.score);
+  const winner = rankedPlayers[0];
+  
+  // Calculate percentiles from global scores and top 10 feedback
   const playerStats = useMemo(() => {
-    const player = [...state.players].sort((a, b) => b.score - a.score)[0];
+    const player = winner; // Use winner (top player) for top 10 calculations
     const scores = state.globalScores;
     
     if (!player) {
@@ -121,6 +126,8 @@ function GameOver() {
         loading: state.globalScoresLoading,
         playerScore: player.score,
         playerSpeed: player.avgResponseTime,
+        top10Rank: null,
+        pointsFromTop10: null,
       };
     }
     
@@ -139,6 +146,24 @@ function GameOver() {
       speedPercentile = (fasterThanPlayer / speedScores.length) * 100;
     }
     
+    // Calculate top 10 position
+    const sortedScores = [...leagueScores].sort((a, b) => b.score - a.score);
+    // Count how many players have higher scores (player's score might not be in list yet)
+    const playersWithHigherScore = sortedScores.filter(s => s.score > player.score).length;
+    const playerRank = playersWithHigherScore + 1; // Rank is 1-indexed
+    
+    // Player is in top 10 if rank <= 10 OR if there are less than 10 total scores
+    const isInTop10 = playerRank <= 10 || sortedScores.length < 10;
+    const top10Rank = isInTop10 ? playerRank : null;
+    
+    // Calculate points needed to reach top 10
+    let pointsFromTop10 = null;
+    if (!isInTop10 && sortedScores.length >= 10) {
+      // There are at least 10 scores, check what's needed to beat #10
+      const top10Score = sortedScores[9].score;
+      pointsFromTop10 = Math.max(0, top10Score - player.score + 1);
+    }
+    
     return { 
       scorePercentile, 
       speedPercentile, 
@@ -149,17 +174,20 @@ function GameOver() {
       avgSpeed: speedScores.length > 0 
         ? Math.round(speedScores.reduce((a, b) => a + b.avgSpeed, 0) / speedScores.length) 
         : null,
+      top10Rank,
+      pointsFromTop10,
       loading: false,
     };
-  }, [state.globalScores, state.globalScoresLoading, state.players]);
+  }, [state.globalScores, state.globalScoresLoading, state.players, winner]);
 
-  // Sort players by score
-  const rankedPlayers = [...state.players].sort((a, b) => b.score - a.score);
-  const winner = rankedPlayers[0];
   const isMultiplayer = state.gameMode === 'multiplayer';
   
   // Check if playing a league (eligible for global leaderboard)
   const isLeagueGame = state.selectedLeague !== null;
+  
+  // Determine if game ended by completing all rounds (win) or losing all lives (lose)
+  const completedAllRounds = state.currentRound > state.settings.totalRounds;
+  const lostAllLives = rankedPlayers.some(p => p.lives <= 0);
 
   // Load all global scores for stats comparison
   useEffect(() => {
@@ -215,9 +243,9 @@ function GameOver() {
     }
   }, []);
 
-  // Subtle celebration confetti for winner
+  // Subtle celebration confetti for winner (only if completed all rounds, not game over)
   useEffect(() => {
-    if (!confettiFired.current) {
+    if (!confettiFired.current && completedAllRounds) {
       confettiFired.current = true;
       play('gameOver');
       
@@ -251,7 +279,7 @@ function GameOver() {
         });
       }, 300);
     }
-  }, []);
+  }, [completedAllRounds, play]);
 
   const handlePlayAgain = () => {
     play('start');
@@ -300,8 +328,11 @@ function GameOver() {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          <FontAwesomeIcon icon={faTrophy} className="trophy-icon" />
-          <h1>{rankedPlayers.some(p => p.lives <= 0) ? 'Game Over!' : 'Final Score!'}</h1>
+          <FontAwesomeIcon 
+            icon={completedAllRounds ? faTrophy : faHeartBroken} 
+            className={completedAllRounds ? "trophy-icon" : "gameover-icon"} 
+          />
+          <h1>{lostAllLives ? 'Game Over!' : 'Final Score!'}</h1>
           {isMultiplayer && (
             <p className="winner-text">
               <FontAwesomeIcon icon={faCrown} /> {winner.name} Wins!
@@ -414,6 +445,42 @@ function GameOver() {
             ) : null;
           })()}
         </motion.div>
+
+        {/* Top 10 Feedback */}
+        {isLeagueGame && !playerStats.loading && playerStats.totalPlayers > 0 && (
+          <motion.div 
+            className="top10-feedback"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.75 }}
+          >
+            {playerStats.top10Rank ? (
+              <div className="top10-success">
+                <span className="top10-icon">🏆</span>
+                <div className="top10-message">
+                  <strong>Congratulations, {winner.name}!</strong>
+                  <p>You've earned your place in the Hall of Fame for the <span className="league-highlight">{LEAGUES[state.selectedLeague]?.name}</span>! Ranked #{playerStats.top10Rank} out of {playerStats.totalPlayers} trainers. Your dedication has been recognized by the Pokémon League!</p>
+                </div>
+              </div>
+            ) : playerStats.pointsFromTop10 !== null ? (
+              <div className="top10-encouragement">
+                {state.selectedLeague && badgeImages[state.selectedLeague] ? (
+                  <img 
+                    src={badgeImages[state.selectedLeague]} 
+                    alt={LEAGUES[state.selectedLeague]?.name} 
+                    className="top10-icon badge-icon" 
+                  />
+                ) : (
+                  <span className="top10-icon">🔥</span>
+                )}
+                <div className="top10-message">
+                  <strong>Keep Training, {winner.name}!</strong>
+                  <p>You're just <span className="points-highlight">{playerStats.pointsFromTop10}</span> points away from entering the Top 10 for the <span className="league-highlight">{LEAGUES[state.selectedLeague]?.name}</span>! Like a Pokémon evolving, you're getting stronger with each battle. Train harder and <span className="very-best-highlight">you'll be the very best!</span></p>
+                </div>
+              </div>
+            ) : null}
+          </motion.div>
+        )}
 
         {/* High Scores with Tabs */}
         <motion.div 

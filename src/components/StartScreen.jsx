@@ -27,8 +27,10 @@ import {
   faToggleOn,
   faToggleOff,
   faInfoCircle,
-  faEnvelope
+  faEnvelope,
+  faCoffee
 } from '@fortawesome/free-solid-svg-icons';
+import { faPaypal } from '@fortawesome/free-brands-svg-icons';
 import { useGame, LEAGUES } from '../context/GameContext';
 import { useSound } from '../context/SoundContext';
 
@@ -450,6 +452,28 @@ function StartScreen() {
               <a href="mailto:fabio.votta@gmail.com" className="creator-email">
                 <FontAwesomeIcon icon={faEnvelope} /> fabio.votta@gmail.com
               </a>
+            </div>
+            
+            <div className="about-donate support-section">
+              <span>Enjoying the game? Consider supporting the development :)</span>
+              <div className="support-buttons">
+                <a 
+                  href="https://buymeacoffee.com/favstats" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="support-btn coffee"
+                >
+                  <FontAwesomeIcon icon={faCoffee} /> Coffee
+                </a>
+                <a 
+                  href="https://paypal.me/favstats" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="support-btn paypal"
+                >
+                  <FontAwesomeIcon icon={faPaypal} /> PayPal
+                </a>
+              </div>
             </div>
             
             <div className="about-version">
