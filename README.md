@@ -31,7 +31,7 @@ Test your knowledge in this fast-paced guessing game! Features 170+ real medicat
 | 🪨 Boulder | Easy | 15s | 3 | 10 |
 | 💧 Cascade | Medium | 10s | 3 | 15 |
 | 🌋 Volcano | Hard | 8s | 2 | 20 |
-| 🌍 Earth | Expert | 5s | 0 | 30 |
+| 🌍 Earth | Expert | 5s | 1 | 30 |
 
 ### Global Leaderboard
 - 🏆 **Compete Globally** - Your scores are ranked against players worldwide

@@ -54,6 +54,10 @@ function RevealCard() {
 
   if (!question) return null;
 
+  // Always get the latest player data from state to ensure lives are up-to-date
+  const latestPlayer = state.players[state.currentPlayerIndex] ?? currentPlayer;
+  const livesLeft = state.settings.livesPerPlayer > 0 ? Math.max(0, latestPlayer.lives) : null;
+
   // Calculate points earned/lost
   const getPointsDisplay = () => {
     if (!isCorrect) {
@@ -211,9 +215,13 @@ function RevealCard() {
         >
           <p>
             <strong>{currentPlayer.name}</strong>: {currentPlayer.score} pts
+            {/* Show response time */}
+            {state.lastTimeTaken && (
+              <> | ⚡ {(state.lastTimeTaken / 1000).toFixed(2)}s</>
+            )}
             {/* Only show lives if not in no-lives mode */}
-            {state.settings.livesPerPlayer > 0 && (
-              <> | {Math.max(0, currentPlayer.lives)} {currentPlayer.lives === 1 ? 'life' : 'lives'} left</>
+            {livesLeft !== null && (
+              <> | {livesLeft} {livesLeft === 1 ? 'life' : 'lives'} left</>
             )}
           </p>
         </motion.div>

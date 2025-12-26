@@ -63,7 +63,7 @@ export const LEAGUES = {
     color: '#E0C068',
     settings: {
       totalRounds: 30,
-      livesPerPlayer: 0, // No life loss - play all rounds
+      livesPerPlayer: 1, // One wrong answer and you're out
       timerDuration: 5,
       bonusProbability: 0,
     },
@@ -408,11 +408,26 @@ function gameReducer(state, action) {
       const firstQuestion = questions[0];
       // Generate a unique game ID
       const gameId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      
+      // Update players' lives to match current settings (in case league changed)
+      const updatedPlayers = state.players.map(player => ({
+        ...player,
+        lives: state.settings.livesPerPlayer,
+        score: 0,
+        streak: 0,
+        correctAnswers: 0,
+        wrongAnswers: 0,
+        responseTimes: [],
+        fastestResponse: null,
+        avgResponseTime: null,
+      }));
+      
       return {
         ...state,
         gameStatus: 'playing',
         currentRound: 1,
         currentPlayerIndex: 0,
+        players: updatedPlayers,
         questions,
         questionIndex: 1,
         currentQuestion: firstQuestion,

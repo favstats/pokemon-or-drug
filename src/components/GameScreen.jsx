@@ -12,10 +12,23 @@ import {
   faVolumeMute,
   faStopwatch
 } from '@fortawesome/free-solid-svg-icons';
-import { useGame } from '../context/GameContext';
+import { useGame, LEAGUES } from '../context/GameContext';
 import { useSound } from '../context/SoundContext';
 import { fetchPokemonDetails } from '../data/pokemonService';
 import './GameScreen.css';
+
+// Import badge SVGs
+import BoulderBadge from '../assets/badges/boulder.svg';
+import CascadeBadge from '../assets/badges/cascade.svg';
+import VolcanoBadge from '../assets/badges/volcano.svg';
+import EarthBadge from '../assets/badges/earth.svg';
+
+const badgeImages = {
+  boulder: BoulderBadge,
+  cascade: CascadeBadge,
+  volcano: VolcanoBadge,
+  earth: EarthBadge,
+};
 
 function GameScreen() {
   const { state, actions } = useGame();
@@ -126,8 +139,18 @@ function GameScreen() {
         animate={{ y: 0, opacity: 1 }}
       >
         <div className="round-info">
-          <span className="round-label">Round</span>
-          <span className="round-number">{state.currentRound}/{state.settings.totalRounds}</span>
+          {state.selectedLeague && badgeImages[state.selectedLeague] && (
+            <img 
+              src={badgeImages[state.selectedLeague]} 
+              alt={state.selectedLeague} 
+              className="header-badge"
+              title={LEAGUES[state.selectedLeague]?.name}
+            />
+          )}
+          <div className="round-text">
+            <span className="round-label">Round</span>
+            <span className="round-number">{state.currentRound}/{state.settings.totalRounds}</span>
+          </div>
         </div>
 
         <div className="current-player">

@@ -524,7 +524,7 @@ function GameOver() {
               state.globalScoresLoading ? (
                 <div className="loading-scores">Loading...</div>
               ) : state.globalScores.length > 0 ? (
-                state.globalScores.slice(0, 5).map((entry, index) => (
+                state.globalScores.slice(0, 10).map((entry, index) => (
                   <div key={index} className={`highscore-entry ${index < 3 ? getMedalClass(index) : ''}`}>
                     <span className="hs-rank">#{index + 1}</span>
                     {entry.league && badgeImages[entry.league] && (
@@ -548,7 +548,7 @@ function GameOver() {
               )
             ) : (
               state.highScores.length > 0 ? (
-                state.highScores.slice(0, 5).map((entry, index) => (
+                state.highScores.slice(0, 10).map((entry, index) => (
                   <div key={index} className={`highscore-entry ${index < 3 ? getMedalClass(index) : ''}`}>
                     <span className="hs-rank">#{index + 1}</span>
                     <span className="hs-name">{entry.name}</span>
