@@ -210,8 +210,11 @@ function RevealCard() {
           transition={{ delay: 1.1 }}
         >
           <p>
-            <strong>{currentPlayer.name}</strong>: {currentPlayer.score} pts | 
-            {' '}{Math.max(0, currentPlayer.lives)} {currentPlayer.lives === 1 ? 'life' : 'lives'} left
+            <strong>{currentPlayer.name}</strong>: {currentPlayer.score} pts
+            {/* Only show lives if not in no-lives mode */}
+            {state.settings.livesPerPlayer > 0 && (
+              <> | {Math.max(0, currentPlayer.lives)} {currentPlayer.lives === 1 ? 'life' : 'lives'} left</>
+            )}
           </p>
         </motion.div>
 
@@ -225,9 +228,10 @@ function RevealCard() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          {currentPlayer.lives === 0 && state.gameMode === 'single' ? (
+          {/* Only show Game Over if lives mode is active and player has 0 lives */}
+          {state.settings.livesPerPlayer > 0 && currentPlayer.lives === 0 && state.gameMode === 'single' ? (
             'Game Over'
-          ) : state.currentRound >= state.totalRounds ? (
+          ) : state.currentRound >= state.settings.totalRounds ? (
             'See Results'
           ) : (
             <>

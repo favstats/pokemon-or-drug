@@ -483,6 +483,9 @@ function gameReducer(state, action) {
         newStreak = 0;
       }
       
+      // Check if using "no lives" mode (livesPerPlayer === 0 means no life loss)
+      const noLivesMode = state.settings.livesPerPlayer === 0;
+      
       const updatedPlayers = state.players.map((player, index) => {
         if (index === state.currentPlayerIndex) {
           // Track response times (only for correct answers to measure skill)
@@ -498,10 +501,15 @@ function gameReducer(state, action) {
             ? Math.round(newResponseTimes.reduce((a, b) => a + b, 0) / newResponseTimes.length)
             : null;
           
+          // In no-lives mode, don't decrement lives
+          const newLives = noLivesMode 
+            ? player.lives 
+            : (isCorrect ? player.lives : player.lives - 1);
+          
           return {
             ...player,
             score: Math.max(0, player.score + points),
-            lives: isCorrect ? player.lives : player.lives - 1,
+            lives: newLives,
             streak: newStreak,
             correctAnswers: isCorrect ? player.correctAnswers + 1 : player.correctAnswers,
             wrongAnswers: isCorrect ? player.wrongAnswers : player.wrongAnswers + 1,
@@ -531,8 +539,11 @@ function gameReducer(state, action) {
     case ACTIONS.NEXT_ROUND: {
       const currentPlayer = state.players[state.currentPlayerIndex];
       
-      // Check if current player just died in single player
-      if (currentPlayer.lives <= 0 && state.gameMode === 'single') {
+      // Check if using "no lives" mode (livesPerPlayer === 0 means play all rounds, no elimination)
+      const noLivesMode = state.settings.livesPerPlayer === 0;
+      
+      // Check if current player just died in single player (only if not in no-lives mode)
+      if (!noLivesMode && currentPlayer.lives <= 0 && state.gameMode === 'single') {
         return {
           ...state,
           gameStatus: 'gameover',
@@ -547,11 +558,13 @@ function gameReducer(state, action) {
       const isNewRound = nextPlayerIndex === 0;
       const nextRound = isNewRound ? state.currentRound + 1 : state.currentRound;
       
-      // Check if any player is still alive
-      const alivePlayers = state.players.filter(p => p.lives > 0);
+      // Check if any player is still alive (skip this check in no-lives mode)
+      const alivePlayers = noLivesMode 
+        ? state.players 
+        : state.players.filter(p => p.lives > 0);
       
       // Check if game should end
-      if (nextRound > state.settings.totalRounds || alivePlayers.length === 0) {
+      if (nextRound > state.settings.totalRounds || (!noLivesMode && alivePlayers.length === 0)) {
         return {
           ...state,
           gameStatus: 'gameover',
@@ -562,12 +575,14 @@ function gameReducer(state, action) {
         };
       }
       
-      // Find next alive player
+      // Find next alive player (in no-lives mode, just go to next player)
       let actualNextIndex = nextPlayerIndex;
-      let loopCount = 0;
-      while (state.players[actualNextIndex].lives <= 0 && loopCount < state.players.length) {
-        actualNextIndex = (actualNextIndex + 1) % state.players.length;
-        loopCount++;
+      if (!noLivesMode) {
+        let loopCount = 0;
+        while (state.players[actualNextIndex].lives <= 0 && loopCount < state.players.length) {
+          actualNextIndex = (actualNextIndex + 1) % state.players.length;
+          loopCount++;
+        }
       }
       
       // Check for bonus round trigger (configurable chance, not on first 2 rounds)
