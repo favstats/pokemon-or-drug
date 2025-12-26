@@ -39,7 +39,7 @@ const BlueskyIcon = () => (
   </svg>
 );
 
-const GAME_URL = 'https://favstats.github.io/pokemon-or-drug/';
+const GAME_URL = 'https://pokepill.net/';
 
 function ShareModal({ isOpen, onClose, playerData, gameData }) {
   const [copied, setCopied] = useState(false);
@@ -191,7 +191,7 @@ function ShareModal({ isOpen, onClose, playerData, gameData }) {
         // Footer
         ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
         ctx.font = '14px system-ui, -apple-system, sans-serif';
-        ctx.fillText('favstats.github.io/pokemon-or-drug', w / 2, h - 15);
+        ctx.fillText('pokepill.net', w / 2, h - 15);
         
         // Convert to image URL
         setScoreCardUrl(canvas.toDataURL('image/png', 1.0));
@@ -201,7 +201,7 @@ function ShareModal({ isOpen, onClose, playerData, gameData }) {
       // No badge - just footer
       ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
       ctx.font = '14px system-ui, -apple-system, sans-serif';
-      ctx.fillText('favstats.github.io/pokemon-or-drug', w / 2, h - 15);
+      ctx.fillText('pokepill.net', w / 2, h - 15);
       
       // Convert to image URL
       setScoreCardUrl(canvas.toDataURL('image/png', 1.0));
