@@ -212,47 +212,62 @@ function GameOver() {
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.5 + index * 0.15 }}
             >
-              <div className="rank">
-                <FontAwesomeIcon 
-                  icon={getMedalIcon(index)} 
-                  className={`medal-icon ${getMedalClass(index)}`}
-                />
-                <span className="rank-number">#{index + 1}</span>
-              </div>
-              
-              <div className="player-info">
+              {/* Top row: rank, name, score, share */}
+              <div className="player-header">
+                <div className="rank">
+                  <FontAwesomeIcon 
+                    icon={getMedalIcon(index)} 
+                    className={`medal-icon ${getMedalClass(index)}`}
+                  />
+                  <span className="rank-number">#{index + 1}</span>
+                </div>
+                
                 <span className="player-name">
                   <span className="player-icon">{player.icon || '🎮'}</span>
                   {player.name}
                 </span>
-                <div className="player-stats">
-                  <span className="stat correct">
-                    <FontAwesomeIcon icon={faCheck} /> {player.correctAnswers}
-                  </span>
-                  <span className="stat wrong">
-                    <FontAwesomeIcon icon={faTimes} /> {player.wrongAnswers}
-                  </span>
-                  {player.streak > 0 && (
-                    <span className="stat streak">
-                      <FontAwesomeIcon icon={faFire} /> Best: {player.streak}
-                    </span>
-                  )}
-                  {player.avgResponseTime !== null && (
-                    <span className="stat speed">
-                      <FontAwesomeIcon icon={faStopwatch} /> {(player.avgResponseTime / 1000).toFixed(2)}s avg
-                    </span>
-                  )}
-                  {player.fastestResponse !== null && (
-                    <span className="stat fastest">
-                      <FontAwesomeIcon icon={faBolt} /> {(player.fastestResponse / 1000).toFixed(2)}s best
-                    </span>
-                  )}
+                
+                <div className="player-score">
+                  <FontAwesomeIcon icon={faStar} />
+                  <span>{player.score}</span>
                 </div>
+                
+                <button 
+                  className="player-share-btn"
+                  onClick={() => {
+                    play('select');
+                    // Set the winner to this player for the share modal
+                    setShowShareModal(true);
+                  }}
+                  title="Share score"
+                >
+                  <FontAwesomeIcon icon={faShareAlt} />
+                </button>
               </div>
               
-              <div className="player-score">
-                <FontAwesomeIcon icon={faStar} />
-                <span>{player.score}</span>
+              {/* Stats row */}
+              <div className="player-stats">
+                <span className="stat correct">
+                  <FontAwesomeIcon icon={faCheck} /> {player.correctAnswers}
+                </span>
+                <span className="stat wrong">
+                  <FontAwesomeIcon icon={faTimes} /> {player.wrongAnswers}
+                </span>
+                {player.streak > 0 && (
+                  <span className="stat streak">
+                    <FontAwesomeIcon icon={faFire} /> {player.streak}
+                  </span>
+                )}
+                {player.avgResponseTime !== null && (
+                  <span className="stat speed">
+                    <FontAwesomeIcon icon={faStopwatch} /> {(player.avgResponseTime / 1000).toFixed(2)}s
+                  </span>
+                )}
+                {player.fastestResponse !== null && (
+                  <span className="stat fastest">
+                    <FontAwesomeIcon icon={faBolt} /> {(player.fastestResponse / 1000).toFixed(2)}s
+                  </span>
+                )}
               </div>
             </motion.div>
           ))}

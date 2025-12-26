@@ -66,13 +66,19 @@
 .player-row {
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
+  padding: 1rem 1.25rem;
   border-radius: 16px;
   margin-bottom: 0.75rem;
   background: rgba(255, 255, 255, 0.05);
   transition: all 0.3s ease;
+}
+
+.player-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
 }
 
 .player-row:last-child {
@@ -101,8 +107,8 @@
 .rank {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
+  flex-shrink: 0;
 }
 
 .medal-icon {
@@ -119,42 +125,56 @@
   color: rgba(255, 255, 255, 0.7);
 }
 
-.player-info {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  width: 100%;
-}
-
 .player-name {
-  font-size: 1.4rem;
+  flex: 1;
+  font-size: 1.25rem;
   font-weight: 700;
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 0.5rem;
-  margin-bottom: 0.25rem;
 }
 
 .player-icon {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
+}
+
+.player-share-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.player-share-btn:hover {
+  background: rgba(29, 161, 242, 0.2);
+  color: #1DA1F2;
+  transform: scale(1.1);
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
 }
 
 .player-stats {
   display: flex;
-  justify-content: center;
   flex-wrap: wrap;
-  gap: 1rem;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  padding-left: 0.5rem;
 }
 
 .player-stats .stat {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.3rem;
+  padding: 0.25rem 0.6rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
 }
 
 .player-stats .correct {
@@ -180,10 +200,11 @@
 .player-score {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 1.5rem;
+  gap: 0.4rem;
+  font-size: 1.4rem;
   font-weight: 800;
   color: var(--pokemon-yellow);
+  flex-shrink: 0;
 }
 
 /* Game Stats */
@@ -547,50 +568,62 @@
     font-size: 1.2rem;
   }
   
-  /* Player row - full width card layout */
+  /* Player row - mobile layout */
   .player-row {
-    flex-direction: column;
-    gap: 0.75rem;
-    padding: 1rem 0.75rem;
+    gap: 0.6rem;
+    padding: 0.75rem;
+  }
+  
+  .player-header {
+    gap: 0.6rem;
   }
   
   .rank {
-    min-width: auto;
-    justify-content: center;
+    gap: 0.3rem;
   }
   
-  .player-info {
-    width: 100%;
-    text-align: center;
+  .medal-icon {
+    font-size: 1.2rem;
+  }
+  
+  .rank-number {
+    font-size: 0.9rem;
   }
   
   .player-name {
-    font-size: 1.2rem;
-    justify-content: center;
-    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    gap: 0.4rem;
   }
   
-  /* Stats as 2x2 or 2x3 grid */
-  .player-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.5rem;
-    font-size: 0.8rem;
-    width: 100%;
-  }
-  
-  .player-stats .stat {
-    padding: 0.4rem 0.5rem;
-    background: rgba(255,255,255,0.08);
-    border-radius: 8px;
-    justify-content: center;
-    flex-direction: column;
-    gap: 0.1rem;
+  .player-icon {
+    font-size: 1rem;
   }
   
   .player-score {
-    font-size: 1.4rem;
-    margin-top: 0.25rem;
+    font-size: 1.1rem;
+    gap: 0.3rem;
+  }
+  
+  .player-share-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
+  }
+  
+  /* Stats row */
+  .player-stats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 0.4rem;
+    font-size: 0.75rem;
+    padding-left: 0;
+  }
+  
+  .player-stats .stat {
+    padding: 0.2rem 0.5rem;
+    background: rgba(255,255,255,0.08);
+    border-radius: 8px;
   }
   
   .final-scoreboard {
