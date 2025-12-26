@@ -176,6 +176,7 @@ function GameOver() {
         : null,
       top10Rank,
       pointsFromTop10,
+      playerRank, // Include player rank for display
       loading: false,
     };
   }, [state.globalScores, state.globalScoresLoading, state.players, winner]);
@@ -475,7 +476,7 @@ function GameOver() {
                 )}
                 <div className="top10-message">
                   <strong>Keep Training, {winner.name}!</strong>
-                  <p>You're just <span className="points-highlight">{playerStats.pointsFromTop10}</span> points away from entering the Top 10 for the <span className="league-highlight">{LEAGUES[state.selectedLeague]?.name}</span>! Like a Pokémon evolving, you're getting stronger with each battle. Train harder and <span className="very-best-highlight">you'll be the very best!</span></p>
+                  <p>You're just <span className="points-highlight">{playerStats.pointsFromTop10}</span> points away from entering the Top 10 for the <span className="league-highlight">{LEAGUES[state.selectedLeague]?.name}</span>{playerStats.playerRank && ` (#${playerStats.playerRank})`}! Like a Pokémon evolving, you're getting stronger with each battle. Train harder and <span className="very-best-highlight">you'll be the very best!</span></p>
                 </div>
               </div>
             ) : null}

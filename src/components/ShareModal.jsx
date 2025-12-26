@@ -18,6 +18,7 @@ import {
 } from '@fortawesome/free-brands-svg-icons';
 import { QRCodeSVG } from 'qrcode.react';
 import './ShareModal.css';
+import { fetchGlobalScores } from '../data/globalScoreService';
 
 // Import badge SVGs
 import BoulderBadge from '../assets/badges/boulder.svg';
@@ -46,9 +47,30 @@ function ShareModal({ isOpen, onClose, playerData, gameData }) {
   const [activeTab, setActiveTab] = useState('share'); // 'share' or 'challenge'
   const canvasRef = useRef(null);
   const [scoreCardUrl, setScoreCardUrl] = useState(null);
+  const [leagueRank, setLeagueRank] = useState(null); // 1-indexed rank within the league
 
   const { name, icon, score, accuracy, avgSpeed, correctAnswers, wrongAnswers, streak } = playerData;
   const { league, gameMode, totalRounds } = gameData;
+
+  // Compute player's rank within the selected league (for ranked games)
+  useEffect(() => {
+    let cancelled = false;
+    if (!isOpen || !league) {
+      setLeagueRank(null);
+      return () => { cancelled = true; };
+    }
+
+    (async () => {
+      const scores = await fetchGlobalScores(false, league);
+      if (cancelled) return;
+
+      const playerScore = Number(score) || 0;
+      const higher = (scores || []).filter(s => (Number(s?.score) || 0) > playerScore).length;
+      setLeagueRank(higher + 1);
+    })();
+
+    return () => { cancelled = true; };
+  }, [isOpen, league, score]);
 
   // Generate share text
   const getShareText = () => {
@@ -172,40 +194,241 @@ function ShareModal({ isOpen, onClose, playerData, gameData }) {
       ctx.fillText(`⚡ ${(avgSpeed / 1000).toFixed(1)}s avg`, spacing * 4, statsY);
     }
 
-    // Badge (if ranked)
-    if (league && badgeImages[league]) {
-      const img = new Image();
-      img.onload = () => {
-        // Draw badge
+    // Helper function to draw the complete card
+    const drawCard = (badgeImg = null) => {
+      // Redraw everything (in case rank changed)
+      // Background
+      const gradient = ctx.createLinearGradient(0, 0, w, h);
+      gradient.addColorStop(0, '#1e1e2e');
+      gradient.addColorStop(1, '#181825');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, w, h);
+
+      // Subtle corner accents
+      ctx.fillStyle = 'rgba(255, 203, 5, 0.06)';
+      ctx.beginPath();
+      ctx.arc(0, 0, 120, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(w, h, 100, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Title
+      ctx.font = 'bold 28px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+      const titleY = 35;
+      const pokemonText = 'Pokemon';
+      const orText = ' or ';
+      const pillText = 'Pill';
+      const questionMark = '?';
+      const pokemonWidth = ctx.measureText(pokemonText).width;
+      const orWidth = ctx.measureText(orText).width;
+      const pillWidth = ctx.measureText(pillText).width;
+      const questionWidth = ctx.measureText(questionMark).width;
+      const totalWidth = pokemonWidth + orWidth + pillWidth + questionWidth;
+      let titleX = (w - totalWidth) / 2;
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#FFCB05';
+      ctx.fillText(pokemonText, titleX, titleY);
+      titleX += pokemonWidth;
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+      ctx.fillText(orText, titleX, titleY);
+      titleX += orWidth;
+      ctx.fillStyle = '#FF6B9D';
+      ctx.fillText(pillText, titleX, titleY);
+      titleX += pillWidth;
+      ctx.fillText(questionMark, titleX, titleY);
+      ctx.textAlign = 'center';
+
+      // Player name
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '18px -apple-system, BlinkMacSystemFont, sans-serif';
+      ctx.fillText(`${icon || '🎮'}  ${name}`, w / 2, 65);
+
+      // Score
+      ctx.fillStyle = '#FFCB05';
+      ctx.font = 'bold 64px -apple-system, BlinkMacSystemFont, sans-serif';
+      ctx.fillText(score.toLocaleString(), w / 2, 130);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.font = '600 12px -apple-system, BlinkMacSystemFont, sans-serif';
+      ctx.fillText('POINTS', w / 2, 148);
+
+      // Stats
+      const statsY = 185;
+      ctx.font = '15px -apple-system, BlinkMacSystemFont, sans-serif';
+      const hasSpeed = avgSpeed && avgSpeed > 0;
+      const items = hasSpeed ? 4 : 3;
+      const spacing = w / (items + 1);
+      ctx.fillStyle = '#4ade80';
+      ctx.fillText(`✓ ${correctAnswers} correct`, spacing, statsY);
+      ctx.fillStyle = '#f87171';
+      ctx.fillText(`✗ ${wrongAnswers} wrong`, spacing * 2, statsY);
+      ctx.fillStyle = '#fbbf24';
+      ctx.fillText(`${accuracy}% accuracy`, spacing * 3, statsY);
+      if (hasSpeed) {
+        ctx.fillStyle = '#60a5fa';
+        ctx.fillText(`⚡ ${(avgSpeed / 1000).toFixed(1)}s avg`, spacing * 4, statsY);
+      }
+
+      // Badge row (if ranked)
+      if (league && badgeImg) {
         const badgeSize = 32;
         const badgeX = w / 2 - badgeSize / 2 - 60;
         const badgeY = 215;
-        ctx.drawImage(img, badgeX, badgeY, badgeSize, badgeSize);
+        ctx.drawImage(badgeImg, badgeX, badgeY, badgeSize, badgeSize);
         
-        // Badge name next to it
         ctx.fillStyle = '#FFCB05';
         ctx.font = '600 14px -apple-system, BlinkMacSystemFont, sans-serif';
         ctx.textAlign = 'left';
         ctx.fillText(`${league.charAt(0).toUpperCase() + league.slice(1)} Badge`, badgeX + badgeSize + 10, badgeY + 21);
-        
-        // Footer
+
+        // Rank (only for ranked games)
+        if (typeof leagueRank === 'number' && Number.isFinite(leagueRank)) {
+          ctx.textAlign = 'right';
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+          ctx.font = '600 11px -apple-system, BlinkMacSystemFont, sans-serif';
+          ctx.fillText('RANK', w - 20, badgeY + 12);
+
+          ctx.fillStyle = '#FFCB05';
+          ctx.font = '700 14px -apple-system, BlinkMacSystemFont, sans-serif';
+          ctx.fillText(`#${leagueRank}`, w - 20, badgeY + 28);
+        }
         ctx.textAlign = 'center';
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
-        ctx.font = '12px -apple-system, BlinkMacSystemFont, sans-serif';
-        ctx.fillText('pokepill.net', w / 2, h - 12);
-        
-        setScoreCardUrl(canvas.toDataURL('image/png', 1.0));
-      };
-      img.src = badgeImages[league];
-    } else {
-      // Footer only
+      }
+      
+      // Footer
       ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
       ctx.font = '12px -apple-system, BlinkMacSystemFont, sans-serif';
       ctx.fillText('pokepill.net', w / 2, h - 12);
       
       setScoreCardUrl(canvas.toDataURL('image/png', 1.0));
+    };
+
+    // Badge (if ranked)
+    if (league && badgeImages[league]) {
+      const img = new Image();
+      img.onload = () => {
+        drawCard(img);
+      };
+      img.src = badgeImages[league];
+    } else {
+      drawCard();
     }
   }, [isOpen, name, icon, score, accuracy, avgSpeed, correctAnswers, wrongAnswers, league]);
+
+  // Redraw canvas when leagueRank changes (after initial load)
+  useEffect(() => {
+    if (!isOpen || !canvasRef.current || !league || !badgeImages[league]) return;
+    
+    // Only redraw if we already have a scoreCardUrl (meaning initial draw happened)
+    if (!scoreCardUrl) return;
+    
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    
+    const scale = 3;
+    const w = 500;
+    const h = 280;
+    
+    // Redraw the card with updated rank
+    const img = new Image();
+    img.onload = () => {
+      // Redraw everything
+      const gradient = ctx.createLinearGradient(0, 0, w, h);
+      gradient.addColorStop(0, '#1e1e2e');
+      gradient.addColorStop(1, '#181825');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.fillStyle = 'rgba(255, 203, 5, 0.06)';
+      ctx.beginPath();
+      ctx.arc(0, 0, 120, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(w, h, 100, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Title
+      ctx.font = 'bold 28px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+      const titleY = 35;
+      const pokemonText = 'Pokemon';
+      const orText = ' or ';
+      const pillText = 'Pill';
+      const questionMark = '?';
+      const pokemonWidth = ctx.measureText(pokemonText).width;
+      const orWidth = ctx.measureText(orText).width;
+      const pillWidth = ctx.measureText(pillText).width;
+      const questionWidth = ctx.measureText(questionMark).width;
+      const totalWidth = pokemonWidth + orWidth + pillWidth + questionWidth;
+      let titleX = (w - totalWidth) / 2;
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#FFCB05';
+      ctx.fillText(pokemonText, titleX, titleY);
+      titleX += pokemonWidth;
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+      ctx.fillText(orText, titleX, titleY);
+      titleX += orWidth;
+      ctx.fillStyle = '#FF6B9D';
+      ctx.fillText(pillText, titleX, titleY);
+      titleX += pillWidth;
+      ctx.fillText(questionMark, titleX, titleY);
+      ctx.textAlign = 'center';
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '18px -apple-system, BlinkMacSystemFont, sans-serif';
+      ctx.fillText(`${icon || '🎮'}  ${name}`, w / 2, 65);
+
+      ctx.fillStyle = '#FFCB05';
+      ctx.font = 'bold 64px -apple-system, BlinkMacSystemFont, sans-serif';
+      ctx.fillText(score.toLocaleString(), w / 2, 130);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.font = '600 12px -apple-system, BlinkMacSystemFont, sans-serif';
+      ctx.fillText('POINTS', w / 2, 148);
+
+      const statsY = 185;
+      ctx.font = '15px -apple-system, BlinkMacSystemFont, sans-serif';
+      const hasSpeed = avgSpeed && avgSpeed > 0;
+      const items = hasSpeed ? 4 : 3;
+      const spacing = w / (items + 1);
+      ctx.fillStyle = '#4ade80';
+      ctx.fillText(`✓ ${correctAnswers} correct`, spacing, statsY);
+      ctx.fillStyle = '#f87171';
+      ctx.fillText(`✗ ${wrongAnswers} wrong`, spacing * 2, statsY);
+      ctx.fillStyle = '#fbbf24';
+      ctx.fillText(`${accuracy}% accuracy`, spacing * 3, statsY);
+      if (hasSpeed) {
+        ctx.fillStyle = '#60a5fa';
+        ctx.fillText(`⚡ ${(avgSpeed / 1000).toFixed(1)}s avg`, spacing * 4, statsY);
+      }
+
+      const badgeSize = 32;
+      const badgeX = w / 2 - badgeSize / 2 - 60;
+      const badgeY = 215;
+      ctx.drawImage(img, badgeX, badgeY, badgeSize, badgeSize);
+      
+      ctx.fillStyle = '#FFCB05';
+      ctx.font = '600 14px -apple-system, BlinkMacSystemFont, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(`${league.charAt(0).toUpperCase() + league.slice(1)} Badge`, badgeX + badgeSize + 10, badgeY + 21);
+
+      if (typeof leagueRank === 'number' && Number.isFinite(leagueRank)) {
+        ctx.textAlign = 'right';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+        ctx.font = '600 11px -apple-system, BlinkMacSystemFont, sans-serif';
+        ctx.fillText('RANK', w - 20, badgeY + 12);
+        ctx.fillStyle = '#FFCB05';
+        ctx.font = '700 14px -apple-system, BlinkMacSystemFont, sans-serif';
+        ctx.fillText(`#${leagueRank}`, w - 20, badgeY + 28);
+      }
+      ctx.textAlign = 'center';
+      
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+      ctx.font = '12px -apple-system, BlinkMacSystemFont, sans-serif';
+      ctx.fillText('pokepill.net', w / 2, h - 12);
+      
+      setScoreCardUrl(canvas.toDataURL('image/png', 1.0));
+    };
+    img.src = badgeImages[league];
+  }, [leagueRank, isOpen, league, scoreCardUrl, name, icon, score, accuracy, avgSpeed, correctAnswers, wrongAnswers]);
 
   const handleCopyLink = async () => {
     try {
