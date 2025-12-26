@@ -187,7 +187,7 @@ function GameOver() {
           transition={{ delay: 0.2 }}
         >
           <FontAwesomeIcon icon={faTrophy} className="trophy-icon" />
-          <h1>Game Over!</h1>
+          <h1>{rankedPlayers.some(p => p.lives <= 0) ? 'Game Over!' : 'Final Score!'}</h1>
           {isMultiplayer && (
             <p className="winner-text">
               <FontAwesomeIcon icon={faCrown} /> {winner.name} Wins!
