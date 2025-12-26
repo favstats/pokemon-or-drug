@@ -123,26 +123,31 @@
   transform: scale(1.1);
 }
 
-/* Rank badge */
-.card-rank {
+/* Rank badge - positioned top left */
+.card-rank-badge {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
+  gap: 0.35rem;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.35rem 0.6rem;
+  border-radius: 12px;
 }
 
-.rank-icon {
-  font-size: 1.75rem;
+.card-rank-badge .rank-icon {
+  font-size: 1rem;
 }
 
 .rank-icon.gold { color: #FFD700; }
 .rank-icon.silver { color: #C0C0C0; }
 .rank-icon.bronze { color: #CD7F32; }
 
-.card-rank span {
+.card-rank-badge span {
   font-weight: 700;
-  font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 /* Player name tab - positioned at top */
@@ -707,16 +712,18 @@
     right: 0.5rem;
   }
   
-  .card-rank {
-    margin-bottom: 0.5rem;
+  .card-rank-badge {
+    padding: 0.25rem 0.5rem;
+    top: 0.5rem;
+    left: 0.5rem;
   }
   
-  .rank-icon {
-    font-size: 1.25rem;
+  .card-rank-badge .rank-icon {
+    font-size: 0.85rem;
   }
   
-  .card-rank span {
-    font-size: 0.9rem;
+  .card-rank-badge span {
+    font-size: 0.75rem;
   }
   
   .card-name-tab {

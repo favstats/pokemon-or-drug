@@ -102,6 +102,7 @@ function GameOver() {
   const [scoreTab, setScoreTab] = useState('global');
   const [leagueFilter, setLeagueFilter] = useState(state.selectedLeague || 'all');
   const [showShareModal, setShowShareModal] = useState(false);
+  const [sharePlayer, setSharePlayer] = useState(null); // Which player to share
   
   // Calculate percentiles from global scores
   const playerStats = useMemo(() => {
@@ -323,21 +324,9 @@ function GameOver() {
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.5 + index * 0.15 }}
             >
-              {/* Share button */}
-              <button 
-                className="card-share-btn"
-                onClick={() => {
-                  play('select');
-                  setShowShareModal(true);
-                }}
-                title="Share score"
-              >
-                <FontAwesomeIcon icon={faShareAlt} />
-              </button>
-
-              {/* Rank badge - only show for multiplayer */}
+              {/* Rank badge - top left (only for multiplayer) */}
               {rankedPlayers.length > 1 && (
-                <div className="card-rank">
+                <div className="card-rank-badge">
                   <FontAwesomeIcon 
                     icon={getMedalIcon(index)} 
                     className={`rank-icon ${getMedalClass(index)}`}
@@ -345,6 +334,19 @@ function GameOver() {
                   <span>#{index + 1}</span>
                 </div>
               )}
+
+              {/* Share button - top right */}
+              <button 
+                className="card-share-btn"
+                onClick={() => {
+                  play('select');
+                  setSharePlayer(player);
+                  setShowShareModal(true);
+                }}
+                title="Share score"
+              >
+                <FontAwesomeIcon icon={faShareAlt} />
+              </button>
 
               {/* Player name tab */}
               <div className="card-name-tab">
@@ -569,7 +571,7 @@ function GameOver() {
         >
           <motion.button
             className="action-btn share"
-            onClick={() => { play('select'); setShowShareModal(true); }}
+            onClick={() => { play('select'); setSharePlayer(winner); setShowShareModal(true); }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -636,18 +638,18 @@ function GameOver() {
       {/* Share Modal */}
       <ShareModal
         isOpen={showShareModal}
-        onClose={() => setShowShareModal(false)}
+        onClose={() => { setShowShareModal(false); setSharePlayer(null); }}
         playerData={{
-          name: winner.name,
-          icon: winner.icon,
-          score: winner.score,
-          accuracy: winner.correctAnswers + winner.wrongAnswers > 0
-            ? Math.round((winner.correctAnswers / (winner.correctAnswers + winner.wrongAnswers)) * 100)
+          name: (sharePlayer || winner).name,
+          icon: (sharePlayer || winner).icon,
+          score: (sharePlayer || winner).score,
+          accuracy: (sharePlayer || winner).correctAnswers + (sharePlayer || winner).wrongAnswers > 0
+            ? Math.round(((sharePlayer || winner).correctAnswers / ((sharePlayer || winner).correctAnswers + (sharePlayer || winner).wrongAnswers)) * 100)
             : 0,
-          avgSpeed: winner.avgResponseTime,
-          correctAnswers: winner.correctAnswers,
-          wrongAnswers: winner.wrongAnswers,
-          streak: winner.streak,
+          avgSpeed: (sharePlayer || winner).avgResponseTime,
+          correctAnswers: (sharePlayer || winner).correctAnswers,
+          wrongAnswers: (sharePlayer || winner).wrongAnswers,
+          streak: (sharePlayer || winner).streak,
         }}
         gameData={{
           league: state.selectedLeague,
