@@ -66,6 +66,7 @@
 .player-row {
   display: flex;
   align-items: center;
+  gap: 1rem;
   padding: 1rem 1.5rem;
   border-radius: 16px;
   margin-bottom: 0.75rem;
@@ -127,25 +128,27 @@
   font-weight: 700;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.5rem;
   margin-bottom: 0.25rem;
 }
 
 .player-icon {
   font-size: 1.4rem;
+  margin-right: 0.25rem;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
 }
 
 .player-stats {
   display: flex;
-  gap: 1rem;
-  font-size: 0.85rem;
+  gap: 1.25rem;
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
 }
 
 .player-stats .stat {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.35rem;
 }
 
 .player-stats .correct {
