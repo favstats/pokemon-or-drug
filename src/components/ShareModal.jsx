@@ -310,7 +310,7 @@ function ShareModal({ isOpen, onClose, playerData, gameData }) {
 
           {/* Support Section */}
           <div className="support-section">
-            <span>Enjoying the game?</span>
+            <span>Enjoying the game? Consider supporting the development :)</span>
             <div className="support-buttons">
               <a 
                 href="https://www.buymeacoffee.com/favstats" 
