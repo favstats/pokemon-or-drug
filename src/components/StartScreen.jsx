@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faUser, 
@@ -63,11 +63,33 @@ function StartScreen() {
   const [playerNames, setPlayerNames] = useState(['', '']);
   const [playerIcons, setPlayerIcons] = useState(['🎮', '🎮']);
   const [showIconPicker, setShowIconPicker] = useState(null); // index of player or null
+  const [isFirstIconVisit, setIsFirstIconVisit] = useState(() => {
+    return !localStorage.getItem('pord_icon_hint_shown');
+  });
+  const [showIconHint, setShowIconHint] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showScoreboard, setShowScoreboard] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
   const [scoreTab, setScoreTab] = useState('global'); // 'global' or 'local'
   const [leagueFilter, setLeagueFilter] = useState('all'); // 'all' or league id
+
+  // Show mobile hint for first-time visitors
+  useEffect(() => {
+    if (isFirstIconVisit && state.gameMode) {
+      // Show hint after a short delay
+      const showTimer = setTimeout(() => setShowIconHint(true), 500);
+      // Hide hint after 3 seconds
+      const hideTimer = setTimeout(() => {
+        setShowIconHint(false);
+        setIsFirstIconVisit(false);
+        localStorage.setItem('pord_icon_hint_shown', 'true');
+      }, 3500);
+      return () => {
+        clearTimeout(showTimer);
+        clearTimeout(hideTimer);
+      };
+    }
+  }, [isFirstIconVisit, state.gameMode]);
 
   const handleModeSelect = (mode) => {
     play('select');
@@ -463,10 +485,13 @@ function StartScreen() {
         </div>
       ) : (
         <div className="player-setup">
-          <h2>
-            <FontAwesomeIcon icon={faGamepad} /> 
-            {state.gameMode === 'single' ? ' Enter Your Name' : ' Player Setup'}
-          </h2>
+          <div className="player-setup-header">
+            <h2>
+              <FontAwesomeIcon icon={faGamepad} /> 
+              {state.gameMode === 'single' ? ' Enter Your Name' : ' Player Setup'}
+            </h2>
+            <span className="player-setup-subtitle">and choose your icon</span>
+          </div>
           
           <div className="player-list">
             {playerNames.map((name, index) => (
@@ -476,12 +501,25 @@ function StartScreen() {
               >
                 <div className="icon-picker-container">
                   <button 
-                    className="icon-select-btn"
-                    onClick={() => setShowIconPicker(showIconPicker === index ? null : index)}
+                    className={`icon-select-btn ${isFirstIconVisit && index === 0 ? 'first-visit-pulse' : ''}`}
+                    onClick={() => {
+                      setShowIconPicker(showIconPicker === index ? null : index);
+                      // Dismiss hint on first click
+                      if (isFirstIconVisit) {
+                        setShowIconHint(false);
+                        setIsFirstIconVisit(false);
+                        localStorage.setItem('pord_icon_hint_shown', 'true');
+                      }
+                    }}
                     title="Choose your icon"
                   >
-                    {playerIcons[index] || '🎮'}
+                    <span className="icon-emoji">{playerIcons[index] || '🎮'}</span>
+                    <span className="icon-chevron">▾</span>
                   </button>
+                  {/* Mobile hint tooltip */}
+                  {showIconHint && index === 0 && (
+                    <div className="icon-hint-tooltip">Tap to change</div>
+                  )}
                   {showIconPicker === index && (
                     <div className="icon-picker-dropdown">
                       {PLAYER_ICONS.map((icon) => (

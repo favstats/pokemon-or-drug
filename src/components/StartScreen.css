@@ -668,11 +668,22 @@
   z-index: 10;
 }
 
-.player-setup h2 {
+.player-setup-header {
   text-align: center;
   margin-bottom: 2rem;
+}
+
+.player-setup h2 {
   color: white;
   font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.player-setup-subtitle {
+  display: block;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 400;
 }
 
 .player-list {
@@ -712,15 +723,87 @@
   cursor: pointer;
   font-size: 1.5rem;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+  position: relative;
+  gap: 0;
+}
+
+.icon-emoji {
+  line-height: 1;
+}
+
+.icon-chevron {
+  font-size: 0.5rem;
+  opacity: 0.5;
+  margin-top: -2px;
+  line-height: 1;
 }
 
 .icon-select-btn:hover {
   border-color: var(--pokemon-yellow);
   background: rgba(255, 203, 5, 0.2);
   transform: scale(1.05);
+}
+
+.icon-select-btn:hover .icon-chevron {
+  opacity: 0.8;
+}
+
+/* First-time pulse animation */
+.icon-select-btn.first-visit-pulse {
+  animation: icon-pulse 2s ease-in-out infinite;
+}
+
+@keyframes icon-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 203, 5, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(255, 203, 5, 0);
+  }
+}
+
+/* Mobile hint tooltip */
+.icon-hint-tooltip {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 6px;
+  background: var(--pokemon-yellow);
+  color: #1a1a2e;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  z-index: 50;
+  animation: hint-fade-in 0.3s ease-out;
+  pointer-events: none;
+}
+
+.icon-hint-tooltip::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-bottom-color: var(--pokemon-yellow);
+}
+
+@keyframes hint-fade-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 .icon-picker-dropdown {
@@ -953,6 +1036,15 @@
     height: 40px;
     min-width: 40px;
     font-size: 1.2rem;
+  }
+  
+  .icon-chevron {
+    font-size: 0.4rem;
+  }
+  
+  .icon-hint-tooltip {
+    font-size: 0.6rem;
+    padding: 2px 6px;
   }
   
   .player-input-row input {
