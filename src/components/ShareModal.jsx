@@ -97,12 +97,14 @@ function ShareModal({ isOpen, onClose, playerData, gameData }) {
     // Measure text parts
     const pokemonText = 'Pokemon';
     const orText = ' or ';
-    const pillText = 'Pill?';
+    const pillText = 'Pill';
+    const questionMark = '?';
     
     const pokemonWidth = ctx.measureText(pokemonText).width;
     const orWidth = ctx.measureText(orText).width;
     const pillWidth = ctx.measureText(pillText).width;
-    const totalWidth = pokemonWidth + orWidth + pillWidth;
+    const questionWidth = ctx.measureText(questionMark).width;
+    const totalWidth = pokemonWidth + orWidth + pillWidth + questionWidth;
     
     let titleX = (w - totalWidth) / 2;
     
@@ -117,9 +119,14 @@ function ShareModal({ isOpen, onClose, playerData, gameData }) {
     ctx.fillText(orText, titleX, titleY);
     titleX += orWidth;
     
-    // Pill? - pink
+    // Pill - pink
     ctx.fillStyle = '#FF6B9D';
     ctx.fillText(pillText, titleX, titleY);
+    titleX += pillWidth;
+    
+    // ? - white (same as "or")
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+    ctx.fillText(questionMark, titleX, titleY);
     
     ctx.textAlign = 'center';
 
