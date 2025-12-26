@@ -90,11 +90,38 @@ function ShareModal({ isOpen, onClose, playerData, gameData }) {
     ctx.arc(w, h, 100, 0, Math.PI * 2);
     ctx.fill();
 
-    // Title
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#FFCB05';
+    // Title - colored like the front page
     ctx.font = 'bold 28px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
-    ctx.fillText('Pokemon or Pill?', w / 2, 35);
+    const titleY = 35;
+    
+    // Measure text parts
+    const pokemonText = 'Pokemon';
+    const orText = ' or ';
+    const pillText = 'Pill?';
+    
+    const pokemonWidth = ctx.measureText(pokemonText).width;
+    const orWidth = ctx.measureText(orText).width;
+    const pillWidth = ctx.measureText(pillText).width;
+    const totalWidth = pokemonWidth + orWidth + pillWidth;
+    
+    let titleX = (w - totalWidth) / 2;
+    
+    // Pokemon - yellow
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#FFCB05';
+    ctx.fillText(pokemonText, titleX, titleY);
+    titleX += pokemonWidth;
+    
+    // or - white
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+    ctx.fillText(orText, titleX, titleY);
+    titleX += orWidth;
+    
+    // Pill? - pink
+    ctx.fillStyle = '#FF6B9D';
+    ctx.fillText(pillText, titleX, titleY);
+    
+    ctx.textAlign = 'center';
 
     // Player name with icon
     ctx.fillStyle = '#ffffff';
