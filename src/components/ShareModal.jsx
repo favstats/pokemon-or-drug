@@ -19,6 +19,19 @@ import {
 import { QRCodeSVG } from 'qrcode.react';
 import './ShareModal.css';
 
+// Import badge SVGs
+import BoulderBadge from '../assets/badges/boulder.svg';
+import CascadeBadge from '../assets/badges/cascade.svg';
+import VolcanoBadge from '../assets/badges/volcano.svg';
+import EarthBadge from '../assets/badges/earth.svg';
+
+const badgeImages = {
+  boulder: BoulderBadge,
+  cascade: CascadeBadge,
+  volcano: VolcanoBadge,
+  earth: EarthBadge,
+};
+
 // Bluesky icon (not in FontAwesome)
 const BlueskyIcon = () => (
   <svg viewBox="0 0 600 530" width="18" height="18" fill="currentColor">
@@ -46,76 +59,154 @@ function ShareModal({ isOpen, onClose, playerData, gameData }) {
            `Can you beat my score? 👇\n${GAME_URL}`;
   };
 
-  // Generate score card image
+  // Generate score card image (2x resolution for high quality)
   useEffect(() => {
     if (!isOpen || !canvasRef.current) return;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    const width = 600;
-    const height = 400;
+    
+    // 2x resolution for crisp images
+    const scale = 2;
+    const width = 600 * scale;
+    const height = 450 * scale;
     canvas.width = width;
     canvas.height = height;
+    ctx.scale(scale, scale);
+    
+    const w = 600; // Logical width
+    const h = 450; // Logical height
 
     // Background gradient
-    const gradient = ctx.createLinearGradient(0, 0, width, height);
+    const gradient = ctx.createLinearGradient(0, 0, w, h);
     gradient.addColorStop(0, '#1a1a2e');
-    gradient.addColorStop(1, '#16213e');
+    gradient.addColorStop(0.5, '#16213e');
+    gradient.addColorStop(1, '#0f1629');
     ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, width, height);
+    ctx.fillRect(0, 0, w, h);
 
-    // Decorative elements
-    ctx.fillStyle = 'rgba(255, 203, 5, 0.1)';
+    // Decorative circles
+    ctx.fillStyle = 'rgba(255, 203, 5, 0.08)';
     ctx.beginPath();
-    ctx.arc(-50, -50, 200, 0, Math.PI * 2);
+    ctx.arc(-30, -30, 180, 0, Math.PI * 2);
     ctx.fill();
     ctx.beginPath();
-    ctx.arc(width + 50, height + 50, 200, 0, Math.PI * 2);
+    ctx.arc(w + 30, h + 30, 180, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255, 107, 157, 0.05)';
+    ctx.beginPath();
+    ctx.arc(w, 0, 150, 0, Math.PI * 2);
     ctx.fill();
 
-    // Title
+    // Title with shadow
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+    ctx.shadowBlur = 10;
+    ctx.shadowOffsetY = 3;
     ctx.fillStyle = '#FFCB05';
-    ctx.font = 'bold 32px system-ui, -apple-system, sans-serif';
+    ctx.font = 'bold 38px system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Pokemon or Drug?', width / 2, 50);
+    ctx.fillText('Pokemon or Drug?', w / 2, 50);
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
 
-    // Player info
+    // Player icon and name
     ctx.fillStyle = 'white';
-    ctx.font = '24px system-ui, -apple-system, sans-serif';
-    ctx.fillText(`${icon || '🎮'} ${name}`, width / 2, 100);
+    ctx.font = '28px system-ui, -apple-system, sans-serif';
+    ctx.fillText(`${icon || '🎮'} ${name}`, w / 2, 95);
 
-    // Score
+    // Score (large)
+    ctx.shadowColor = 'rgba(255, 203, 5, 0.4)';
+    ctx.shadowBlur = 20;
     ctx.fillStyle = '#FFCB05';
-    ctx.font = 'bold 72px system-ui, -apple-system, sans-serif';
-    ctx.fillText(score.toLocaleString(), width / 2, 180);
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-    ctx.font = '18px system-ui, -apple-system, sans-serif';
-    ctx.fillText('POINTS', width / 2, 210);
+    ctx.font = 'bold 90px system-ui, -apple-system, sans-serif';
+    ctx.fillText(score.toLocaleString(), w / 2, 185);
+    ctx.shadowBlur = 0;
+    
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+    ctx.font = '600 20px system-ui, -apple-system, sans-serif';
+    ctx.letterSpacing = '4px';
+    ctx.fillText('POINTS', w / 2, 215);
 
-    // Stats
-    ctx.font = '20px system-ui, -apple-system, sans-serif';
-    ctx.fillStyle = 'white';
+    // Stats row with icons (drawn as shapes)
     const statsY = 270;
-    ctx.fillText(`✅ ${correctAnswers} correct`, width / 4, statsY);
-    ctx.fillText(`❌ ${wrongAnswers} wrong`, width / 2, statsY);
-    ctx.fillText(`🎯 ${accuracy}%`, (width / 4) * 3, statsY);
+    const statSpacing = w / 4;
+    
+    // Draw stat boxes
+    const drawStatBox = (x, label, value, color) => {
+      // Background
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+      ctx.beginPath();
+      ctx.roundRect(x - 60, statsY - 25, 120, 50, 10);
+      ctx.fill();
+      
+      // Icon circle
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(x - 35, statsY, 12, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Checkmark or X
+      ctx.fillStyle = '#1a1a2e';
+      ctx.font = 'bold 14px system-ui';
+      ctx.fillText(label === 'correct' ? '✓' : label === 'wrong' ? '✗' : '◎', x - 35, statsY + 5);
+      
+      // Value
+      ctx.fillStyle = 'white';
+      ctx.font = 'bold 20px system-ui, -apple-system, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(value, x + 15, statsY + 7);
+    };
+    
+    drawStatBox(statSpacing * 1, 'correct', `${correctAnswers}`, '#4ade80');
+    drawStatBox(statSpacing * 2, 'wrong', `${wrongAnswers}`, '#f87171');
+    drawStatBox(statSpacing * 3, 'accuracy', `${accuracy}%`, '#fbbf24');
 
-    // League/Badge
-    if (league) {
-      const leagueName = `${league.charAt(0).toUpperCase() + league.slice(1)} Badge`;
-      ctx.fillStyle = '#FFCB05';
-      ctx.font = 'bold 22px system-ui, -apple-system, sans-serif';
-      ctx.fillText(`🏅 ${leagueName}`, width / 2, 320);
+    // Speed stat
+    if (avgSpeed) {
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+      ctx.beginPath();
+      ctx.roundRect(w / 2 - 80, statsY + 40, 160, 35, 8);
+      ctx.fill();
+      
+      ctx.fillStyle = '#60a5fa';
+      ctx.font = '16px system-ui';
+      ctx.fillText(`⚡ Avg Speed: ${(avgSpeed / 1000).toFixed(1)}s`, w / 2, statsY + 63);
     }
 
-    // Footer
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-    ctx.font = '16px system-ui, -apple-system, sans-serif';
-    ctx.fillText('Play at: favstats.github.io/pokemon-or-drug', width / 2, 370);
-
-    // Convert to image URL
-    setScoreCardUrl(canvas.toDataURL('image/png'));
-  }, [isOpen, name, icon, score, accuracy, correctAnswers, wrongAnswers, league]);
+    // Badge section
+    if (league && badgeImages[league]) {
+      const badgeY = avgSpeed ? 365 : 340;
+      
+      // Load and draw badge
+      const img = new Image();
+      img.onload = () => {
+        ctx.drawImage(img, w / 2 - 25, badgeY - 30, 50, 50);
+        
+        // Badge name
+        const leagueName = `${league.charAt(0).toUpperCase() + league.slice(1)} Badge`;
+        ctx.fillStyle = '#FFCB05';
+        ctx.font = 'bold 20px system-ui, -apple-system, sans-serif';
+        ctx.fillText(leagueName, w / 2, badgeY + 40);
+        
+        // Footer
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.font = '14px system-ui, -apple-system, sans-serif';
+        ctx.fillText('favstats.github.io/pokemon-or-drug', w / 2, h - 15);
+        
+        // Convert to image URL
+        setScoreCardUrl(canvas.toDataURL('image/png', 1.0));
+      };
+      img.src = badgeImages[league];
+    } else {
+      // No badge - just footer
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.font = '14px system-ui, -apple-system, sans-serif';
+      ctx.fillText('favstats.github.io/pokemon-or-drug', w / 2, h - 15);
+      
+      // Convert to image URL
+      setScoreCardUrl(canvas.toDataURL('image/png', 1.0));
+    }
+  }, [isOpen, name, icon, score, accuracy, avgSpeed, correctAnswers, wrongAnswers, league]);
 
   const handleCopyLink = async () => {
     try {
