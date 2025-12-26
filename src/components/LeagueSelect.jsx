@@ -123,7 +123,7 @@ function LeagueSelect() {
             </motion.button>
             <div className="unranked-info">
               <span className="unranked-settings-preview">
-                {state.settings.totalRounds} rounds • {state.settings.livesPerPlayer} lives • {state.settings.timerDuration}s • {state.settings.bonusProbability}% bonus
+                Default: {state.settings.totalRounds} rounds • {state.settings.livesPerPlayer} lives • {state.settings.timerDuration}s • {state.settings.bonusProbability}% bonus
               </span>
               <button 
                 className="edit-settings-btn"
