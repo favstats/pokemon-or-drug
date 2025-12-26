@@ -922,6 +922,44 @@
   
   .player-setup {
     padding: 1.5rem;
+    max-width: 100%;
+  }
+  
+  .player-list {
+    width: 100%;
+  }
+  
+  .player-input-row {
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .icon-select-btn {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    font-size: 1.2rem;
+  }
+  
+  .player-input-row input {
+    min-width: 0;
+    padding: 0.6rem 0.75rem;
+    font-size: 1rem;
+  }
+  
+  .remove-player-btn {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    font-size: 0.8rem;
+  }
+  
+  .icon-picker-dropdown {
+    grid-template-columns: repeat(8, 1fr);
+    max-width: 280px;
+    left: -20px;
   }
   
   .action-buttons {
