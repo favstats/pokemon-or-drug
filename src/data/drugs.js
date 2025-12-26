@@ -80,16 +80,16 @@ export const drugNames = [
   { name: "Coreg", category: "BLOOD PRESSURE", description: "Treats high blood pressure and heart failure.", color: "#F39C12" },
   
   // Diabetes
-  { name: "Ozempic", category: "DIABETES", description: "Treats type 2 diabetes and aids weight loss.", color: "#2ECC71" },
-  { name: "Wegovy", category: "WEIGHT LOSS", description: "Aids chronic weight management.", color: "#27AE60" },
+  { name: "Ozempic", category: "DIABETES", description: "Treats type 2 diabetes and aids weight loss.", color: "#2ECC71", form: "Injection" },
+  { name: "Wegovy", category: "WEIGHT LOSS", description: "Aids chronic weight management.", color: "#27AE60", form: "Injection" },
   { name: "Metformin", category: "DIABETES", description: "Treats type 2 diabetes.", color: "#16A085" },
   { name: "Jardiance", category: "DIABETES", description: "Treats type 2 diabetes.", color: "#1ABC9C" },
   { name: "Farxiga", category: "DIABETES", description: "Treats type 2 diabetes and heart failure.", color: "#3498DB" },
-  { name: "Trulicity", category: "DIABETES", description: "Treats type 2 diabetes.", color: "#2980B9" },
+  { name: "Trulicity", category: "DIABETES", description: "Treats type 2 diabetes.", color: "#2980B9", form: "Injection" },
   { name: "Januvia", category: "DIABETES", description: "Treats type 2 diabetes.", color: "#9B59B6" },
   { name: "Invokana", category: "DIABETES", description: "Treats type 2 diabetes.", color: "#8E44AD" },
-  { name: "Victoza", category: "DIABETES", description: "Treats type 2 diabetes.", color: "#E74C3C" },
-  { name: "Mounjaro", category: "DIABETES", description: "Treats type 2 diabetes and aids weight loss.", color: "#C0392B" },
+  { name: "Victoza", category: "DIABETES", description: "Treats type 2 diabetes.", color: "#E74C3C", form: "Injection" },
+  { name: "Mounjaro", category: "DIABETES", description: "Treats type 2 diabetes and aids weight loss.", color: "#C0392B", form: "Injection" },
   
   // Antibiotics
   { name: "Amoxil", category: "ANTIBIOTIC", description: "Treats bacterial infections.", color: "#E74C3C" },
@@ -106,12 +106,12 @@ export const drugNames = [
   { name: "Allegra", category: "ANTIHISTAMINE", description: "Treats allergies.", color: "#2980B9" },
   { name: "Claritin", category: "ANTIHISTAMINE", description: "Treats allergies.", color: "#1ABC9C" },
   { name: "Singulair", category: "RESPIRATORY", description: "Treats asthma and allergies.", color: "#16A085" },
-  { name: "Flonase", category: "NASAL SPRAY", description: "Treats nasal allergies.", color: "#27AE60" },
-  { name: "Nasonex", category: "NASAL SPRAY", description: "Treats nasal allergies.", color: "#2ECC71" },
-  { name: "Advair", category: "RESPIRATORY", description: "Treats asthma and COPD.", color: "#F1C40F" },
-  { name: "Symbicort", category: "RESPIRATORY", description: "Treats asthma and COPD.", color: "#F39C12" },
-  { name: "Spiriva", category: "RESPIRATORY", description: "Treats COPD.", color: "#E67E22" },
-  { name: "Breo", category: "RESPIRATORY", description: "Treats asthma and COPD.", color: "#D35400" },
+  { name: "Flonase", category: "NASAL SPRAY", description: "Treats nasal allergies.", color: "#27AE60", form: "Nasal Spray" },
+  { name: "Nasonex", category: "NASAL SPRAY", description: "Treats nasal allergies.", color: "#2ECC71", form: "Nasal Spray" },
+  { name: "Advair", category: "RESPIRATORY", description: "Treats asthma and COPD.", color: "#F1C40F", form: "Inhaler" },
+  { name: "Symbicort", category: "RESPIRATORY", description: "Treats asthma and COPD.", color: "#F39C12", form: "Inhaler" },
+  { name: "Spiriva", category: "RESPIRATORY", description: "Treats COPD.", color: "#E67E22", form: "Inhaler" },
+  { name: "Breo", category: "RESPIRATORY", description: "Treats asthma and COPD.", color: "#D35400", form: "Inhaler" },
   
   // Acid Reflux & GI
   { name: "Nexium", category: "ACID REDUCER", description: "Treats heartburn, GERD, and ulcers.", color: "#9B59B6" },
@@ -123,28 +123,28 @@ export const drugNames = [
   { name: "Linzess", category: "GI MEDICATION", description: "Treats IBS with constipation.", color: "#00BCD4" },
   
   // Immunology & Biologics
-  { name: "Humira", category: "BIOLOGIC", description: "Treats autoimmune diseases like arthritis.", color: "#E91E63" },
-  { name: "Enbrel", category: "BIOLOGIC", description: "Treats autoimmune diseases.", color: "#F44336" },
-  { name: "Remicade", category: "BIOLOGIC", description: "Treats autoimmune diseases.", color: "#FF5722" },
-  { name: "Stelara", category: "BIOLOGIC", description: "Treats psoriasis and Crohn's disease.", color: "#FF9800" },
-  { name: "Cosentyx", category: "BIOLOGIC", description: "Treats psoriasis and arthritis.", color: "#FFC107" },
-  { name: "Dupixent", category: "BIOLOGIC", description: "Treats eczema and asthma.", color: "#FFEB3B" },
-  { name: "Skyrizi", category: "BIOLOGIC", description: "Treats psoriasis.", color: "#CDDC39" },
+  { name: "Humira", category: "BIOLOGIC", description: "Treats autoimmune diseases like arthritis.", color: "#E91E63", form: "Injection" },
+  { name: "Enbrel", category: "BIOLOGIC", description: "Treats autoimmune diseases.", color: "#F44336", form: "Injection" },
+  { name: "Remicade", category: "BIOLOGIC", description: "Treats autoimmune diseases.", color: "#FF5722", form: "Infusion" },
+  { name: "Stelara", category: "BIOLOGIC", description: "Treats psoriasis and Crohn's disease.", color: "#FF9800", form: "Injection" },
+  { name: "Cosentyx", category: "BIOLOGIC", description: "Treats psoriasis and arthritis.", color: "#FFC107", form: "Injection" },
+  { name: "Dupixent", category: "BIOLOGIC", description: "Treats eczema and asthma.", color: "#FFEB3B", form: "Injection" },
+  { name: "Skyrizi", category: "BIOLOGIC", description: "Treats psoriasis.", color: "#CDDC39", form: "Injection" },
   { name: "Rinvoq", category: "BIOLOGIC", description: "Treats rheumatoid arthritis.", color: "#8BC34A" },
-  { name: "Tremfya", category: "BIOLOGIC", description: "Treats psoriasis.", color: "#4CAF50" },
-  { name: "Taltz", category: "BIOLOGIC", description: "Treats psoriasis and arthritis.", color: "#009688" },
+  { name: "Tremfya", category: "BIOLOGIC", description: "Treats psoriasis.", color: "#4CAF50", form: "Injection" },
+  { name: "Taltz", category: "BIOLOGIC", description: "Treats psoriasis and arthritis.", color: "#009688", form: "Injection" },
   
   // Cancer/Oncology
-  { name: "Keytruda", category: "ONCOLOGY", description: "Cancer immunotherapy.", color: "#E74C3C" },
-  { name: "Opdivo", category: "ONCOLOGY", description: "Cancer immunotherapy.", color: "#C0392B" },
-  { name: "Rituxan", category: "ONCOLOGY", description: "Treats certain cancers.", color: "#9B59B6" },
-  { name: "Herceptin", category: "ONCOLOGY", description: "Treats breast and stomach cancer.", color: "#8E44AD" },
-  { name: "Avastin", category: "ONCOLOGY", description: "Treats various cancers.", color: "#2980B9" },
+  { name: "Keytruda", category: "ONCOLOGY", description: "Cancer immunotherapy.", color: "#E74C3C", form: "Infusion" },
+  { name: "Opdivo", category: "ONCOLOGY", description: "Cancer immunotherapy.", color: "#C0392B", form: "Infusion" },
+  { name: "Rituxan", category: "ONCOLOGY", description: "Treats certain cancers.", color: "#9B59B6", form: "Infusion" },
+  { name: "Herceptin", category: "ONCOLOGY", description: "Treats breast and stomach cancer.", color: "#8E44AD", form: "Infusion" },
+  { name: "Avastin", category: "ONCOLOGY", description: "Treats various cancers.", color: "#2980B9", form: "Infusion" },
   { name: "Revlimid", category: "ONCOLOGY", description: "Treats multiple myeloma.", color: "#3498DB" },
   { name: "Ibrance", category: "ONCOLOGY", description: "Treats breast cancer.", color: "#1ABC9C" },
   { name: "Imbruvica", category: "ONCOLOGY", description: "Treats blood cancers.", color: "#16A085" },
   { name: "Tagrisso", category: "ONCOLOGY", description: "Treats lung cancer.", color: "#27AE60" },
-  { name: "Darzalex", category: "ONCOLOGY", description: "Treats multiple myeloma.", color: "#2ECC71" },
+  { name: "Darzalex", category: "ONCOLOGY", description: "Treats multiple myeloma.", color: "#2ECC71", form: "Infusion" },
   
   // Blood Thinners
   { name: "Eliquis", category: "ANTICOAGULANT", description: "Prevents blood clots.", color: "#E74C3C" },
@@ -182,9 +182,9 @@ export const drugNames = [
   { name: "Maxalt", category: "MIGRAINE", description: "Treats migraine headaches.", color: "#C0392B" },
   { name: "Zomig", category: "MIGRAINE", description: "Treats migraine headaches.", color: "#9B59B6" },
   { name: "Relpax", category: "MIGRAINE", description: "Treats migraine headaches.", color: "#8E44AD" },
-  { name: "Aimovig", category: "MIGRAINE", description: "Prevents migraine headaches.", color: "#2980B9" },
-  { name: "Ajovy", category: "MIGRAINE", description: "Prevents migraine headaches.", color: "#3498DB" },
-  { name: "Emgality", category: "MIGRAINE", description: "Prevents migraine headaches.", color: "#1ABC9C" },
+  { name: "Aimovig", category: "MIGRAINE", description: "Prevents migraine headaches.", color: "#2980B9", form: "Injection" },
+  { name: "Ajovy", category: "MIGRAINE", description: "Prevents migraine headaches.", color: "#3498DB", form: "Injection" },
+  { name: "Emgality", category: "MIGRAINE", description: "Prevents migraine headaches.", color: "#1ABC9C", form: "Injection" },
   { name: "Nurtec", category: "MIGRAINE", description: "Treats and prevents migraines.", color: "#16A085" },
   { name: "Ubrelvy", category: "MIGRAINE", description: "Treats acute migraines.", color: "#27AE60" },
   
@@ -197,19 +197,19 @@ export const drugNames = [
   // Osteoporosis
   { name: "Fosamax", category: "BONE HEALTH", description: "Treats osteoporosis.", color: "#F1C40F" },
   { name: "Boniva", category: "BONE HEALTH", description: "Treats osteoporosis.", color: "#F39C12" },
-  { name: "Prolia", category: "BONE HEALTH", description: "Treats osteoporosis.", color: "#E67E22" },
-  { name: "Evenity", category: "BONE HEALTH", description: "Treats osteoporosis.", color: "#D35400" },
+  { name: "Prolia", category: "BONE HEALTH", description: "Treats osteoporosis.", color: "#E67E22", form: "Injection" },
+  { name: "Evenity", category: "BONE HEALTH", description: "Treats osteoporosis.", color: "#D35400", form: "Injection" },
   
   // Birth Control
   { name: "Yaz", category: "CONTRACEPTIVE", description: "Birth control pill.", color: "#E91E63" },
   { name: "Ortho", category: "CONTRACEPTIVE", description: "Birth control pill.", color: "#F44336" },
-  { name: "Mirena", category: "CONTRACEPTIVE", description: "IUD birth control.", color: "#FF5722" },
-  { name: "Nexplanon", category: "CONTRACEPTIVE", description: "Implant birth control.", color: "#FF9800" },
+  { name: "Mirena", category: "CONTRACEPTIVE", description: "IUD birth control.", color: "#FF5722", form: "IUD" },
+  { name: "Nexplanon", category: "CONTRACEPTIVE", description: "Implant birth control.", color: "#FF9800", form: "Implant" },
   
   // Opioid Treatment
   { name: "Suboxone", category: "ADDICTION", description: "Treats opioid dependence.", color: "#E74C3C" },
-  { name: "Vivitrol", category: "ADDICTION", description: "Treats alcohol and opioid dependence.", color: "#C0392B" },
-  { name: "Narcan", category: "OVERDOSE", description: "Reverses opioid overdose.", color: "#9B59B6" },
+  { name: "Vivitrol", category: "ADDICTION", description: "Treats alcohol and opioid dependence.", color: "#C0392B", form: "Injection" },
+  { name: "Narcan", category: "OVERDOSE", description: "Reverses opioid overdose.", color: "#9B59B6", form: "Nasal Spray" },
   
   // HIV/AIDS
   { name: "Truvada", category: "HIV", description: "Treats and prevents HIV.", color: "#3498DB" },
@@ -225,23 +225,23 @@ export const drugNames = [
   
   // MS (Multiple Sclerosis)
   { name: "Tecfidera", category: "MS", description: "Treats multiple sclerosis.", color: "#9C27B0" },
-  { name: "Ocrevus", category: "MS", description: "Treats multiple sclerosis.", color: "#673AB7" },
-  { name: "Tysabri", category: "MS", description: "Treats multiple sclerosis.", color: "#3F51B5" },
+  { name: "Ocrevus", category: "MS", description: "Treats multiple sclerosis.", color: "#673AB7", form: "Infusion" },
+  { name: "Tysabri", category: "MS", description: "Treats multiple sclerosis.", color: "#3F51B5", form: "Infusion" },
   { name: "Gilenya", category: "MS", description: "Treats multiple sclerosis.", color: "#2196F3" },
   { name: "Aubagio", category: "MS", description: "Treats multiple sclerosis.", color: "#03A9F4" },
-  { name: "Kesimpta", category: "MS", description: "Treats multiple sclerosis.", color: "#00BCD4" },
+  { name: "Kesimpta", category: "MS", description: "Treats multiple sclerosis.", color: "#00BCD4", form: "Injection" },
   
   // Eye Care
-  { name: "Restasis", category: "EYE CARE", description: "Treats chronic dry eye.", color: "#3498DB" },
-  { name: "Xiidra", category: "EYE CARE", description: "Treats dry eye disease.", color: "#2980B9" },
-  { name: "Lumigan", category: "EYE CARE", description: "Treats glaucoma.", color: "#1ABC9C" },
-  { name: "Xalatan", category: "EYE CARE", description: "Treats glaucoma.", color: "#16A085" },
+  { name: "Restasis", category: "EYE CARE", description: "Treats chronic dry eye.", color: "#3498DB", form: "Eye Drops" },
+  { name: "Xiidra", category: "EYE CARE", description: "Treats dry eye disease.", color: "#2980B9", form: "Eye Drops" },
+  { name: "Lumigan", category: "EYE CARE", description: "Treats glaucoma.", color: "#1ABC9C", form: "Eye Drops" },
+  { name: "Xalatan", category: "EYE CARE", description: "Treats glaucoma.", color: "#16A085", form: "Eye Drops" },
   
   // Skin Conditions
   { name: "Otezla", category: "DERMATOLOGY", description: "Treats psoriasis and psoriatic arthritis.", color: "#FF5722" },
-  { name: "Eucrisa", category: "DERMATOLOGY", description: "Treats eczema.", color: "#FF9800" },
-  { name: "Epiduo", category: "DERMATOLOGY", description: "Treats acne.", color: "#FFC107" },
-  { name: "Differin", category: "DERMATOLOGY", description: "Treats acne.", color: "#FFEB3B" },
+  { name: "Eucrisa", category: "DERMATOLOGY", description: "Treats eczema.", color: "#FF9800", form: "Cream" },
+  { name: "Epiduo", category: "DERMATOLOGY", description: "Treats acne.", color: "#FFC107", form: "Gel" },
+  { name: "Differin", category: "DERMATOLOGY", description: "Treats acne.", color: "#FFEB3B", form: "Gel" },
   
   // Miscellaneous
   { name: "Provigil", category: "WAKEFULNESS", description: "Treats narcolepsy and sleep apnea.", color: "#F39C12" },
@@ -254,9 +254,9 @@ export const drugNames = [
   { name: "Xeljanz", category: "IMMUNOLOGY", description: "Treats rheumatoid arthritis.", color: "#2980B9" },
   { name: "Olumiant", category: "IMMUNOLOGY", description: "Treats rheumatoid arthritis.", color: "#3498DB" },
   { name: "Orencia", category: "IMMUNOLOGY", description: "Treats rheumatoid arthritis.", color: "#1ABC9C" },
-  { name: "Actemra", category: "IMMUNOLOGY", description: "Treats rheumatoid arthritis.", color: "#16A085" },
-  { name: "Simponi", category: "IMMUNOLOGY", description: "Treats autoimmune diseases.", color: "#27AE60" },
-  { name: "Cimzia", category: "IMMUNOLOGY", description: "Treats autoimmune diseases.", color: "#2ECC71" },
+  { name: "Actemra", category: "IMMUNOLOGY", description: "Treats rheumatoid arthritis.", color: "#16A085", form: "Injection" },
+  { name: "Simponi", category: "IMMUNOLOGY", description: "Treats autoimmune diseases.", color: "#27AE60", form: "Injection" },
+  { name: "Cimzia", category: "IMMUNOLOGY", description: "Treats autoimmune diseases.", color: "#2ECC71", form: "Injection" },
 ];
 
 // Pill shapes for variety

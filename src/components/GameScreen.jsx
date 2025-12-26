@@ -227,7 +227,7 @@ function GameScreen() {
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
-          <span className="btn-emoji">⚡</span>
+          <FontAwesomeIcon icon={faBolt} className="btn-icon" />
           <span className="btn-text">Pokémon</span>
         </motion.button>
 
@@ -240,7 +240,7 @@ function GameScreen() {
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
-          <span className="btn-emoji">💊</span>
+          <FontAwesomeIcon icon={faCapsules} className="btn-icon" />
           <span className="btn-text">Pill</span>
         </motion.button>
       </div>

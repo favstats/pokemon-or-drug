@@ -137,7 +137,7 @@ function RevealCard() {
         >
           <h2 className="reveal-name">{question.name}</h2>
           <p className="reveal-type">
-            is a <span className={question.type}>{question.type === 'pokemon' ? 'Pokémon' : 'Pill'}</span>!
+            is a <span className={question.type}>{question.type === 'pokemon' ? 'Pokémon' : (question.form || 'Pill')}</span>!
           </p>
           
           {/* Drug description */}
