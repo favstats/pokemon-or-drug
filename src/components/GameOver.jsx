@@ -13,8 +13,10 @@ import {
   faCrown,
   faStopwatch,
   faBolt,
-  faShareAlt
+  faShareAlt,
+  faCoffee
 } from '@fortawesome/free-solid-svg-icons';
+import { faPaypal } from '@fortawesome/free-brands-svg-icons';
 import confetti from 'canvas-confetti';
 import { useGame, LEAGUES } from '../context/GameContext';
 import { useSound } from '../context/SoundContext';
@@ -426,6 +428,34 @@ function GameOver() {
             Unranked game — not on global leaderboard
           </motion.p>
         )}
+
+        {/* Support Section */}
+        <motion.div 
+          className="support-section"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.3 }}
+        >
+          <span>Enjoying the game? Consider supporting the development :)</span>
+          <div className="support-buttons">
+            <a 
+              href="https://buymeacoffee.com/favstats" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="support-btn coffee"
+            >
+              <FontAwesomeIcon icon={faCoffee} /> Coffee
+            </a>
+            <a 
+              href="https://paypal.me/favstats" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="support-btn paypal"
+            >
+              <FontAwesomeIcon icon={faPaypal} /> PayPal
+            </a>
+          </div>
+        </motion.div>
       </motion.div>
 
       {/* Share Modal */}

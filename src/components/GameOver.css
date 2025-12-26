@@ -352,6 +352,61 @@
   text-align: center;
 }
 
+/* Support Section */
+.gameover-content .support-section {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+}
+
+.gameover-content .support-section span {
+  display: block;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.gameover-content .support-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.gameover-content .support-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.gameover-content .support-btn.coffee {
+  background: #FFDD00;
+  color: #000;
+}
+
+.gameover-content .support-btn.coffee:hover {
+  background: #FFE840;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 221, 0, 0.3);
+}
+
+.gameover-content .support-btn.paypal {
+  background: #0070BA;
+  color: #fff;
+}
+
+.gameover-content .support-btn.paypal:hover {
+  background: #003087;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 112, 186, 0.3);
+}
+
 /* Loading/no scores */
 .highscores-list .loading-scores,
 .highscores-list .no-scores {
