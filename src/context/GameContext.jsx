@@ -19,7 +19,7 @@ export const LEAGUES = {
     settings: {
       totalRounds: 10,
       livesPerPlayer: 5,
-      timerDuration: 20,
+      timerDuration: 15,
       bonusProbability: 30,
     },
   },
@@ -34,7 +34,7 @@ export const LEAGUES = {
     settings: {
       totalRounds: 15,
       livesPerPlayer: 3,
-      timerDuration: 15,
+      timerDuration: 10,
       bonusProbability: 20,
     },
   },
@@ -49,7 +49,7 @@ export const LEAGUES = {
     settings: {
       totalRounds: 20,
       livesPerPlayer: 2,
-      timerDuration: 12,
+      timerDuration: 8,
       bonusProbability: 10,
     },
   },
@@ -64,7 +64,7 @@ export const LEAGUES = {
     settings: {
       totalRounds: 30,
       livesPerPlayer: 0, // No life loss - play all rounds
-      timerDuration: 10,
+      timerDuration: 5,
       bonusProbability: 0,
     },
   },
