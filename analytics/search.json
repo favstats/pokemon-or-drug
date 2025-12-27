@@ -1,0 +1,30 @@
+[
+  {
+    "objectID": "games_over_time.html",
+    "href": "games_over_time.html",
+    "title": " Games Over Time",
+    "section": "",
+    "text": "Last Updated: 2025-12-27 11:57:51 CET (data fetched from Google Sheets)"
+  },
+  {
+    "objectID": "games_over_time.html#time",
+    "href": "games_over_time.html#time",
+    "title": " Games Over Time",
+    "section": "time",
+    "text": "time\n\nGames Played Over Time by LeagueGames by Hour of DayGames by Day of Week"
+  },
+  {
+    "objectID": "league_analysis.html",
+    "href": "league_analysis.html",
+    "title": " League Analysis",
+    "section": "",
+    "text": "Last Updated: 2025-12-27 11:57:51 CET (data fetched from Google Sheets)\nThe table below shows aggregated statistics for each league:\n\n\n\n\n\nLeague Statistics\n\n\n\n\nPerformance metrics by difficulty level\n\n\n\n\nLeague\n\n\nTotal Games\n\n\nAvg Score\n\n\nAvg Accuracy (%)\n\n\nAvg Speed (ms)\n\n\n\n\n\n\nboulder\n\n\n497\n\n\n2,378\n\n\n91.0\n\n\n1,989\n\n\n\n\ncascade\n\n\n93\n\n\n4,023\n\n\n91.9\n\n\n1,678\n\n\n\n\nvolcano\n\n\n53\n\n\n4,992\n\n\n87.8\n\n\n1,582\n\n\n\n\nearth\n\n\n652\n\n\n4,731\n\n\n68.2\n\n\n1,046\n\n\n\n\nNA\n\n\n771\n\n\n2,640\n\n\n96.3\n\n\n2,031"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": " Overview",
+    "section": "",
+    "text": "Pokémon or Drug - Game Analytics\nLast Updated: 2025-12-27 11:58:54 CET (data fetched from Google Sheets)\nWelcome to the analytics dashboard for Pokémon or Drug! This dashboard provides insights into game play patterns, league preferences, and player performance.\n\n🔄 Live Data: This dashboard automatically fetches fresh data from Google Sheets on page load and updates every 5 minutes.\n\n\n\n\n                    Total Games        1800                            \n                    Unique Players        1164                            \n                    Average Score        3793                            \n                    Average Accuracy        93.4%                            \n\n\n\n\n\n\n\n\n\n\nWhat’s Inside\n\n\n\nExplore the dashboard to see:\n\nGames Over Time: Daily trends and hourly patterns\nLeague Analysis: Performance metrics by difficulty level\nPlayer Insights: Score distributions and accuracy trends\n\n\n\n\n\n\n\n\n\n Back to top"
+  }
+]

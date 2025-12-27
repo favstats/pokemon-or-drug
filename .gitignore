@@ -23,3 +23,4 @@ itch-build
 *.njsproj
 *.sln
 *.sw?
+.Rproj.user

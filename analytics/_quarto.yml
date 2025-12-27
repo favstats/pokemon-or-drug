@@ -1,0 +1,54 @@
+project:
+  type: website
+  output-dir: .
+  resources:
+    - assets/
+
+website:
+  title: "Pokémon or Drug - Game Analytics"
+  navbar:
+    style: dark
+    brand: "🎮 Pokémon or Drug Analytics"
+    toggle: collapse
+    left:
+      - href: index.qmd
+        text: "Home"
+      - href: games_over_time.qmd
+        text: "{{< iconify ph chart-line >}} Games Over Time"
+      - href: league_analysis.qmd
+        text: "{{< iconify ph trophy >}} League Analysis"
+    right:
+      - icon: github
+        href: https://github.com/favstats/pokemon-or-drug
+      - icon: twitter
+        href: https://twitter.com/favstats
+    search: true
+  bread-crumbs: true
+  page-navigation: true
+  back-to-top-navigation: true
+  reader-mode: true
+  repo-url: https://github.com/favstats/pokemon-or-drug
+  repo-actions: [edit, source, issue]
+  page-footer: "© 2025 Pokémon or Drug - Built with dashboardr"
+
+format:
+  html:
+    prefer-html: true
+    theme:
+      - default
+      - _tabset_modern.scss
+
+    css:
+      - assets/modal.css
+      - assets/pagination.css
+    mainfont: "Fira Sans"
+    fontsize: 16px
+    monofont: "Fira Code"
+    code-tools: true
+    value-boxes: true
+    page-layout: full
+    include-in-header:
+      text: |
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500;600;700&display=swap" rel="stylesheet">

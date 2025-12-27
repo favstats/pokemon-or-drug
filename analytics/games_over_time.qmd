@@ -1,0 +1,170 @@
+---
+title: "{{< iconify ph chart-line >}} Games Over Time"
+format: html
+---
+
+```{r}
+#| include: false
+library(dashboardr)
+```
+
+```{=html}
+<style>
+/* Ensure chart containers expand to fit content - aggressive overrides */
+.cell-output-display,
+.cell-output,
+.panel-tabset-tabby > .tab-content,
+.panel-tabset > .tab-content,
+.tab-pane,
+.tab-pane.active,
+.card-body,
+.quarto-figure,
+section {
+  overflow: visible !important;
+  height: auto !important;
+  max-height: none !important;
+}
+/* Ensure highcharts containers respect their set height */
+.highcharts-container,
+.html-widget,
+.htmlwidget {
+  overflow: visible !important;
+}
+</style>
+<script>
+// Aggressive reflow for Highcharts - multiple attempts to catch widget initialization
+(function() {
+  function reflowCharts() {
+    if (typeof Highcharts !== 'undefined' && Highcharts.charts) {
+      Highcharts.charts.forEach(function(chart) {
+        if (chart) {
+          try { chart.reflow(); } catch(e) {}
+        }
+      });
+    }
+  }
+  
+  // Try multiple times at different intervals
+  [0, 100, 250, 500, 1000, 2000].forEach(function(delay) {
+    setTimeout(function() {
+      window.dispatchEvent(new Event('resize'));
+      requestAnimationFrame(reflowCharts);
+    }, delay);
+  });
+  
+  // Also reflow on any tab click
+  document.addEventListener('click', function(e) {
+    if (e.target.matches('.nav-link, [data-bs-toggle="tab"]')) {
+      setTimeout(reflowCharts, 50);
+    }
+  });
+})();
+</script>
+```
+
+```{r setup}
+#| echo: false
+#| warning: false
+#| message: false
+#| error: false
+#| results: 'hide'
+
+# Load required libraries
+library(dashboardr)
+library(dplyr)
+library(highcharter)
+
+# Global chunk options
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE,
+  error = FALSE,
+  fig.width = 12,
+  fig.height = 8,
+  dpi = 300
+)
+
+# Load multiple datasets
+
+# Load data
+data <- readRDS('data_1800obs.rds')
+cat('data loaded:', nrow(data), 'rows,', ncol(data), 'columns\n')
+
+# Load hourly_agg
+hourly_agg <- readRDS('hourly_agg_170obs.rds')
+cat('hourly_agg loaded:', nrow(hourly_agg), 'rows,', ncol(hourly_agg), 'columns\n')
+
+```
+
+
+**Last Updated**: 2025-12-27 11:58:54 CET (data fetched from Google Sheets)
+
+
+## time
+
+
+::: {.panel-tabset}
+
+### Games Played Over Time by League
+
+```{r time}
+# Games Played Over Time by League
+result <- create_timeline(
+  data = hourly_agg,
+  title = "Games Played Over Time by League",
+  time_var = "Date_Hour_Floor",
+  response_var = "GameCount",
+  group_var = "League",
+  chart_type = "line",
+  subtitle = "Number of games per hour over time, grouped by league (line chart)",
+  x_label = "Date & Time",
+  y_label = "Number of Games"
+)
+
+result
+```
+
+
+### Games by Hour of Day
+
+```{r time-2}
+# Games by Hour of Day
+result <- create_bar(
+  data = data,
+  title = "Games by Hour of Day",
+  x_var = "Date_Hour",
+  group_var = "League",
+  subtitle = "Distribution of games across hours of the day (0-23), grouped by league",
+  x_label = "Hour of Day (0-23)",
+  y_label = "Number of Games",
+  bar_type = "count",
+  horizontal = FALSE
+)
+
+result
+```
+
+
+### Games by Day of Week
+
+```{r time-3}
+# Games by Day of Week
+result <- create_bar(
+  data = data,
+  title = "Games by Day of Week",
+  x_var = "Date_Weekday",
+  group_var = "League",
+  subtitle = "Distribution of games across days of the week",
+  x_label = "Day of Week",
+  y_label = "Number of Games",
+  bar_type = "count",
+  horizontal = FALSE
+)
+
+result
+```
+
+
+:::
+

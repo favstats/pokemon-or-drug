@@ -1,0 +1,46 @@
+name: Update Analytics Dashboard
+
+on:
+  schedule:
+    # Run every hour
+    - cron: '0 * * * *'
+  workflow_dispatch:  # Allow manual triggering
+  push:
+    paths:
+      - 'analytics.R'
+      - '.github/workflows/update-analytics.yml'
+
+jobs:
+  update-dashboard:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up R
+      uses: r-lib/actions/setup-r@v2
+      with:
+        r-version: '4.3'
+        
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev
+        
+    - name: Install R packages
+      run: |
+        Rscript -e "install.packages(c('tidyverse', 'lubridate', 'gt', 'jsonlite', 'devtools'), repos = 'https://cloud.r-project.org')"
+        Rscript -e "if (!requireNamespace('dashboardr', quietly = TRUE)) devtools::install_github('favstats/dashboardr')"
+        
+    - name: Generate dashboard
+      working-directory: pokemon-or-drug
+      run: Rscript analytics.R
+        
+    - name: Commit and push if changed
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add analytics/
+        git diff --staged --quiet || (git commit -m "Auto-update analytics dashboard [skip ci]" && git push)
+

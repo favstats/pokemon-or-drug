@@ -1,0 +1,503 @@
+---
+title: "{{< iconify ph house >}} Overview"
+format: html
+---
+
+```{r}
+#| include: false
+library(dashboardr)
+```
+
+```{=html}
+<style>
+/* Ensure chart containers expand to fit content - aggressive overrides */
+.cell-output-display,
+.cell-output,
+.panel-tabset-tabby > .tab-content,
+.panel-tabset > .tab-content,
+.tab-pane,
+.tab-pane.active,
+.card-body,
+.quarto-figure,
+section {
+  overflow: visible !important;
+  height: auto !important;
+  max-height: none !important;
+}
+/* Ensure highcharts containers respect their set height */
+.highcharts-container,
+.html-widget,
+.htmlwidget {
+  overflow: visible !important;
+}
+</style>
+<script>
+// Aggressive reflow for Highcharts - multiple attempts to catch widget initialization
+(function() {
+  function reflowCharts() {
+    if (typeof Highcharts !== 'undefined' && Highcharts.charts) {
+      Highcharts.charts.forEach(function(chart) {
+        if (chart) {
+          try { chart.reflow(); } catch(e) {}
+        }
+      });
+    }
+  }
+  
+  // Try multiple times at different intervals
+  [0, 100, 250, 500, 1000, 2000].forEach(function(delay) {
+    setTimeout(function() {
+      window.dispatchEvent(new Event('resize'));
+      requestAnimationFrame(reflowCharts);
+    }, delay);
+  });
+  
+  // Also reflow on any tab click
+  document.addEventListener('click', function(e) {
+    if (e.target.matches('.nav-link, [data-bs-toggle="tab"]')) {
+      setTimeout(reflowCharts, 50);
+    }
+  });
+})();
+</script>
+```
+
+```{r setup}
+#| echo: false
+#| warning: false
+#| message: false
+#| error: false
+#| results: 'hide'
+
+# Load required libraries
+library(dashboardr)
+library(dplyr)
+library(highcharter)
+
+# Global chunk options
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE,
+  error = FALSE,
+  fig.width = 12,
+  fig.height = 8,
+  dpi = 300
+)
+
+```
+
+
+# Pokémon or Drug - Game Analytics
+
+**Last Updated**: 2025-12-27 11:58:54 CET (data fetched from Google Sheets)
+
+Welcome to the analytics dashboard for **Pokémon or Drug**!
+This dashboard provides insights into game play patterns, league preferences, and player performance.
+
+> **🔄 Live Data**: This dashboard automatically fetches fresh data from Google Sheets on page load and updates every 5 minutes.
+
+
+
+<div style='height: 1rem;'></div>
+
+
+```{=html}
+<div class='card mb-3' style='border-left: 4px solid #2E86AB;'>  <div class='card-body'>    <div class='d-flex justify-content-between align-items-start'>      <div>        <h6 class='card-subtitle mb-2 text-muted'>Total Games</h6>        <h2 class='card-title mb-1'>1800</h2>                </div>      <div class='text-primary'>{{< iconify ph:game-controller size=2em >}}</div>    </div>  </div></div>
+```
+
+```{=html}
+<div class='card mb-3' style='border-left: 4px solid #F18F01;'>  <div class='card-body'>    <div class='d-flex justify-content-between align-items-start'>      <div>        <h6 class='card-subtitle mb-2 text-muted'>Unique Players</h6>        <h2 class='card-title mb-1'>1164</h2>                </div>      <div class='text-primary'>{{< iconify ph:users size=2em >}}</div>    </div>  </div></div>
+```
+
+```{=html}
+<div class='card mb-3' style='border-left: 4px solid #A23B72;'>  <div class='card-body'>    <div class='d-flex justify-content-between align-items-start'>      <div>        <h6 class='card-subtitle mb-2 text-muted'>Average Score</h6>        <h2 class='card-title mb-1'>3793</h2>                </div>      <div class='text-primary'>{{< iconify ph:trophy size=2em >}}</div>    </div>  </div></div>
+```
+
+```{=html}
+<div class='card mb-3' style='border-left: 4px solid #2E8B57;'>  <div class='card-body'>    <div class='d-flex justify-content-between align-items-start'>      <div>        <h6 class='card-subtitle mb-2 text-muted'>Average Accuracy</h6>        <h2 class='card-title mb-1'>93.4%</h2>                </div>      <div class='text-primary'>{{< iconify ph:target size=2em >}}</div>    </div>  </div></div>
+```
+
+
+<div style='height: 1rem;'></div>
+
+
+
+<script>
+// Dynamic Data Loader for Pokémon or Drug Analytics Dashboard
+// Fetches fresh data from Google Sheets and updates all Highcharts charts
+
+(function() {
+  const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQKvOHhK-Rw71DILu_X0ydZCS86KF2TeCyLrNAQx_MQsQN0mIPEteIO_V86DUerFO_JpwZmieGXLW-P/pub?gid=923170622&single=true&output=csv";
+  
+  // Simple CSV parser
+  function parseCSV(text) {
+    const lines = text.split("\n").filter(line => line.trim());
+    if (lines.length === 0) return [];
+    
+    const headers = lines[0].split(",").map(h => h.trim());
+    return lines.slice(1).map(line => {
+      const values = line.split(",");
+      const obj = {};
+      headers.forEach((header, i) => {
+        let value = values[i]?.trim() || "";
+        // Try to parse numbers
+        if (value && !isNaN(value) && value !== "") {
+          obj[header] = parseFloat(value);
+        } else {
+          obj[header] = value;
+        }
+      });
+      return obj;
+    }).filter(row => row.Date && row.League);
+  }
+  
+  // Process date
+  function parseDate(dateStr) {
+    const date = new Date(dateStr);
+    return {
+      date: date,
+      dateOnly: date.toISOString().split("T")[0],
+      hour: date.getHours(),
+      weekday: date.toLocaleDateString("en-US", { weekday: "long" })
+    };
+  }
+  
+  // Aggregate data for timeline (games per hour by league)
+  function aggregateTimelineData(data) {
+    const hourly = {};
+    
+    // Check if data is already aggregated (has GameCount) or raw (needs counting)
+    const isAggregated = data.length > 0 && data[0].hasOwnProperty("GameCount");
+    
+    if (isAggregated) {
+      // Data is pre-aggregated: Date_Hour_Floor, League, GameCount
+      data.forEach(row => {
+        if (!row.Date_Hour_Floor || !row.League) return;
+        
+        const date = new Date(row.Date_Hour_Floor);
+        if (isNaN(date.getTime())) {
+          console.warn("Invalid date:", row.Date_Hour_Floor);
+          return;
+        }
+        
+        const key = date.getTime();
+        const league = String(row.League).toLowerCase();
+        
+        if (!hourly[key]) hourly[key] = {};
+        hourly[key][league] = (hourly[key][league] || 0) + (row.GameCount || 0);
+      });
+    } else {
+      // Raw data: need to count games per hour per league
+      data.forEach(row => {
+        if (!row.Date || !row.League) return;
+        
+        const date = new Date(row.Date);
+        if (isNaN(date.getTime())) {
+          console.warn("Invalid date:", row.Date);
+          return;
+        }
+        
+        // Round down to nearest hour
+        const hourFloor = new Date(date);
+        hourFloor.setMinutes(0, 0, 0);
+        hourFloor.setSeconds(0, 0);
+        hourFloor.setMilliseconds(0);
+        const key = hourFloor.getTime();
+        
+        if (!hourly[key]) hourly[key] = {};
+        const league = String(row.League).toLowerCase();
+        hourly[key][league] = (hourly[key][league] || 0) + 1;
+      });
+    }
+    
+    // Convert to array format for Highcharts (line chart - counts)
+    const leagues = ["boulder", "cascade", "volcano", "earth", "custom"];
+    const series = {};
+    leagues.forEach(league => series[league] = []);
+    
+    // Sort timestamps and create data points
+    const sortedTimestamps = Object.keys(hourly).map(Number).sort((a, b) => a - b);
+    
+    sortedTimestamps.forEach(timestamp => {
+      leagues.forEach(league => {
+        const count = hourly[timestamp][league] || 0;
+        // Include all points, even zeros, for continuity
+        series[league].push([timestamp, count]);
+      });
+    });
+    
+    console.log("Aggregated timeline data:", {
+      isAggregated: isAggregated,
+      totalHours: sortedTimestamps.length,
+      seriesLengths: Object.keys(series).map(l => ({ 
+        league: l, 
+        points: series[l].length,
+        totalCount: series[l].reduce((sum, p) => sum + p[1], 0)
+      }))
+    });
+    
+    return series;
+  }
+  
+  // Aggregate data for bar charts (count by category and group)
+  function aggregateBarData(data, xVar, groupVar) {
+    const counts = {};
+    data.forEach(row => {
+      let xValue = row[xVar];
+      if (xVar === "Date_Hour") xValue = parseDate(row.Date).hour;
+      if (xVar === "Date_Weekday") xValue = parseDate(row.Date).weekday;
+      
+      const group = row[groupVar] || "All";
+      const key = `${xValue}|${group}`;
+      counts[key] = (counts[key] || 0) + 1;
+    });
+    
+    // Organize by group
+    const groups = {};
+    Object.keys(counts).forEach(key => {
+      const [xValue, group] = key.split("|");
+      if (!groups[group]) groups[group] = [];
+      groups[group].push([xValue, counts[key]]);
+    });
+    
+    return groups;
+  }
+  
+  // Update timeline chart (line chart) - fix initial render and update with counts
+  function updateTimelineChart(chart, data) {
+    if (!chart) {
+      console.error("Chart is null or undefined");
+      return;
+    }
+    
+    console.log("Updating timeline chart, chart has", chart.series.length, "series");
+    
+    // Get count data (not percentages)
+    const seriesData = aggregateTimelineData(data);
+    const leagues = ["boulder", "cascade", "volcano", "earth", "custom"];
+    
+    // Check if chart has existing series or if we need to recreate them
+    if (chart.series.length === 0) {
+      console.log("Chart has no series, creating new ones...");
+      // Create new series
+      leagues.forEach((league, idx) => {
+        const dataPoints = seriesData[league] || [];
+        if (dataPoints.length > 0) {
+          chart.addSeries({
+            name: league.charAt(0).toUpperCase() + league.slice(1),
+            data: dataPoints,
+            type: "line"
+          }, false);
+        }
+      });
+    } else {
+      // Update existing series
+      leagues.forEach((league, idx) => {
+        const dataPoints = seriesData[league] || [];
+        if (chart.series[idx]) {
+          chart.series[idx].setData(dataPoints, false);
+          chart.series[idx].update({ name: league.charAt(0).toUpperCase() + league.slice(1) }, false);
+        } else if (dataPoints.length > 0) {
+          // Add missing series
+          chart.addSeries({
+            name: league.charAt(0).toUpperCase() + league.slice(1),
+            data: dataPoints,
+            type: "line"
+          }, false);
+        }
+      });
+    }
+    
+    // Ensure chart type is line (not area)
+    if (chart.options.chart && chart.options.chart.type !== "line") {
+      chart.update({ chart: { type: "line" } }, false);
+    }
+    
+    // Update y-axis to show counts
+    if (chart.yAxis && chart.yAxis[0]) {
+      chart.yAxis[0].update({ 
+        title: { text: "Number of Games" },
+        min: 0
+      }, false);
+    }
+    
+    chart.redraw();
+    console.log("✅ Timeline chart updated with", data.length, "games,", chart.series.length, "series");
+  }
+  
+  // Update bar chart
+  function updateBarChart(chart, data, xVar, groupVar) {
+    const groups = aggregateBarData(data, xVar, groupVar);
+    const groupNames = Object.keys(groups).sort();
+    
+    groupNames.forEach((groupName, idx) => {
+      if (chart.series[idx]) {
+        chart.series[idx].setData(groups[groupName] || [], false);
+      }
+    });
+    chart.redraw();
+  }
+  
+  // Update simple bar chart (no grouping)
+  function updateSimpleBarChart(chart, data, xVar) {
+    const counts = {};
+    data.forEach(row => {
+      let value = row[xVar];
+      if (xVar === "League") value = row.League;
+      counts[value] = (counts[value] || 0) + 1;
+    });
+    
+    const seriesData = Object.keys(counts).map(key => [key, counts[key]]);
+    if (chart.series[0]) {
+      chart.series[0].setData(seriesData, false);
+      chart.redraw();
+    }
+  }
+  
+  // Update last updated timestamp display
+  function updateLastUpdatedTimestamp() {
+    const now = new Date();
+    const formatted = now.toLocaleString("en-US", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      timeZoneName: "short"
+    });
+    
+    // Update all "Last Updated" elements
+    document.querySelectorAll("strong").forEach(el => {
+      if (el.textContent.includes("Last Updated")) {
+        el.textContent = "Last Updated: " + formatted + " (data fetched from Google Sheets)";
+      }
+    });
+    
+    // Also try to find and update in parent elements
+    document.querySelectorAll("p").forEach(el => {
+      if (el.textContent.includes("Last Updated")) {
+        el.innerHTML = "<strong>Last Updated</strong>: " + formatted + " (data fetched from Google Sheets)";
+      }
+    });
+  }
+  
+  // Main function to update all charts
+  async function updateAllCharts() {
+    try {
+      console.log("Fetching fresh data from Google Sheets...");
+      const response = await fetch(CSV_URL);
+      const csvText = await response.text();
+      const freshData = parseCSV(csvText);
+      
+      console.log(`Loaded ${freshData.length} games`);
+      
+      // Update last updated timestamp
+      updateLastUpdatedTimestamp();
+      
+      // Wait for Highcharts to be ready
+      if (typeof Highcharts === "undefined" || !Highcharts.charts) {
+        console.log("Waiting for Highcharts to load...");
+        setTimeout(updateAllCharts, 500);
+        return;
+      }
+      
+      // Update all charts
+      Highcharts.charts.forEach((chart, idx) => {
+        if (!chart) return;
+        
+        try {
+          const container = chart.renderTo;
+          const title = chart.options.title?.text || "";
+          
+          // Identify chart type and update accordingly
+          if (title.includes("Over Time") || title.includes("Timeline") || title.includes("Games Played")) {
+            // For timeline, we need to aggregate fresh data by hour
+            updateTimelineChart(chart, freshData);
+          } else if (title.includes("Hour") && !title.includes("Over Time")) {
+            // Bar chart for hour of day (not timeline)
+            updateBarChart(chart, freshData, "Date_Hour", "League");
+          } else if (title.includes("Day of Week") || title.includes("Weekday")) {
+            updateBarChart(chart, freshData, "Date_Weekday", "League");
+          } else if (title.includes("Total Games by League")) {
+            updateSimpleBarChart(chart, freshData, "League");
+          }
+        } catch (error) {
+          console.warn(`Error updating chart ${idx}:`, error);
+        }
+      });
+      
+      // Update summary metrics if they exist
+      updateSummaryMetrics(freshData);
+      
+      console.log("✅ Charts updated with fresh data!");
+      console.log("   Updated", Highcharts.charts.filter(c => c).length, "charts");
+      
+    } catch (error) {
+      console.error("❌ Error loading fresh data:", error);
+    }
+  }
+  
+  // Update summary metrics
+  function updateSummaryMetrics(data) {
+    const totalGames = data.length;
+    const uniquePlayers = new Set(data.map(d => d.Name)).size;
+    const avgScore = Math.round(data.reduce((sum, d) => sum + (d.Score || 0), 0) / totalGames);
+    const avgAccuracy = (data.reduce((sum, d) => sum + (d.Accuracy || 0), 0) / totalGames).toFixed(1);
+    
+    // Try to update metric elements (adjust selectors based on actual structure)
+    document.querySelectorAll(".metric-value, [class*="value"]").forEach((el, idx) => {
+      const values = [totalGames, uniquePlayers, avgScore, avgAccuracy + "%"];
+      if (values[idx]) {
+        el.textContent = values[idx];
+      }
+    });
+  }
+  
+  // Initialize when page loads
+  function initDynamicUpdates() {
+    console.log("🔄 Dynamic data loader initialized");
+    console.log("   Will fetch fresh data from:", CSV_URL);
+    
+    // Wait for Highcharts to be ready, then update
+    function waitAndUpdate() {
+      if (typeof Highcharts !== "undefined" && Highcharts.charts && Highcharts.charts.length > 0) {
+        console.log("   Highcharts ready, updating charts...");
+        updateAllCharts();
+      } else {
+        console.log("   Waiting for Highcharts...");
+        setTimeout(waitAndUpdate, 500);
+      }
+    }
+    
+    // Start checking after a short delay
+    setTimeout(waitAndUpdate, 1500);
+    
+    // Also update every 5 minutes
+    setInterval(function() {
+      console.log("⏰ Scheduled update (every 5 minutes)");
+      updateAllCharts();
+    }, 5 * 60 * 1000);
+  }
+  
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initDynamicUpdates);
+  } else {
+    initDynamicUpdates();
+  }
+  
+})();
+</script>
+
+
+
+::: {.callout-tip}
+## What's Inside
+Explore the dashboard to see:
+
+- **Games Over Time**: Daily trends and hourly patterns
+- **League Analysis**: Performance metrics by difficulty level
+- **Player Insights**: Score distributions and accuracy trends
+:::
+
