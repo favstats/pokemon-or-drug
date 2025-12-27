@@ -90,7 +90,7 @@ knitr::opts_chunk$set(
 
 # Pokémon or Drug - Game Analytics
 
-**Last Updated**: 2025-12-27 11:58:54 CET (data fetched from Google Sheets)
+**Last Updated**: 2025-12-27 12:00:20 CET (data fetched from Google Sheets)
 
 Welcome to the analytics dashboard for **Pokémon or Drug**!
 This dashboard provides insights into game play patterns, league preferences, and player performance.
@@ -106,13 +106,16 @@ This dashboard provides insights into game play patterns, league preferences, an
 <div class='card mb-3' style='border-left: 4px solid #2E86AB;'>  <div class='card-body'>    <div class='d-flex justify-content-between align-items-start'>      <div>        <h6 class='card-subtitle mb-2 text-muted'>Total Games</h6>        <h2 class='card-title mb-1'>1800</h2>                </div>      <div class='text-primary'>{{< iconify ph:game-controller size=2em >}}</div>    </div>  </div></div>
 ```
 
+
 ```{=html}
 <div class='card mb-3' style='border-left: 4px solid #F18F01;'>  <div class='card-body'>    <div class='d-flex justify-content-between align-items-start'>      <div>        <h6 class='card-subtitle mb-2 text-muted'>Unique Players</h6>        <h2 class='card-title mb-1'>1164</h2>                </div>      <div class='text-primary'>{{< iconify ph:users size=2em >}}</div>    </div>  </div></div>
 ```
 
+
 ```{=html}
 <div class='card mb-3' style='border-left: 4px solid #A23B72;'>  <div class='card-body'>    <div class='d-flex justify-content-between align-items-start'>      <div>        <h6 class='card-subtitle mb-2 text-muted'>Average Score</h6>        <h2 class='card-title mb-1'>3793</h2>                </div>      <div class='text-primary'>{{< iconify ph:trophy size=2em >}}</div>    </div>  </div></div>
 ```
+
 
 ```{=html}
 <div class='card mb-3' style='border-left: 4px solid #2E8B57;'>  <div class='card-body'>    <div class='d-flex justify-content-between align-items-start'>      <div>        <h6 class='card-subtitle mb-2 text-muted'>Average Accuracy</h6>        <h2 class='card-title mb-1'>93.4%</h2>                </div>      <div class='text-primary'>{{< iconify ph:target size=2em >}}</div>    </div>  </div></div>

@@ -2,10 +2,16 @@
 # Visualizes games over time and by league
 
 library(tidyverse)
-library(dashboardr)
 library(lubridate)
 library(gt)
 library(jsonlite)
+
+# Load dashboardr from development source to ensure metric HTML fix is applied
+if (requireNamespace("devtools", quietly = TRUE)) {
+  devtools::load_all("/Users/favstats/Dropbox/postdoc/dashboardr", quiet = TRUE)
+} else {
+  library(dashboardr)
+}
 
 # Fetch data from Google Sheets
 csv_url <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vQKvOHhK-Rw71DILu_X0ydZCS86KF2TeCyLrNAQx_MQsQN0mIPEteIO_V86DUerFO_JpwZmieGXLW-P/pub?gid=923170622&single=true&output=csv"
