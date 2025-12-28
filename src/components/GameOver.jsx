@@ -111,7 +111,7 @@ function GameOver() {
   const confettiFired = useRef(false);
   const scoresSaved = useRef(false);
   const [scoreTab, setScoreTab] = useState('daily');
-  const [leagueFilter, setLeagueFilter] = useState(state.selectedLeague || 'all');
+  const [leagueFilter, setLeagueFilter] = useState(state.selectedLeague || 'boulder');
   const [showShareModal, setShowShareModal] = useState(false);
   const [sharePlayer, setSharePlayer] = useState(null); // Which player to share
   
@@ -660,19 +660,6 @@ function GameOver() {
 
           {(scoreTab === 'global' || scoreTab === 'daily') && (
             <div className="league-filter-tabs">
-              <button
-                className={`league-filter-tab ${leagueFilter === 'all' ? 'active' : ''}`}
-                onClick={() => {
-                  setLeagueFilter('all');
-                  if (scoreTab === 'global') {
-                    actions.loadGlobalScores(null);
-                  } else {
-                    actions.loadDailyScores(null);
-                  }
-                }}
-              >
-                All
-              </button>
               {Object.keys(LEAGUES).map(leagueId => (
                 <button
                   key={leagueId}

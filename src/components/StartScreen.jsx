@@ -99,7 +99,7 @@ function StartScreen() {
   const [showAbout, setShowAbout] = useState(false);
   const [showPrizeCabinet, setShowPrizeCabinet] = useState(false);
   const [scoreTab, setScoreTab] = useState('daily'); // 'daily', 'global' or 'local'
-  const [leagueFilter, setLeagueFilter] = useState('all'); // 'all' or league id
+  const [leagueFilter, setLeagueFilter] = useState('boulder'); // league id (boulder, cascade, volcano, earth)
 
   // Show mobile hint for first-time visitors
   useEffect(() => {
@@ -119,10 +119,10 @@ function StartScreen() {
     }
   }, [isFirstIconVisit, state.gameMode]);
 
-  // Load scores on mount
+  // Load scores on mount (default to boulder league)
   useEffect(() => {
-    actions.loadGlobalScores(null);
-    actions.loadDailyScores(null);
+    actions.loadGlobalScores('boulder');
+    actions.loadDailyScores('boulder');
 
     // One-time cleanup of demo medals (remove after first run)
     const cleanupDone = localStorage.getItem('pord_demo_cleanup');
@@ -273,9 +273,9 @@ function StartScreen() {
                 setShowPrizeCabinet(true);
                 setShowScoreboard(false);
               }}
-              title="View your medal collection"
+              title="View your badge collection"
             >
-              <FontAwesomeIcon icon={faStar} /> Medals
+              <FontAwesomeIcon icon={faStar} /> Badges
             </button>
           </div>
           
@@ -322,19 +322,6 @@ function StartScreen() {
           {(scoreTab === 'global' || scoreTab === 'daily') ? (
             <>
               <div className="league-filter-tabs">
-                <button
-                  className={`league-filter-tab ${leagueFilter === 'all' ? 'active' : ''}`}
-                  onClick={() => {
-                    setLeagueFilter('all');
-                    if (scoreTab === 'global') {
-                      actions.loadGlobalScores(null);
-                    } else {
-                      actions.loadDailyScores(null);
-                    }
-                  }}
-                >
-                  All
-                </button>
                 {Object.keys(LEAGUES).map(leagueId => (
                   <button
                     key={leagueId}
