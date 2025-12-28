@@ -4,15 +4,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  padding: 2rem 1rem;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
 }
 
 .league-content {
   max-width: 900px;
   width: 100%;
   text-align: center;
+  margin: auto;
 }
 
 .league-content h1 {

@@ -49,6 +49,28 @@ const badgeImages = {
   volcano: VolcanoBadge,
   earth: EarthBadge,
 };
+
+// Helper function to keep only the top score per player
+const getUniquePlayerScores = (scores) => {
+  if (!scores || !Array.isArray(scores)) return [];
+  
+  const playerBestScores = new Map();
+  
+  // Sort by score descending first
+  const sortedScores = [...scores].sort((a, b) => (b.score || 0) - (a.score || 0));
+  
+  // Keep only the best score for each player (by name)
+  for (const entry of sortedScores) {
+    const nameStr = typeof entry.name === 'string' ? entry.name : String(entry.name || 'unknown');
+    const playerKey = nameStr.toLowerCase();
+    if (!playerBestScores.has(playerKey)) {
+      playerBestScores.set(playerKey, entry);
+    }
+  }
+  
+  // Return sorted by score
+  return Array.from(playerBestScores.values()).sort((a, b) => (b.score || 0) - (a.score || 0));
+};
 import './StartScreen.css';
 
 // Player icon options - cool mix of flags and fun icons
@@ -336,7 +358,7 @@ function StartScreen() {
                   state.dailyScoresLoading ? (
                     <p className="loading-scores"><FontAwesomeIcon icon={faSync} spin /> Loading today's scores...</p>
                   ) : state.dailyScores.length > 0 ? (
-                    state.dailyScores.slice(0, 10).map((entry, index) => (
+                    getUniquePlayerScores(state.dailyScores).slice(0, 10).map((entry, index) => (
                       <div key={entry.id || index} className="highscore-item" title={
                         entry.timestamp || entry.date || entry.createdAt ?
                           `Submitted: ${new Date((entry.timestamp || entry.date || entry.createdAt)).toLocaleString('en-US', { timeZone: 'Europe/Berlin' })}` :
@@ -366,7 +388,7 @@ function StartScreen() {
                   state.globalScoresLoading ? (
                     <p className="loading-scores"><FontAwesomeIcon icon={faSync} spin /> Loading...</p>
                   ) : state.globalScores.length > 0 ? (
-                    state.globalScores.slice(0, 10).map((entry, index) => (
+                    getUniquePlayerScores(state.globalScores).slice(0, 10).map((entry, index) => (
                       <div key={entry.id || index} className="highscore-item" title={
                         entry.timestamp || entry.date || entry.createdAt ?
                           `Submitted: ${new Date((entry.timestamp || entry.date || entry.createdAt)).toLocaleString('en-US', { timeZone: 'Europe/Berlin' })}` :

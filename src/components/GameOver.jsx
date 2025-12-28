@@ -119,6 +119,28 @@ function GameOver() {
   const rankedPlayers = [...state.players].sort((a, b) => b.score - a.score);
   const winner = rankedPlayers[0];
   
+  // Helper function to keep only the top score per player
+  const getUniquePlayerScores = (scores) => {
+    if (!scores || !Array.isArray(scores)) return [];
+    
+    const playerBestScores = new Map();
+    
+    // Sort by score descending first
+    const sortedScores = [...scores].sort((a, b) => (b.score || 0) - (a.score || 0));
+    
+    // Keep only the best score for each player (by name)
+    for (const entry of sortedScores) {
+      const nameStr = typeof entry.name === 'string' ? entry.name : String(entry.name || 'unknown');
+      const playerKey = nameStr.toLowerCase();
+      if (!playerBestScores.has(playerKey)) {
+        playerBestScores.set(playerKey, entry);
+      }
+    }
+    
+    // Return sorted by score
+    return Array.from(playerBestScores.values()).sort((a, b) => (b.score || 0) - (a.score || 0));
+  };
+  
   // Calculate percentiles from global scores and top 10 feedback
   const playerStats = useMemo(() => {
     const player = winner; // Use winner (top player) for top 10 calculations
@@ -129,7 +151,16 @@ function GameOver() {
       return { scorePercentile: 50, speedPercentile: 50, totalPlayers: 0, loading: false };
     }
 
-    if (!globalScores.length) {
+    // Filter scores by the selected league for proper comparison
+    const selectedLeague = state.selectedLeague;
+    const leagueFilteredGlobalScores = selectedLeague 
+      ? globalScores.filter(s => s.league === selectedLeague)
+      : globalScores;
+    const leagueFilteredDailyScores = selectedLeague 
+      ? dailyScores.filter(s => s.league === selectedLeague)
+      : dailyScores;
+
+    if (!leagueFilteredGlobalScores.length) {
       return {
         scorePercentile: 50,
         speedPercentile: 50,
@@ -142,11 +173,12 @@ function GameOver() {
         pointsFromTop10: null,
         dailyPointsFromTop10: null,
         dailyPlayerRank: null,
+        selectedLeague: selectedLeague,
       };
     }
     
-    // Use all scores - we compare against everyone
-    const leagueScores = globalScores;
+    // Use league-filtered scores for comparison, with unique players only
+    const leagueScores = getUniquePlayerScores(leagueFilteredGlobalScores);
     
     // Calculate score percentile
     const scoresBelowPlayer = leagueScores.filter(s => s.score < player.score).length;
@@ -160,30 +192,31 @@ function GameOver() {
       speedPercentile = (fasterThanPlayer / speedScores.length) * 100;
     }
     
-    // Calculate top 10 position
+    // Calculate top 10 position (using unique player scores)
     const sortedScores = [...leagueScores].sort((a, b) => b.score - a.score);
-    // Count how many players have higher scores (player's score might not be in list yet)
+    // Count how many unique players have higher scores
     const playersWithHigherScore = sortedScores.filter(s => s.score > player.score).length;
     const playerRank = playersWithHigherScore + 1; // Rank is 1-indexed
     
-    // Player is in top 10 if rank <= 10 OR if there are less than 10 total scores
+    // Player is in top 10 if rank <= 10 OR if there are less than 10 total unique players
     const isInTop10 = playerRank <= 10 || sortedScores.length < 10;
     const top10Rank = isInTop10 ? playerRank : null;
     
     // Calculate points needed to reach top 10
     let pointsFromTop10 = null;
     if (!isInTop10 && sortedScores.length >= 10) {
-      // There are at least 10 scores, check what's needed to beat #10
+      // There are at least 10 unique players, check what's needed to beat #10
       const top10Score = sortedScores[9].score;
       pointsFromTop10 = Math.max(0, top10Score - player.score + 1);
     }
 
-    // Calculate points needed for daily top 10
+    // Calculate points needed for daily top 10 (using league-filtered daily scores with unique players)
     let dailyPointsFromTop10 = null;
     let dailyTop10Rank = null;
     let dailyPlayerRank = null;
-    if (dailyScores.length > 0) {
-      const dailySortedScores = [...dailyScores].sort((a, b) => b.score - a.score);
+    const uniqueDailyScores = getUniquePlayerScores(leagueFilteredDailyScores);
+    if (uniqueDailyScores.length > 0) {
+      const dailySortedScores = [...uniqueDailyScores].sort((a, b) => b.score - a.score);
       const dailyPlayersWithHigherScore = dailySortedScores.filter(s => s.score > player.score).length;
       dailyPlayerRank = dailyPlayersWithHigherScore + 1;
       const dailyIsInTop10 = dailyPlayerRank <= 10 || dailySortedScores.length < 10;
@@ -221,8 +254,9 @@ function GameOver() {
       playerRank: DEBUG_FORCE_MEDAL ? DEBUG_MEDAL_RANK : playerRank,
       dailyPlayerRank: DEBUG_FORCE_MEDAL ? DEBUG_MEDAL_RANK : dailyPlayerRank,
       loading: false,
+      selectedLeague: selectedLeague,
     };
-  }, [state.globalScores, state.globalScoresLoading, state.players, winner]);
+  }, [state.globalScores, state.dailyScores, state.globalScoresLoading, state.selectedLeague, state.players, winner]);
 
   const isMultiplayer = state.gameMode === 'multiplayer';
   
@@ -239,8 +273,11 @@ function GameOver() {
     actions.loadDailyScores(null);
   }, []);
 
-  // Award medals when player reaches top 10
+  // Award medals when player reaches top 10 (only for league games)
   useEffect(() => {
+    // Only award medals if we're playing a league game
+    if (!state.selectedLeague) return;
+    
     const shouldAwardGlobal = DEBUG_FORCE_MEDAL && (DEBUG_MEDAL_TYPE === 'global' || DEBUG_MEDAL_TYPE === 'both');
     const actualRank = shouldAwardGlobal ? DEBUG_MEDAL_RANK : playerStats.top10Rank;
     
@@ -258,6 +295,9 @@ function GameOver() {
   }, [playerStats.top10Rank, state.selectedLeague, playerStats.playerScore]);
 
   useEffect(() => {
+    // Only award medals if we're playing a league game
+    if (!state.selectedLeague) return;
+    
     const shouldAwardDaily = DEBUG_FORCE_MEDAL && (DEBUG_MEDAL_TYPE === 'daily' || DEBUG_MEDAL_TYPE === 'both');
     const actualRank = shouldAwardDaily ? DEBUG_MEDAL_RANK : playerStats.dailyTop10Rank;
     
@@ -710,7 +750,7 @@ function GameOver() {
               state.dailyScoresLoading ? (
                 <div className="loading-scores">Loading today's scores...</div>
               ) : state.dailyScores.length > 0 ? (
-                state.dailyScores.slice(0, 10).map((entry, index) => (
+                getUniquePlayerScores(state.dailyScores).slice(0, 10).map((entry, index) => (
                   <div key={index} className={`highscore-entry ${index < 3 ? getMedalClass(index) : ''}`} title={
                     entry.timestamp || entry.date || entry.createdAt ?
                       `Submitted: ${new Date((entry.timestamp || entry.date || entry.createdAt)).toLocaleString('en-US', { timeZone: 'Europe/Berlin' })}` :
@@ -740,7 +780,7 @@ function GameOver() {
               state.globalScoresLoading ? (
                 <div className="loading-scores">Loading...</div>
               ) : state.globalScores.length > 0 ? (
-                state.globalScores.slice(0, 10).map((entry, index) => (
+                getUniquePlayerScores(state.globalScores).slice(0, 10).map((entry, index) => (
                   <div key={index} className={`highscore-entry ${index < 3 ? getMedalClass(index) : ''}`} title={
                     entry.timestamp || entry.date || entry.createdAt ?
                       `Submitted: ${new Date((entry.timestamp || entry.date || entry.createdAt)).toLocaleString('en-US', { timeZone: 'Europe/Berlin' })}` :
@@ -768,7 +808,7 @@ function GameOver() {
               )
             ) : (
               state.highScores.length > 0 ? (
-                state.highScores.slice(0, 10).map((entry, index) => (
+                getUniquePlayerScores(state.highScores).slice(0, 10).map((entry, index) => (
                   <div key={index} className={`highscore-entry ${index < 3 ? getMedalClass(index) : ''}`} title={
                     entry.date ?
                       `Submitted: ${new Date(entry.date).toLocaleString('en-US', { timeZone: 'Europe/Berlin' })}` :
