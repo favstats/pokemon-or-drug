@@ -689,8 +689,13 @@ function GameOver() {
                 ) : playerStats.totalPlayers > 0 ? (
                   <>
                     <div className="stats-intro">
+                      {state.selectedLeague && (
+                        <span className="stats-league">
+                          Competing for: <strong>{LEAGUES[state.selectedLeague]?.name || 'Badge'}</strong>
+                        </span>
+                      )}
                       <span className="stats-count">
-                        Compared to <strong>{playerStats.totalPlayers}</strong> players {state.selectedLeague ? `in ${LEAGUES[state.selectedLeague]?.name || 'this league'}` : 'globally'}
+                        Compared to <strong>{playerStats.totalPlayers}</strong> players
                       </span>
                     </div>
                     <div className="bell-curves">
