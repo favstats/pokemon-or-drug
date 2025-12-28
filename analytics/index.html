@@ -241,407 +241,3156 @@ section {
   });
 })();
 </script>
+<!-- Premium Libraries -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #fafbfc;
+    color: #1a1a2e;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    margin: 0;
+    padding: 0;
+  }
+
+  .dashboard-wrapper {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 280px;
+    background: white;
+    border-right: 1px solid #e5e7eb;
+    padding: 2rem 0;
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 100;
+  }
+
+  .sidebar-header {
+    padding: 0 1.5rem 2rem;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 1.5rem;
+  }
+
+  .sidebar-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0a0a0f;
+    margin-bottom: 0.25rem;
+  }
+
+  .sidebar-subtitle {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+
+  .sidebar-nav {
+    padding: 0 1rem;
+  }
+
+  .nav-item {
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.25rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #374151;
+    font-weight: 500;
+    font-size: 0.9375rem;
+  }
+
+  .nav-item:hover {
+    background: #f3f4f6;
+    color: #0a0a0f;
+  }
+
+  .nav-item.active {
+    background: #eff6ff;
+    color: #3b82f6;
+    font-weight: 600;
+  }
+
+  .nav-icon {
+    font-size: 1.125rem;
+    width: 24px;
+    text-align: center;
+    color: inherit;
+  }
+
+  /* Main Content */
+  .main-content {
+    flex: 1;
+    margin-left: 280px;
+    padding: 2rem 3rem;
+    max-width: calc(100vw - 280px);
+  }
+
+  .content-header {
+    margin-bottom: 2rem;
+  }
+
+  .content-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0a0a0f;
+    margin-bottom: 0.5rem;
+  }
+
+  .content-description {
+    color: #6b7280;
+    font-size: 0.9375rem;
+  }
+
+  .dashboard-container {
+    width: 100%;
+  }
+
+  .dashboard-header {
+    margin-bottom: 3rem;
+  }
+
+  .dashboard-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2.75rem;
+    font-weight: 700;
+    color: #0a0a0f;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+  }
+
+  .dashboard-subtitle {
+    font-size: 1rem;
+    color: #6b7280;
+    font-weight: 400;
+    margin-bottom: 1rem;
+  }
+
+  .last-updated {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: #9ca3af;
+    padding: 0.5rem 1rem;
+    background: #f3f4f6;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.75rem;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-color: #d1d5db;
+  }
+
+  .stat-card:hover::before {
+    transform: scaleX(1);
+  }
+
+  .stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+
+  .stat-icon-wrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    background: #f3f4f6;
+    color: #374151;
+  }
+
+  .stat-card:nth-child(1) .stat-icon-wrapper { background: #dbeafe; color: #1e40af; }
+  .stat-card:nth-child(2) .stat-icon-wrapper { background: #fce7f3; color: #be185d; }
+  .stat-card:nth-child(3) .stat-icon-wrapper { background: #fef3c7; color: #d97706; }
+  .stat-card:nth-child(4) .stat-icon-wrapper { background: #d1fae5; color: #059669; }
+
+  .stat-label {
+    font-size: 0.8125rem;
+    color: #6b7280;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0a0a0f;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .filters-bar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 1.25rem;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+
+  .view-content {
+    display: none;
+  }
+
+  .view-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .insight-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 1rem;
+  }
+
+  .insight-title {
+    font-weight: 600;
+    color: #0a0a0f;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .insight-text {
+    color: #6b7280;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  .tooltip-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    color: #6b7280;
+    font-size: 0.75rem;
+    cursor: help;
+    margin-left: 0.25rem;
+    position: relative;
+  }
+
+  .tooltip-trigger:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 8px;
+    padding: 0.75rem 1rem;
+    background: #1f2937;
+    color: white;
+    font-size: 0.8125rem;
+    border-radius: 8px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    z-index: 1000;
+    pointer-events: none;
+    max-width: 250px;
+    white-space: normal;
+  }
+
+  .tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #1f2937;
+  }
+
+  .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .filter-label {
+    font-size: 0.875rem;
+    color: #374151;
+    font-weight: 500;
+  }
+
+  .filter-select {
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    color: #1a1a2e;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none;
+    min-width: 140px;
+  }
+
+  .filter-select:hover {
+    border-color: #9ca3af;
+  }
+
+  .filter-select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .grid-full {
+    grid-column: 1 / -1;
+  }
+
+  .chart-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.75rem;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+  }
+
+  .chart-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .chart-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #0a0a0f;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+
+  .chart-title-icon {
+    font-size: 1.25rem;
+  }
+
+  .chart-container {
+    position: relative;
+    width: 100%;
+    min-height: 350px;
+  }
+
+  .loading-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 50%;
+    border-top-color: #3b82f6;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @media (max-width: 768px) {
+    .dashboard-container {
+      padding: 1.5rem 1rem;
+    }
+    .dashboard-title {
+      font-size: 2rem;
+    }
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+    .grid-2 {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
 <section id="pokémon-or-drug---game-analytics" class="level1">
-<h1>Pokémon or Drug - Game Analytics</h1>
-<p><strong>Last Updated</strong>: 2025-12-27 11:58:54 CET (data fetched from Google Sheets)</p>
-<p>Welcome to the analytics dashboard for <strong>Pokémon or Drug</strong>! This dashboard provides insights into game play patterns, league preferences, and player performance.</p>
-<blockquote class="blockquote">
-<p><strong>🔄 Live Data</strong>: This dashboard automatically fetches fresh data from Google Sheets on page load and updates every 5 minutes.</p>
-</blockquote>
-<div style="height: 1rem;">
+<div class="dashboard-wrapper">
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h1 class="sidebar-title">Analytics</h1>
+      <p class="sidebar-subtitle">Game Insights</p>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item active" data-view="overview">
+        <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
+        <span>Overview</span>
+      </div>
+      <div class="nav-item" data-view="users">
+        <span class="nav-icon"><i class="fas fa-users"></i></span>
+        <span>Users Over Time</span>
+      </div>
+      <div class="nav-item" data-view="leagues">
+        <span class="nav-icon"><i class="fas fa-trophy"></i></span>
+        <span>League Analysis</span>
+      </div>
+      <div class="nav-item" data-view="performance">
+        <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
+        <span>Performance</span>
+      </div>
+      <div class="nav-item" data-view="patterns">
+        <span class="nav-icon"><i class="fas fa-clock"></i></span>
+        <span>Time Patterns</span>
+      </div>
+      <div class="nav-item" data-view="insights">
+        <span class="nav-icon"><i class="fas fa-lightbulb"></i></span>
+        <span>Key Insights</span>
+      </div>
+    </nav>
+    <div style="padding: 1.5rem 1rem; border-top: 1px solid #e5e7eb; margin-top: 1.5rem;">
+      <div style="font-size: 0.8125rem; color: #9ca3af;" id="sidebar-last-updated">Loading...</div>
+    </div>
+  </aside>
 
-</div>
-<div class="card mb-3" style="border-left: 4px solid #2E86AB;">  <div class="card-body">    <div class="d-flex justify-content-between align-items-start">      <div>        <h6 class="card-subtitle mb-2 text-muted anchored">Total Games</h6>        <h2 class="card-title mb-1 anchored" data-anchor-id="pokémon-or-drug---game-analytics">1800</h2>                </div>      <div class="text-primary"></div>    </div>  </div></div>
-<div class="card mb-3" style="border-left: 4px solid #F18F01;">  <div class="card-body">    <div class="d-flex justify-content-between align-items-start">      <div>        <h6 class="card-subtitle mb-2 text-muted anchored">Unique Players</h6>        <h2 class="card-title mb-1 anchored">1164</h2>                </div>      <div class="text-primary"></div>    </div>  </div></div>
-<div class="card mb-3" style="border-left: 4px solid #A23B72;">  <div class="card-body">    <div class="d-flex justify-content-between align-items-start">      <div>        <h6 class="card-subtitle mb-2 text-muted anchored">Average Score</h6>        <h2 class="card-title mb-1 anchored">3793</h2>                </div>      <div class="text-primary"></div>    </div>  </div></div>
-<div class="card mb-3" style="border-left: 4px solid #2E8B57;">  <div class="card-body">    <div class="d-flex justify-content-between align-items-start">      <div>        <h6 class="card-subtitle mb-2 text-muted anchored">Average Accuracy</h6>        <h2 class="card-title mb-1 anchored">93.4%</h2>                </div>      <div class="text-primary"></div>    </div>  </div></div>
-<div style="height: 1rem;">
+  <!-- Main Content Area -->
+  <main class="main-content">
+    <!-- Overview View -->
+    <div class="view-content active" id="view-overview">
+      <div class="content-header">
+        <h2 class="content-title">Overview</h2>
+        <p class="content-description">Key metrics and performance indicators</p>
+      </div>
+      <div class="dashboard-container">
 
+  <!-- Summary Stats -->
+  <div class="stats-grid" id="summary-cards">
+          <div class="stat-card">
+            <div class="stat-header">
+              <div>
+                <div class="stat-label">Total Games</div>
+                <div class="stat-value" id="metric-total-games">-</div>
+              </div>
+              <div class="stat-icon-wrapper"><i class="fas fa-gamepad"></i></div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-header">
+              <div>
+                <div class="stat-label">Unique Players</div>
+                <div class="stat-value" id="metric-unique-players">-</div>
+              </div>
+              <div class="stat-icon-wrapper"><i class="fas fa-users"></i></div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-header">
+              <div>
+                <div class="stat-label">Average Score</div>
+                <div class="stat-value" id="metric-avg-score">-</div>
+              </div>
+              <div class="stat-icon-wrapper"><i class="fas fa-trophy"></i></div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-header">
+              <div>
+                <div class="stat-label">Average Accuracy</div>
+                <div class="stat-value" id="metric-avg-accuracy">-</div>
+              </div>
+              <div class="stat-icon-wrapper"><i class="fas fa-bullseye"></i></div>
+            </div>
+          </div>
+  </div>
+
+  <!-- Interactive Filters -->
+  <div class="filters-bar">
+    <div class="filter-group">
+      <span class="filter-label">League</span>
+      <select class="filter-select" id="filter-league">
+        <option value="all">All Leagues</option>
+        <option value="boulder">Boulder</option>
+        <option value="cascade">Cascade</option>
+        <option value="volcano">Volcano</option>
+        <option value="earth">Earth</option>
+        <option value="custom">Custom</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">Time Range</span>
+      <select class="filter-select" id="filter-time">
+        <option value="all">All Time</option>
+        <option value="24h">Last 24 Hours</option>
+        <option value="7d">Last 7 Days</option>
+        <option value="30d">Last 30 Days</option>
+      </select>
+    </div>
+  </div>
+
+        <!-- Overview content will be populated here -->
+      </div>
+    </div>
+
+    <!-- Users Over Time View -->
+    <div class="view-content" id="view-users">
+      <div class="content-header">
+        <h2 class="content-title">Users Over Time</h2>
+        <p class="content-description">Track unique user engagement patterns throughout the day</p>
+      </div>
+      <div class="dashboard-container">
+        <div class="chart-card grid-full">
+          <h3 class="chart-title">
+            <span class="chart-title-icon"><i class="fas fa-users"></i></span>
+            Unique Users Per Hour
+            <span class="tooltip-trigger"><i class="fas fa-info-circle"></i>
+              <span class="tooltip">Shows the number of unique players active in each hour. Helps identify peak engagement times.</span>
+            </span>
+          </h3>
+          <div class="chart-container" id="usersOverTimeChart"></div>
+        </div>
+        <div class="grid-2">
+          <div class="chart-card">
+            <h3 class="chart-title">
+              <span class="chart-title-icon"><i class="fas fa-user-friends"></i></span>
+              New vs Returning Users
+            </h3>
+            <div class="chart-container">
+              <canvas id="newReturningUsersChart"></canvas>
+            </div>
+          </div>
+          <div class="chart-card">
+            <h3 class="chart-title">
+              <span class="chart-title-icon"><i class="fas fa-chart-pie"></i></span>
+              User Engagement Distribution
+            </h3>
+            <div class="chart-container">
+              <canvas id="userEngagementChart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="chart-card grid-full">
+          <h3 class="chart-title">
+            <span class="chart-title-icon"><i class="fas fa-calendar-alt"></i></span>
+            Daily Active Users Trend
+          </h3>
+          <div class="chart-container" id="dailyActiveUsersChart"></div>
+        </div>
+        <div class="insight-card" id="users-insight">
+          <div class="insight-title"><i class="fas fa-lightbulb"></i> Analysis</div>
+          <div class="insight-text">Loading insights...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- League Analysis View -->
+    <div class="view-content" id="view-leagues">
+      <div class="content-header">
+        <h2 class="content-title">League Analysis</h2>
+        <p class="content-description">Compare performance across different leagues</p>
+      </div>
+      <div class="dashboard-container">
+        <div class="chart-card grid-full">
+          <h3 class="chart-title">
+            <span class="chart-title-icon"><i class="fas fa-chart-area"></i></span>
+            Games Per League Over Time
+          </h3>
+          <div class="chart-container" id="leagueOverTimeChart"></div>
+        </div>
+        <div class="grid-2">
+          <div class="chart-card">
+            <h3 class="chart-title">
+              <span class="chart-title-icon"><i class="fas fa-trophy"></i></span>
+              League Distribution
+            </h3>
+            <div class="chart-container">
+              <canvas id="leagueDistributionChart"></canvas>
+            </div>
+          </div>
+          <div class="chart-card">
+            <h3 class="chart-title">
+              <span class="chart-title-icon"><i class="fas fa-users"></i></span>
+              Players per League
+            </h3>
+            <div class="chart-container">
+              <canvas id="playersPerLeagueChart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="chart-card">
+          <h3 class="chart-title">
+            <span class="chart-title-icon"><i class="fas fa-chart-bar"></i></span>
+            League Performance Comparison
+          </h3>
+          <div class="chart-container">
+            <canvas id="leagueMetricsChart"></canvas>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="chart-card">
+            <h3 class="chart-title">
+              <span class="chart-title-icon"><i class="fas fa-chart-line"></i></span>
+              Average Score Trend by League
+            </h3>
+            <div class="chart-container" id="leagueScoreTrendChart"></div>
+          </div>
+          <div class="chart-card">
+            <h3 class="chart-title">
+              <span class="chart-title-icon"><i class="fas fa-bullseye"></i></span>
+              Average Accuracy Trend by League
+            </h3>
+            <div class="chart-container" id="leagueAccuracyTrendChart"></div>
+          </div>
+        </div>
+        <div class="insight-card" id="leagues-insight">
+          <div class="insight-title"><i class="fas fa-lightbulb"></i> Analysis</div>
+          <div class="insight-text">Loading insights...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Performance View -->
+    <div class="view-content" id="view-performance">
+      <div class="content-header">
+        <h2 class="content-title">Performance Analysis</h2>
+        <p class="content-description">Score and accuracy relationships</p>
+      </div>
+      <div class="dashboard-container">
+        <div class="chart-card grid-full">
+          <h3 class="chart-title">
+            <span class="chart-title-icon"><i class="fas fa-chart-scatter"></i></span>
+            Score vs Accuracy Correlation
+            <span class="tooltip-trigger"><i class="fas fa-info-circle"></i>
+              <span class="tooltip">Each point represents a game. Higher accuracy generally correlates with higher scores. Points are colored by league.</span>
+            </span>
+          </h3>
+          <div class="chart-container" id="scoreAccuracyChart"></div>
+        </div>
+        <div class="grid-2">
+          <div class="chart-card">
+            <h3 class="chart-title">
+              <span class="chart-title-icon"><i class="fas fa-chart-bar"></i></span>
+              Score Distribution by League
+            </h3>
+            <div class="chart-container">
+              <canvas id="scoreDistributionChart"></canvas>
+            </div>
+          </div>
+          <div class="chart-card">
+            <h3 class="chart-title">
+              <span class="chart-title-icon"><i class="fas fa-bullseye"></i></span>
+              Accuracy Distribution by League
+            </h3>
+            <div class="chart-container">
+              <canvas id="accuracyDistributionChart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="chart-card grid-full">
+          <h3 class="chart-title">
+            <span class="chart-title-icon"><i class="fas fa-chart-line"></i></span>
+            Score Trends Over Time
+          </h3>
+          <div class="chart-container" id="scoreTrendChart"></div>
+        </div>
+        <div class="grid-2">
+          <div class="chart-card">
+            <h3 class="chart-title">
+              <span class="chart-title-icon"><i class="fas fa-chart-area"></i></span>
+              Score Histogram
+            </h3>
+            <div class="chart-container">
+              <canvas id="scoreHistogramChart"></canvas>
+            </div>
+          </div>
+          <div class="chart-card">
+            <h3 class="chart-title">
+              <span class="chart-title-icon"><i class="fas fa-chart-area"></i></span>
+              Accuracy Histogram
+            </h3>
+            <div class="chart-container">
+              <canvas id="accuracyHistogramChart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="chart-card grid-full">
+          <h3 class="chart-title">
+            <span class="chart-title-icon"><i class="fas fa-chart-scatter"></i></span>
+            Score vs Games Played (Player Progression)
+          </h3>
+          <div class="chart-container" id="playerProgressionChart"></div>
+        </div>
+        <div class="insight-card" id="performance-insight">
+          <div class="insight-title"><i class="fas fa-lightbulb"></i> Analysis</div>
+          <div class="insight-text">Loading insights...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Time Patterns View -->
+    <div class="view-content" id="view-patterns">
+      <div class="content-header">
+        <h2 class="content-title">Time Patterns</h2>
+        <p class="content-description">When do players engage most?</p>
+      </div>
+      <div class="dashboard-container">
+        <div class="chart-card grid-full">
+          <h3 class="chart-title">
+            <span class="chart-title-icon"><i class="fas fa-calendar-day"></i></span>
+            Daily Game Trends
+          </h3>
+          <div class="chart-container" id="gamesPerDayChart"></div>
+        </div>
+        <div class="grid-2">
+          <div class="chart-card">
+            <h3 class="chart-title">
+              <span class="chart-title-icon"><i class="fas fa-clock"></i></span>
+              Games by Hour of Day
+            </h3>
+            <div class="chart-container">
+              <canvas id="hourDistributionChart"></canvas>
+            </div>
+          </div>
+          <div class="chart-card">
+            <h3 class="chart-title">
+              <span class="chart-title-icon"><i class="fas fa-calendar-week"></i></span>
+              Games by Day of Week
+            </h3>
+            <div class="chart-container">
+              <canvas id="dayOfWeekChart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="chart-card grid-full">
+          <h3 class="chart-title">
+            <span class="chart-title-icon"><i class="fas fa-th"></i></span>
+            Heatmap: Games by Hour and Day of Week
+          </h3>
+          <div class="chart-container" id="hourDayHeatmapChart"></div>
+        </div>
+        <div class="grid-2">
+          <div class="chart-card">
+            <h3 class="chart-title">
+              <span class="chart-title-icon"><i class="fas fa-chart-line"></i></span>
+              Average Score by Hour
+            </h3>
+            <div class="chart-container">
+              <canvas id="scoreByHourChart"></canvas>
+            </div>
+          </div>
+          <div class="chart-card">
+            <h3 class="chart-title">
+              <span class="chart-title-icon"><i class="fas fa-chart-line"></i></span>
+              Average Score by Day of Week
+            </h3>
+            <div class="chart-container">
+              <canvas id="scoreByDayChart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="chart-card grid-full">
+          <h3 class="chart-title">
+            <span class="chart-title-icon"><i class="fas fa-chart-area"></i></span>
+            Weekly Activity Pattern
+          </h3>
+          <div class="chart-container" id="weeklyPatternChart"></div>
+        </div>
+        <div class="insight-card" id="patterns-insight">
+          <div class="insight-title"><i class="fas fa-lightbulb"></i> Analysis</div>
+          <div class="insight-text">Loading insights...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Insights View -->
+    <div class="view-content" id="view-insights">
+      <div class="content-header">
+        <h2 class="content-title">Key Insights</h2>
+        <p class="content-description">Automated analysis and recommendations</p>
+      </div>
+      <div class="dashboard-container">
+        <div class="insight-card" id="key-insights">
+          <div class="insight-title"><i class="fas fa-search"></i> Comprehensive Analysis</div>
+          <div class="insight-text">Loading comprehensive insights...</div>
+        </div>
+      </div>
+    </div>
+  </main>
 </div>
+</section>
+<style>
+  .card {
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+  }
+  #summary-cards .card {
+    border-radius: 8px;
+  }
+  .card-header {
+    border-bottom: 2px solid #f0f0f0;
+    font-weight: 600;
+  }
+  canvas {
+    max-height: 400px;
+  }
+</style>
+
 <script>
-// Dynamic Data Loader for Pokémon or Drug Analytics Dashboard
-// Fetches fresh data from Google Sheets and updates all Highcharts charts
+// 🚀 STUNNING MODERN DASHBOARD - Pokémon or Drug Analytics
+// Beautiful, interactive, and fully responsive with Plotly.js & Chart.js
 
 (function() {
   const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQKvOHhK-Rw71DILu_X0ydZCS86KF2TeCyLrNAQx_MQsQN0mIPEteIO_V86DUerFO_JpwZmieGXLW-P/pub?gid=923170622&single=true&output=csv";
   
-  // Simple CSV parser
+  // Global state
+  let allData = [];
+  let filteredData = [];
+  let charts = {};
+  
+  // Premium color palette
+  const colors = {
+    boulder: '#92400e',
+    cascade: '#1e40af',
+    volcano: '#dc2626',
+    earth: '#059669',
+    custom: '#7c3aed',
+    primary: '#3b82f6',
+    secondary: '#8b5cf6',
+    success: '#10b981',
+    danger: '#ef4444'
+  };
+  
+  // Plotly theme - clean and professional
+  const plotlyTheme = {
+    paper_bgcolor: 'rgba(0,0,0,0)',
+    plot_bgcolor: 'rgba(0,0,0,0)',
+    font: { 
+      family: 'Inter, -apple-system, sans-serif', 
+      color: '#374151', 
+      size: 12 
+    },
+    hovermode: 'closest',
+    showlegend: true,
+    legend: {
+      bgcolor: 'rgba(255,255,255,0.95)',
+      bordercolor: '#e5e7eb',
+      borderwidth: 1,
+      font: { size: 11, color: '#6b7280' },
+      x: 0.02,
+      y: 0.98,
+      xanchor: 'left',
+      yanchor: 'top'
+    },
+    margin: { l: 60, r: 30, t: 20, b: 60 },
+    xaxis: {
+      gridcolor: '#f3f4f6',
+      gridwidth: 1,
+      zeroline: false,
+      linecolor: '#e5e7eb',
+      linewidth: 1
+    },
+    yaxis: {
+      gridcolor: '#f3f4f6',
+      gridwidth: 1,
+      zeroline: false,
+      linecolor: '#e5e7eb',
+      linewidth: 1
+    }
+  };
+  
+  // Enhanced CSV parser - don't filter out rows, just parse them
   function parseCSV(text) {
     const lines = text.split("\n").filter(line => line.trim());
     if (lines.length === 0) return [];
     
-    const headers = lines[0].split(",").map(h => h.trim());
-    return lines.slice(1).map(line => {
-      const values = line.split(",");
+    const headers = lines[0].split(",").map(h => h.trim().replace(/^"|"$/g, ''));
+    const parsed = lines.slice(1).map(line => {
+      const values = [];
+      let current = '';
+      let inQuotes = false;
+      
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          values.push(current.trim());
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      values.push(current.trim());
+      
       const obj = {};
       headers.forEach((header, i) => {
-        let value = values[i]?.trim() || "";
-        // Try to parse numbers
-        if (value && !isNaN(value) && value !== "") {
-          obj[header] = parseFloat(value);
+        let value = (values[i] || "").replace(/^"|"$/g, '').trim();
+        if (value && !isNaN(value) && value !== "" && value !== "null") {
+          const num = parseFloat(value);
+          obj[header] = !isNaN(num) ? num : value;
         } else {
-          obj[header] = value;
+          obj[header] = value || null;
         }
       });
       return obj;
-    }).filter(row => row.Date && row.League);
+    });
+    
+    // Log parsing stats
+    const totalRows = parsed.length;
+    const rowsWithDate = parsed.filter(row => row.Date).length;
+    const rowsWithLeague = parsed.filter(row => row.League).length;
+    const rowsWithBoth = parsed.filter(row => row.Date && row.League).length;
+    
+    console.log(`📊 CSV Parsing Stats:
+      Total rows parsed: ${totalRows}
+      Rows with Date: ${rowsWithDate}
+      Rows with League: ${rowsWithLeague}
+      Rows with both: ${rowsWithBoth}
+      Rows missing Date: ${totalRows - rowsWithDate}
+      Rows missing League: ${totalRows - rowsWithLeague}
+    `);
+    
+    // Return all rows - let the individual chart functions handle missing data
+    return parsed;
+  }
+  
+  // Filter data based on filters
+  function filterData(data) {
+    let filtered = [...data];
+    const leagueFilter = document.getElementById('filter-league')?.value;
+    const timeFilter = document.getElementById('filter-time')?.value;
+    
+    if (leagueFilter && leagueFilter !== 'all') {
+      filtered = filtered.filter(row => 
+        String(row.League || '').toLowerCase() === leagueFilter.toLowerCase()
+      );
+    }
+    
+    if (timeFilter && timeFilter !== 'all') {
+      const now = new Date();
+      const cutoff = new Date();
+      if (timeFilter === '24h') cutoff.setHours(now.getHours() - 24);
+      else if (timeFilter === '7d') cutoff.setDate(now.getDate() - 7);
+      else if (timeFilter === '30d') cutoff.setDate(now.getDate() - 30);
+      
+      filtered = filtered.filter(row => {
+        const dateInfo = parseDate(row.Date);
+        return dateInfo && dateInfo.date >= cutoff;
+      });
+    }
+    
+    return filtered;
   }
   
   // Process date
   function parseDate(dateStr) {
+    if (!dateStr) return null;
     const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return null;
     return {
       date: date,
+      timestamp: date.getTime(),
       dateOnly: date.toISOString().split("T")[0],
       hour: date.getHours(),
-      weekday: date.toLocaleDateString("en-US", { weekday: "long" })
+      weekday: date.toLocaleDateString("en-US", { weekday: "long" }),
+      dayOfWeek: date.getDay()
     };
   }
   
-  // Aggregate data for timeline (games per hour by league)
-  function aggregateTimelineData(data) {
-    const hourly = {};
+  // Update summary metrics - use ALL data, not filtered
+  function updateSummaryMetrics(data) {
+    // Use allData for total count, filteredData for filtered metrics
+    const totalGames = allData.length; // Show total from all data
+    const uniquePlayers = new Set(allData.map(d => d.Name).filter(Boolean)).size;
     
-    // Check if data is already aggregated (has GameCount) or raw (needs counting)
-    const isAggregated = data.length > 0 && data[0].hasOwnProperty("GameCount");
+    // For averages, use filtered data if available, otherwise all data
+    const dataForAverages = filteredData.length > 0 ? filteredData : allData;
+    const scores = dataForAverages.map(d => d.Score || 0).filter(s => s > 0);
+    const accuracies = dataForAverages.map(d => d.Accuracy || 0).filter(a => a > 0);
     
-    if (isAggregated) {
-      // Data is pre-aggregated: Date_Hour_Floor, League, GameCount
-      data.forEach(row => {
-        if (!row.Date_Hour_Floor || !row.League) return;
-        
-        const date = new Date(row.Date_Hour_Floor);
-        if (isNaN(date.getTime())) {
-          console.warn("Invalid date:", row.Date_Hour_Floor);
-          return;
-        }
-        
-        const key = date.getTime();
-        const league = String(row.League).toLowerCase();
-        
-        if (!hourly[key]) hourly[key] = {};
-        hourly[key][league] = (hourly[key][league] || 0) + (row.GameCount || 0);
-      });
-    } else {
-      // Raw data: need to count games per hour per league
-      data.forEach(row => {
-        if (!row.Date || !row.League) return;
-        
-        const date = new Date(row.Date);
-        if (isNaN(date.getTime())) {
-          console.warn("Invalid date:", row.Date);
-          return;
-        }
-        
-        // Round down to nearest hour
-        const hourFloor = new Date(date);
-        hourFloor.setMinutes(0, 0, 0);
-        hourFloor.setSeconds(0, 0);
-        hourFloor.setMilliseconds(0);
-        const key = hourFloor.getTime();
-        
-        if (!hourly[key]) hourly[key] = {};
-        const league = String(row.League).toLowerCase();
-        hourly[key][league] = (hourly[key][league] || 0) + 1;
-      });
-    }
+    const avgScore = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+    const avgAccuracy = accuracies.length > 0 ? (accuracies.reduce((a, b) => a + b, 0) / accuracies.length).toFixed(1) : 0;
     
-    // Convert to array format for Highcharts (line chart - counts)
-    const leagues = ["boulder", "cascade", "volcano", "earth", "custom"];
-    const series = {};
-    leagues.forEach(league => series[league] = []);
+    document.getElementById('metric-total-games').textContent = totalGames.toLocaleString();
+    document.getElementById('metric-unique-players').textContent = uniquePlayers.toLocaleString();
+    document.getElementById('metric-avg-score').textContent = avgScore.toLocaleString();
+    document.getElementById('metric-avg-accuracy').textContent = avgAccuracy + '%';
     
-    // Sort timestamps and create data points
-    const sortedTimestamps = Object.keys(hourly).map(Number).sort((a, b) => a - b);
-    
-    sortedTimestamps.forEach(timestamp => {
-      leagues.forEach(league => {
-        const count = hourly[timestamp][league] || 0;
-        // Include all points, even zeros, for continuity
-        series[league].push([timestamp, count]);
-      });
-    });
-    
-    console.log("Aggregated timeline data:", {
-      isAggregated: isAggregated,
-      totalHours: sortedTimestamps.length,
-      seriesLengths: Object.keys(series).map(l => ({ 
-        league: l, 
-        points: series[l].length,
-        totalCount: series[l].reduce((sum, p) => sum + p[1], 0)
-      }))
-    });
-    
-    return series;
+    console.log(`📈 Summary Metrics:
+      Total Games: ${totalGames}
+      Unique Players: ${uniquePlayers}
+      Avg Score: ${avgScore}
+      Avg Accuracy: ${avgAccuracy}%
+      Filtered Games: ${filteredData.length}
+    `);
   }
   
-  // Aggregate data for bar charts (count by category and group)
-  function aggregateBarData(data, xVar, groupVar) {
-    const counts = {};
-    data.forEach(row => {
-      let xValue = row[xVar];
-      if (xVar === "Date_Hour") xValue = parseDate(row.Date).hour;
-      if (xVar === "Date_Weekday") xValue = parseDate(row.Date).weekday;
-      
-      const group = row[groupVar] || "All";
-      const key = `${xValue}|${group}`;
-      counts[key] = (counts[key] || 0) + 1;
-    });
-    
-    // Organize by group
-    const groups = {};
-    Object.keys(counts).forEach(key => {
-      const [xValue, group] = key.split("|");
-      if (!groups[group]) groups[group] = [];
-      groups[group].push([xValue, counts[key]]);
-    });
-    
-    return groups;
-  }
-  
-  // Update timeline chart (line chart) - fix initial render and update with counts
-  function updateTimelineChart(chart, data) {
-    if (!chart) {
-      console.error("Chart is null or undefined");
-      return;
-    }
-    
-    console.log("Updating timeline chart, chart has", chart.series.length, "series");
-    
-    // Get count data (not percentages)
-    const seriesData = aggregateTimelineData(data);
-    const leagues = ["boulder", "cascade", "volcano", "earth", "custom"];
-    
-    // Check if chart has existing series or if we need to recreate them
-    if (chart.series.length === 0) {
-      console.log("Chart has no series, creating new ones...");
-      // Create new series
-      leagues.forEach((league, idx) => {
-        const dataPoints = seriesData[league] || [];
-        if (dataPoints.length > 0) {
-          chart.addSeries({
-            name: league.charAt(0).toUpperCase() + league.slice(1),
-            data: dataPoints,
-            type: "line"
-          }, false);
-        }
-      });
-    } else {
-      // Update existing series
-      leagues.forEach((league, idx) => {
-        const dataPoints = seriesData[league] || [];
-        if (chart.series[idx]) {
-          chart.series[idx].setData(dataPoints, false);
-          chart.series[idx].update({ name: league.charAt(0).toUpperCase() + league.slice(1) }, false);
-        } else if (dataPoints.length > 0) {
-          // Add missing series
-          chart.addSeries({
-            name: league.charAt(0).toUpperCase() + league.slice(1),
-            data: dataPoints,
-            type: "line"
-          }, false);
-        }
-      });
-    }
-    
-    // Ensure chart type is line (not area)
-    if (chart.options.chart && chart.options.chart.type !== "line") {
-      chart.update({ chart: { type: "line" } }, false);
-    }
-    
-    // Update y-axis to show counts
-    if (chart.yAxis && chart.yAxis[0]) {
-      chart.yAxis[0].update({ 
-        title: { text: "Number of Games" },
-        min: 0
-      }, false);
-    }
-    
-    chart.redraw();
-    console.log("✅ Timeline chart updated with", data.length, "games,", chart.series.length, "series");
-  }
-  
-  // Update bar chart
-  function updateBarChart(chart, data, xVar, groupVar) {
-    const groups = aggregateBarData(data, xVar, groupVar);
-    const groupNames = Object.keys(groups).sort();
-    
-    groupNames.forEach((groupName, idx) => {
-      if (chart.series[idx]) {
-        chart.series[idx].setData(groups[groupName] || [], false);
-      }
-    });
-    chart.redraw();
-  }
-  
-  // Update simple bar chart (no grouping)
-  function updateSimpleBarChart(chart, data, xVar) {
-    const counts = {};
-    data.forEach(row => {
-      let value = row[xVar];
-      if (xVar === "League") value = row.League;
-      counts[value] = (counts[value] || 0) + 1;
-    });
-    
-    const seriesData = Object.keys(counts).map(key => [key, counts[key]]);
-    if (chart.series[0]) {
-      chart.series[0].setData(seriesData, false);
-      chart.redraw();
-    }
-  }
-  
-  // Update last updated timestamp display
+  // Update last updated timestamp
   function updateLastUpdatedTimestamp() {
     const now = new Date();
     const formatted = now.toLocaleString("en-US", {
       year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
+      month: "short",
+      day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-      second: "2-digit",
       timeZoneName: "short"
     });
+    const sidebarEl = document.getElementById('sidebar-last-updated');
+    if (sidebarEl) sidebarEl.textContent = `Updated ${formatted}`;
+  }
+
+  // Navigation handling
+  function setupNavigation() {
+    const navItems = document.querySelectorAll('.nav-item');
+    const views = document.querySelectorAll('.view-content');
+
+    navItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const viewId = item.dataset.view;
+        
+        // Update active states
+        navItems.forEach(nav => nav.classList.remove('active'));
+        item.classList.add('active');
+        
+        // Show selected view
+        views.forEach(view => view.classList.remove('active'));
+        const targetView = document.getElementById(`view-${viewId}`);
+        if (targetView) targetView.classList.add('active');
+      });
+    });
+  }
+
+  // Generate insights
+  function generateInsights(data) {
+    const insights = {
+      users: generateUsersInsights(data),
+      leagues: generateLeaguesInsights(data),
+      performance: generatePerformanceInsights(data),
+      patterns: generatePatternsInsights(data),
+      key: generateKeyInsights(data)
+    };
     
-    // Update all "Last Updated" elements
-    document.querySelectorAll("strong").forEach(el => {
-      if (el.textContent.includes("Last Updated")) {
-        el.textContent = "Last Updated: " + formatted + " (data fetched from Google Sheets)";
+    Object.keys(insights).forEach(key => {
+      const el = document.getElementById(`${key}-insight`);
+      if (el) {
+        const textEl = el.querySelector('.insight-text');
+        if (textEl) textEl.innerHTML = insights[key];
+      }
+    });
+  }
+
+  function generateUsersInsights(data) {
+    const hourlyUsers = {};
+    const dailyUsers = {};
+    const userGameCounts = {};
+    
+    data.forEach(row => {
+      const dateInfo = parseDate(row.Date);
+      if (!dateInfo) return;
+      
+      // Hourly
+      const hour = dateInfo.hour;
+      if (!hourlyUsers[hour]) hourlyUsers[hour] = new Set();
+      if (row.Name) hourlyUsers[hour].add(row.Name);
+      
+      // Daily
+      const day = dateInfo.dateOnly;
+      if (!dailyUsers[day]) dailyUsers[day] = new Set();
+      if (row.Name) dailyUsers[day].add(row.Name);
+      
+      // Per user
+      if (row.Name) {
+        userGameCounts[row.Name] = (userGameCounts[row.Name] || 0) + 1;
       }
     });
     
-    // Also try to find and update in parent elements
-    document.querySelectorAll("p").forEach(el => {
-      if (el.textContent.includes("Last Updated")) {
-        el.innerHTML = "<strong>Last Updated</strong>: " + formatted + " (data fetched from Google Sheets)";
+    const peakHour = Object.keys(hourlyUsers).reduce((a, b) => 
+      hourlyUsers[a].size > hourlyUsers[b].size ? a : b
+    );
+    const peakCount = hourlyUsers[peakHour].size;
+    
+    const quietHour = Object.keys(hourlyUsers).reduce((a, b) => 
+      hourlyUsers[a].size < hourlyUsers[b].size ? a : b
+    );
+    const quietCount = hourlyUsers[quietHour].size;
+    
+    // Daily trends
+    const sortedDays = Object.keys(dailyUsers).sort();
+    const dailyCounts = sortedDays.map(d => dailyUsers[d].size);
+    const avgDailyUsers = dailyCounts.length > 0 ? 
+      Math.round(dailyCounts.reduce((a, b) => a + b, 0) / dailyCounts.length) : 0;
+    const maxDailyUsers = Math.max(...dailyCounts, 0);
+    const minDailyUsers = Math.min(...dailyCounts, 0);
+    
+    // User engagement
+    const gameCounts = Object.values(userGameCounts);
+    const avgGamesPerUser = gameCounts.length > 0 ? 
+      (gameCounts.reduce((a, b) => a + b, 0) / gameCounts.length).toFixed(1) : 0;
+    const maxGames = Math.max(...gameCounts, 0);
+    const topPlayers = Object.entries(userGameCounts)
+      .filter(([_, count]) => count === maxGames)
+      .map(([name]) => name);
+    
+    // Growth trend
+    const recentDays = sortedDays.slice(-7);
+    const olderDays = sortedDays.slice(0, Math.max(0, sortedDays.length - 7));
+    const recentAvg = recentDays.length > 0 ? 
+      recentDays.reduce((sum, d) => sum + dailyUsers[d].size, 0) / recentDays.length : 0;
+    const olderAvg = olderDays.length > 0 ? 
+      olderDays.reduce((sum, d) => sum + dailyUsers[d].size, 0) / olderDays.length : 0;
+    const growthRate = olderAvg > 0 ? ((recentAvg - olderAvg) / olderAvg * 100).toFixed(1) : 0;
+    const trend = growthRate > 0 ? '📈 growing' : growthRate < 0 ? '📉 declining' : '➡️ stable';
+    
+    return `
+      <div style="line-height: 1.8;">
+        <p><strong>Peak Hours:</strong> Highest activity at <strong>${peakHour}:00</strong> (${peakCount} users) vs quietest at <strong>${quietHour}:00</strong> (${quietCount} users). 
+        <span class="tooltip-trigger"><i class="fas fa-info-circle" style="font-size: 0.875rem;"></i><span class="tooltip">Consider targeted campaigns during peak hours and re-engagement strategies during quiet periods.</span></span></p>
+        
+        <p><strong>Daily Engagement:</strong> Average <strong>${avgDailyUsers} unique users/day</strong> (range: ${minDailyUsers}-${maxDailyUsers}). 
+        Recent 7-day trend is <strong>${trend}</strong> (${Math.abs(growthRate)}% ${growthRate > 0 ? 'increase' : growthRate < 0 ? 'decrease' : 'change'}).</p>
+        
+        <p><strong>User Retention:</strong> Average <strong>${avgGamesPerUser} games per player</strong>. 
+        ${topPlayers.length > 0 ? `Top player${topPlayers.length > 1 ? 's' : ''}: <strong>${topPlayers.slice(0, 3).join(', ')}</strong> with ${maxGames} games each.` : ''}</p>
+        
+        <p><strong>Recommendation:</strong> ${growthRate > 0 ? 'Maintain momentum with new content.' : growthRate < 0 ? 'Focus on retention campaigns and new features.' : 'Stable growth - consider expansion strategies.'}</p>
+      </div>
+    `;
+  }
+
+  function generateLeaguesInsights(data) {
+    const leagueCounts = {};
+    const leagueScores = {};
+    const leagueAccuracies = {};
+    const leaguePlayers = {};
+    const leagueTrends = {};
+    
+    data.forEach(row => {
+      const league = String(row.League || '').toLowerCase();
+      if (!league) return;
+      
+      leagueCounts[league] = (leagueCounts[league] || 0) + 1;
+      
+      if (row.Score > 0) {
+        if (!leagueScores[league]) leagueScores[league] = [];
+        leagueScores[league].push(row.Score);
+      }
+      
+      if (row.Accuracy > 0) {
+        if (!leagueAccuracies[league]) leagueAccuracies[league] = [];
+        leagueAccuracies[league].push(row.Accuracy);
+      }
+      
+      if (row.Name) {
+        if (!leaguePlayers[league]) leaguePlayers[league] = new Set();
+        leaguePlayers[league].add(row.Name);
+      }
+      
+      // Track trends over time
+      const dateInfo = parseDate(row.Date);
+      if (dateInfo) {
+        const week = Math.floor((dateInfo.date - new Date('2025-01-01')) / (7 * 24 * 60 * 60 * 1000));
+        if (!leagueTrends[league]) leagueTrends[league] = {};
+        leagueTrends[league][week] = (leagueTrends[league][week] || 0) + 1;
       }
     });
+    
+    const total = Object.values(leagueCounts).reduce((a, b) => a + b, 0);
+    if (total === 0) return 'No league data available.';
+    
+    // Sort leagues by popularity
+    const sortedLeagues = Object.entries(leagueCounts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([league, count]) => ({
+        league,
+        count,
+        percentage: ((count / total) * 100).toFixed(1),
+        avgScore: leagueScores[league] ? 
+          Math.round(leagueScores[league].reduce((a, b) => a + b, 0) / leagueScores[league].length) : 0,
+        avgAccuracy: leagueAccuracies[league] ? 
+          (leagueAccuracies[league].reduce((a, b) => a + b, 0) / leagueAccuracies[league].length).toFixed(1) : 0,
+        uniquePlayers: leaguePlayers[league] ? leaguePlayers[league].size : 0,
+        gamesPerPlayer: leaguePlayers[league] ? (count / leaguePlayers[league].size).toFixed(1) : 0
+      }));
+    
+    const mostPopular = sortedLeagues[0];
+    const leastPopular = sortedLeagues[sortedLeagues.length - 1];
+    
+    // Calculate difficulty progression
+    const leagues = ['boulder', 'cascade', 'volcano', 'earth', 'custom'];
+    const difficultyOrder = leagues.filter(l => leagueCounts[l]);
+    const progression = difficultyOrder.length > 1 ? 
+      difficultyOrder.map(l => l.charAt(0).toUpperCase() + l.slice(1)).join(' → ') : 'N/A';
+    
+    // Find best performing league (highest avg score)
+    const bestPerforming = sortedLeagues.reduce((a, b) => 
+      a.avgScore > b.avgScore ? a : b
+    );
+    
+    return `
+      <div style="line-height: 1.8;">
+        <p><strong>Popularity Ranking:</strong> 
+        ${sortedLeagues.map((l, i) => `${i + 1}. <strong>${l.league.charAt(0).toUpperCase() + l.league.slice(1)}</strong> (${l.percentage}%, ${l.count} games)`).join(', ')}</p>
+        
+        <p><strong>Most Popular:</strong> <strong>${mostPopular.league.charAt(0).toUpperCase() + mostPopular.league.slice(1)}</strong> with ${mostPopular.percentage}% of games. 
+        Average score: <strong>${mostPopular.avgScore.toLocaleString()}</strong>, accuracy: <strong>${mostPopular.avgAccuracy}%</strong>. 
+        ${mostPopular.uniquePlayers} unique players averaging ${mostPopular.gamesPerPlayer} games each.</p>
+        
+        <p><strong>Best Performance:</strong> <strong>${bestPerforming.league.charAt(0).toUpperCase() + bestPerforming.league.slice(1)}</strong> has the highest average score (<strong>${bestPerforming.avgScore.toLocaleString()}</strong>), 
+        suggesting optimal difficulty balance.</p>
+        
+        <p><strong>Difficulty Progression:</strong> ${progression}. 
+        ${leastPopular.count > 0 ? `Least played: <strong>${leastPopular.league.charAt(0).toUpperCase() + leastPopular.league.slice(1)}</strong> (${leastPopular.percentage}%) - consider incentives or difficulty adjustment.` : ''}</p>
+        
+        <p><strong>Recommendation:</strong> ${mostPopular.percentage > 40 ? 'One league dominates - consider rebalancing difficulty or adding intermediate levels.' : 'Good distribution across leagues - maintain current balance.'}</p>
+      </div>
+    `;
+  }
+
+  function generatePerformanceInsights(data) {
+    const scores = data.map(d => d.Score || 0).filter(s => s > 0);
+    const accuracies = data.map(d => d.Accuracy || 0).filter(a => a > 0);
+    
+    if (scores.length === 0 || accuracies.length === 0) return 'Insufficient data for analysis.';
+    
+    const avgScore = scores.reduce((a, b) => a + b, 0) / scores.length;
+    const avgAccuracy = accuracies.reduce((a, b) => a + b, 0) / accuracies.length;
+    
+    // Calculate statistics
+    const sortedScores = [...scores].sort((a, b) => a - b);
+    const sortedAccuracies = [...accuracies].sort((a, b) => a - b);
+    const medianScore = sortedScores[Math.floor(sortedScores.length / 2)];
+    const medianAccuracy = sortedAccuracies[Math.floor(sortedAccuracies.length / 2)];
+    const q1Score = sortedScores[Math.floor(sortedScores.length * 0.25)];
+    const q3Score = sortedScores[Math.floor(sortedScores.length * 0.75)];
+    const q1Accuracy = sortedAccuracies[Math.floor(sortedAccuracies.length * 0.25)];
+    const q3Accuracy = sortedAccuracies[Math.floor(sortedAccuracies.length * 0.75)];
+    const minScore = sortedScores[0];
+    const maxScore = sortedScores[sortedScores.length - 1];
+    const minAccuracy = sortedAccuracies[0];
+    const maxAccuracy = sortedAccuracies[sortedAccuracies.length - 1];
+    
+    // Calculate correlation
+    const scoreAccPairs = data.filter(d => d.Score > 0 && d.Accuracy > 0);
+    let correlation = 0;
+    if (scoreAccPairs.length > 1) {
+      const scoreMean = scoreAccPairs.reduce((sum, d) => sum + d.Score, 0) / scoreAccPairs.length;
+      const accMean = scoreAccPairs.reduce((sum, d) => sum + d.Accuracy, 0) / scoreAccPairs.length;
+      let numerator = 0, scoreVar = 0, accVar = 0;
+      scoreAccPairs.forEach(d => {
+        const scoreDiff = d.Score - scoreMean;
+        const accDiff = d.Accuracy - accMean;
+        numerator += scoreDiff * accDiff;
+        scoreVar += scoreDiff * scoreDiff;
+        accVar += accDiff * accDiff;
+      });
+      correlation = numerator / Math.sqrt(scoreVar * accVar);
+    }
+    
+    const correlationStrength = Math.abs(correlation) > 0.7 ? 'strong' : Math.abs(correlation) > 0.4 ? 'moderate' : 'weak';
+    
+    // Performance tiers
+    const highPerformers = scoreAccPairs.filter(d => d.Score > q3Score && d.Accuracy > q3Accuracy).length;
+    const lowPerformers = scoreAccPairs.filter(d => d.Score < q1Score && d.Accuracy < q1Accuracy).length;
+    const highPerformerPct = ((highPerformers / scoreAccPairs.length) * 100).toFixed(1);
+    const lowPerformerPct = ((lowPerformers / scoreAccPairs.length) * 100).toFixed(1);
+    
+    // Score distribution analysis
+    const excellentGames = scores.filter(s => s > q3Score).length;
+    const poorGames = scores.filter(s => s < q1Score).length;
+    
+    // Accuracy distribution
+    const highAccuracyGames = accuracies.filter(a => a > 90).length;
+    const lowAccuracyGames = accuracies.filter(a => a < 70).length;
+    
+    return `
+      <div style="line-height: 1.8;">
+        <p><strong>Central Tendency:</strong> Average score <strong>${Math.round(avgScore).toLocaleString()}</strong> (median: ${medianScore.toLocaleString()}), 
+        average accuracy <strong>${avgAccuracy.toFixed(1)}%</strong> (median: ${medianAccuracy.toFixed(1)}%).</p>
+        
+        <p><strong>Score Distribution:</strong> Range ${minScore.toLocaleString()} - ${maxScore.toLocaleString()}. 
+        Q1: ${q1Score.toLocaleString()}, Q3: ${q3Score.toLocaleString()}. 
+        ${excellentGames} games (${((excellentGames/scores.length)*100).toFixed(1)}%) exceed Q3, 
+        ${poorGames} games (${((poorGames/scores.length)*100).toFixed(1)}%) below Q1.</p>
+        
+        <p><strong>Accuracy Distribution:</strong> Range ${minAccuracy.toFixed(1)}% - ${maxAccuracy.toFixed(1)}%. 
+        ${highAccuracyGames} games (${((highAccuracyGames/accuracies.length)*100).toFixed(1)}%) above 90%, 
+        ${lowAccuracyGames} games (${((lowAccuracyGames/accuracies.length)*100).toFixed(1)}%) below 70%.</p>
+        
+        <p><strong>Correlation Analysis:</strong> <strong>${correlationStrength}</strong> positive correlation (r=${correlation.toFixed(3)}) between accuracy and score. 
+        ${correlation > 0.7 ? 'Strong relationship - accuracy improvements directly translate to higher scores.' : 
+          correlation > 0.4 ? 'Moderate relationship - accuracy matters but other factors also influence scores.' : 
+          'Weak relationship - consider other performance factors beyond accuracy.'}</p>
+        
+        <p><strong>Performance Tiers:</strong> ${highPerformerPct}% are high performers (high score + high accuracy), 
+        ${lowPerformerPct}% are low performers (low score + low accuracy). 
+        ${highPerformerPct > 25 ? 'Strong player base!' : 'Room for improvement in player performance.'}</p>
+        
+        <p><strong>Recommendation:</strong> ${correlation > 0.7 ? 'Focus on accuracy training - it directly impacts scores.' : 
+          'Consider multi-factor performance analysis including speed, strategy, and consistency.'}</p>
+      </div>
+    `;
+  }
+
+  function generatePatternsInsights(data) {
+    const hourCounts = Array(24).fill(0);
+    const dayCounts = Array(7).fill(0);
+    const hourlyScores = Array(24).fill(0).map(() => []);
+    const dayScores = Array(7).fill(0).map(() => []);
+    const weekdayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    
+    data.forEach(row => {
+      const dateInfo = parseDate(row.Date);
+      if (dateInfo) {
+        hourCounts[dateInfo.hour]++;
+        dayCounts[dateInfo.dayOfWeek]++;
+        
+        if (row.Score > 0) {
+          hourlyScores[dateInfo.hour].push(row.Score);
+          dayScores[dateInfo.dayOfWeek].push(row.Score);
+        }
+      }
+    });
+    
+    const peakHour = hourCounts.indexOf(Math.max(...hourCounts));
+    const quietHour = hourCounts.indexOf(Math.min(...hourCounts.filter(c => c > 0)));
+    const peakDayIdx = dayCounts.indexOf(Math.max(...dayCounts));
+    const peakDay = weekdayNames[peakDayIdx];
+    const quietDayIdx = dayCounts.indexOf(Math.min(...dayCounts.filter(c => c > 0)));
+    const quietDay = weekdayNames[quietDayIdx];
+    
+    // Calculate average scores by hour/day
+    const avgHourlyScores = hourlyScores.map(scores => 
+      scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0
+    );
+    const avgDayScores = dayScores.map(scores => 
+      scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0
+    );
+    
+    const bestHourForScore = avgHourlyScores.indexOf(Math.max(...avgHourlyScores.filter(s => s > 0)));
+    const bestDayForScore = avgDayScores.indexOf(Math.max(...avgDayScores.filter(s => s > 0)));
+    
+    // Time of day patterns
+    const morning = hourCounts.slice(6, 12).reduce((a, b) => a + b, 0);
+    const afternoon = hourCounts.slice(12, 18).reduce((a, b) => a + b, 0);
+    const evening = hourCounts.slice(18, 24).reduce((a, b) => a + b, 0);
+    const night = hourCounts.slice(0, 6).reduce((a, b) => a + b, 0);
+    const total = morning + afternoon + evening + night;
+    
+    const timeOfDay = [
+      { name: 'Morning (6am-12pm)', count: morning, pct: ((morning/total)*100).toFixed(1) },
+      { name: 'Afternoon (12pm-6pm)', count: afternoon, pct: ((afternoon/total)*100).toFixed(1) },
+      { name: 'Evening (6pm-12am)', count: evening, pct: ((evening/total)*100).toFixed(1) },
+      { name: 'Night (12am-6am)', count: night, pct: ((night/total)*100).toFixed(1) }
+    ].sort((a, b) => b.count - a.count);
+    
+    // Weekend vs weekday
+    const weekend = dayCounts[0] + dayCounts[6]; // Sunday + Saturday
+    const weekday = dayCounts.slice(1, 6).reduce((a, b) => a + b, 0);
+    const weekendPct = ((weekend / (weekend + weekday)) * 100).toFixed(1);
+    
+    return `
+      <div style="line-height: 1.8;">
+        <p><strong>Peak Activity:</strong> Most games at <strong>${peakHour}:00</strong> (${hourCounts[peakHour]} games) vs quietest at <strong>${quietHour}:00</strong> (${hourCounts[quietHour]} games). 
+        Best performance hour: <strong>${bestHourForScore}:00</strong> (avg score: ${Math.round(avgHourlyScores[bestHourForScore]).toLocaleString()}).</p>
+        
+        <p><strong>Day of Week:</strong> Most active on <strong>${peakDay}</strong> (${dayCounts[peakDayIdx]} games) vs quietest on <strong>${quietDay}</strong> (${dayCounts[quietDayIdx]} games). 
+        Best performance day: <strong>${weekdayNames[bestDayForScore]}</strong> (avg score: ${Math.round(avgDayScores[bestDayForScore]).toLocaleString()}).</p>
+        
+        <p><strong>Time of Day Distribution:</strong> 
+        ${timeOfDay.map(t => `${t.name}: ${t.pct}%`).join(', ')}. 
+        ${timeOfDay[0].name} dominates with ${timeOfDay[0].pct}% of all games.</p>
+        
+        <p><strong>Weekend vs Weekday:</strong> ${weekendPct}% of games on weekends, ${(100 - weekendPct).toFixed(1)}% on weekdays. 
+        ${parseFloat(weekendPct) > 40 ? 'Strong weekend engagement - consider weekend events.' : 'Balanced distribution - consistent engagement throughout the week.'}</p>
+        
+        <p><strong>Performance Patterns:</strong> ${bestHourForScore !== peakHour ? 
+          `Peak activity (${peakHour}:00) doesn't match best performance (${bestHourForScore}:00) - players may be more casual during peak hours.` : 
+          'Peak activity aligns with best performance - highly engaged players drive peak times.'}</p>
+        
+        <p><strong>Recommendation:</strong> Schedule content updates and events for <strong>${peakDay} at ${peakHour}:00</strong> to maximize reach. 
+        Consider targeted campaigns during quiet periods (<strong>${quietDay} at ${quietHour}:00</strong>) to boost engagement.</p>
+      </div>
+    `;
+  }
+
+  // Create New vs Returning Users Chart
+  function createNewReturningUsersChart(data) {
+    const ctx = document.getElementById('newReturningUsersChart');
+    if (!ctx) return;
+    
+    const userFirstGame = {};
+    const userGameCounts = {};
+    
+    data.forEach(row => {
+      if (!row.Name) return;
+      const dateInfo = parseDate(row.Date);
+      if (!dateInfo) return;
+      
+      if (!userFirstGame[row.Name] || dateInfo.timestamp < userFirstGame[row.Name]) {
+        userFirstGame[row.Name] = dateInfo.timestamp;
+      }
+      userGameCounts[row.Name] = (userGameCounts[row.Name] || 0) + 1;
+    });
+    
+    const sortedDates = data
+      .map(row => ({ date: parseDate(row.Date), row }))
+      .filter(d => d.date)
+      .sort((a, b) => a.date.timestamp - b.date.timestamp);
+    
+    const dailyNew = {};
+    const dailyReturning = {};
+    
+    sortedDates.forEach(({ date, row }) => {
+      if (!row.Name) return;
+      const day = date.dateOnly;
+      if (!dailyNew[day]) dailyNew[day] = new Set();
+      if (!dailyReturning[day]) dailyReturning[day] = new Set();
+      
+      if (userFirstGame[row.Name] === date.timestamp) {
+        dailyNew[day].add(row.Name);
+      } else {
+        dailyReturning[day].add(row.Name);
+      }
+    });
+    
+    const sortedDays = Object.keys(dailyNew).sort();
+    const newCounts = sortedDays.map(d => dailyNew[d].size);
+    const returningCounts = sortedDays.map(d => dailyReturning[d].size);
+    
+    if (charts.newReturningUsers) {
+      charts.newReturningUsers.data.datasets[0].data = newCounts;
+      charts.newReturningUsers.data.datasets[1].data = returningCounts;
+      charts.newReturningUsers.update('none');
+    } else {
+      charts.newReturningUsers = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: sortedDays.map(d => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
+          datasets: [
+            {
+              label: 'New Users',
+              data: newCounts,
+              backgroundColor: '#3b82f6',
+              borderRadius: 4
+            },
+            {
+              label: 'Returning Users',
+              data: returningCounts,
+              backgroundColor: '#10b981',
+              borderRadius: 4
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { position: 'top' }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: '#f3f4f6' },
+              ticks: { color: '#6b7280', font: { size: 11 } },
+              title: { display: true, text: 'Users', color: '#6b7280', font: { size: 12 } }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: '#6b7280', font: { size: 10 }, maxRotation: 45 }
+            }
+          }
+        }
+      });
+    }
+  }
+  
+  // Create User Engagement Distribution Chart
+  function createUserEngagementChart(data) {
+    const ctx = document.getElementById('userEngagementChart');
+    if (!ctx) return;
+    
+    const userGameCounts = {};
+    data.forEach(row => {
+      if (row.Name) {
+        userGameCounts[row.Name] = (userGameCounts[row.Name] || 0) + 1;
+      }
+    });
+    
+    const counts = Object.values(userGameCounts);
+    const buckets = {
+      '1 game': counts.filter(c => c === 1).length,
+      '2-5 games': counts.filter(c => c >= 2 && c <= 5).length,
+      '6-10 games': counts.filter(c => c >= 6 && c <= 10).length,
+      '11-20 games': counts.filter(c => c >= 11 && c <= 20).length,
+      '20+ games': counts.filter(c => c > 20).length
+    };
+    
+    if (charts.userEngagement) {
+      charts.userEngagement.data.datasets[0].data = Object.values(buckets);
+      charts.userEngagement.update('none');
+    } else {
+      charts.userEngagement = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(buckets),
+          datasets: [{
+            data: Object.values(buckets),
+            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { position: 'bottom', labels: { padding: 12, font: { size: 11 } } }
+          }
+        }
+      });
+    }
+  }
+  
+  // Create Daily Active Users Chart
+  function createDailyActiveUsersChart(data) {
+    const el = document.getElementById('dailyActiveUsersChart');
+    if (!el) return;
+    
+    const dailyUsers = {};
+    data.forEach(row => {
+      const dateInfo = parseDate(row.Date);
+      if (!dateInfo) return;
+      const day = dateInfo.dateOnly;
+      if (!dailyUsers[day]) dailyUsers[day] = new Set();
+      if (row.Name) dailyUsers[day].add(row.Name);
+    });
+    
+    const sortedDays = Object.keys(dailyUsers).sort();
+    const x = sortedDays.map(d => new Date(d + 'T00:00:00'));
+    const y = sortedDays.map(d => dailyUsers[d].size);
+    
+    const trace = {
+      x: x,
+      y: y,
+      type: 'scatter',
+      mode: 'lines+markers',
+      name: 'Daily Active Users',
+      line: { color: '#3b82f6', width: 2.5, shape: 'spline', smoothing: 1.3 },
+      marker: { size: 6, color: '#3b82f6' },
+      fill: 'tozeroy',
+      fillcolor: 'rgba(59, 130, 246, 0.1)',
+      hovertemplate: '<b>%{fullData.name}</b><br>%{x|%b %d, %Y}<br>DAU: %{y}<extra></extra>'
+    };
+    
+    const layout = {
+      ...plotlyTheme,
+      xaxis: { ...plotlyTheme.xaxis, title: { text: 'Date', font: { color: '#6b7280', size: 12 } } },
+      yaxis: { ...plotlyTheme.yaxis, title: { text: 'Daily Active Users', font: { color: '#6b7280', size: 12 } } },
+      showlegend: false
+    };
+    
+    Plotly.newPlot(el, [trace], layout, { responsive: true, displayModeBar: true });
+  }
+  
+  // Create Players Per League Chart
+  function createPlayersPerLeagueChart(data) {
+    const ctx = document.getElementById('playersPerLeagueChart');
+    if (!ctx) return;
+    
+    const leaguePlayers = {};
+    data.forEach(row => {
+      const league = String(row.League || '').toLowerCase();
+      if (!league || !row.Name) return;
+      if (!leaguePlayers[league]) leaguePlayers[league] = new Set();
+      leaguePlayers[league].add(row.Name);
+    });
+    
+    const leagues = Object.keys(leaguePlayers);
+    const playerCounts = leagues.map(l => leaguePlayers[l].size);
+    const bgColors = leagues.map(l => colors[l] || colors.primary);
+    
+    if (charts.playersPerLeague) {
+      charts.playersPerLeague.data.labels = leagues.map(l => l.charAt(0).toUpperCase() + l.slice(1));
+      charts.playersPerLeague.data.datasets[0].data = playerCounts;
+      charts.playersPerLeague.data.datasets[0].backgroundColor = bgColors;
+      charts.playersPerLeague.update('none');
+    } else {
+      charts.playersPerLeague = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: leagues.map(l => l.charAt(0).toUpperCase() + l.slice(1)),
+          datasets: [{
+            label: 'Unique Players',
+            data: playerCounts,
+            backgroundColor: bgColors,
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: '#f3f4f6' },
+              ticks: { color: '#6b7280', font: { size: 11 } },
+              title: { display: true, text: 'Unique Players', color: '#6b7280', font: { size: 12 } }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: '#6b7280', font: { size: 11 } }
+            }
+          }
+        }
+      });
+    }
+  }
+  
+  // Create League Score Trend Chart
+  function createLeagueScoreTrendChart(data) {
+    const el = document.getElementById('leagueScoreTrendChart');
+    if (!el) return;
+    
+    const leagues = ['boulder', 'cascade', 'volcano', 'earth', 'custom'];
+    const dailyScores = {};
+    
+    data.forEach(row => {
+      const dateInfo = parseDate(row.Date);
+      if (!dateInfo || !row.Score || row.Score <= 0) return;
+      const league = String(row.League || '').toLowerCase();
+      if (!leagues.includes(league)) return;
+      
+      const day = dateInfo.dateOnly;
+      if (!dailyScores[day]) dailyScores[day] = {};
+      if (!dailyScores[day][league]) dailyScores[day][league] = [];
+      dailyScores[day][league].push(row.Score);
+    });
+    
+    const sortedDays = Object.keys(dailyScores).sort();
+    const x = sortedDays.map(d => new Date(d + 'T00:00:00'));
+    
+    const traces = leagues.map(league => {
+      const y = sortedDays.map(day => {
+        const scores = dailyScores[day]?.[league] || [];
+        return scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : null;
+      });
+      
+      return {
+        x: x,
+        y: y,
+        type: 'scatter',
+        mode: 'lines+markers',
+        name: league.charAt(0).toUpperCase() + league.slice(1),
+        line: { color: colors[league] || colors.primary, width: 2.5 },
+        marker: { size: 4, color: colors[league] || colors.primary },
+        hovertemplate: `<b>%{fullData.name}</b><br>%{x|%b %d}<br>Avg Score: %{y:,.0f}<extra></extra>`
+      };
+    });
+    
+    const layout = {
+      ...plotlyTheme,
+      xaxis: { ...plotlyTheme.xaxis, title: { text: 'Date', font: { color: '#6b7280', size: 12 } } },
+      yaxis: { ...plotlyTheme.yaxis, title: { text: 'Average Score', font: { color: '#6b7280', size: 12 } } }
+    };
+    
+    Plotly.newPlot(el, traces, layout, { responsive: true, displayModeBar: true });
+  }
+  
+  // Create League Accuracy Trend Chart
+  function createLeagueAccuracyTrendChart(data) {
+    const el = document.getElementById('leagueAccuracyTrendChart');
+    if (!el) return;
+    
+    const leagues = ['boulder', 'cascade', 'volcano', 'earth', 'custom'];
+    const dailyAccuracies = {};
+    
+    data.forEach(row => {
+      const dateInfo = parseDate(row.Date);
+      if (!dateInfo || !row.Accuracy || row.Accuracy <= 0) return;
+      const league = String(row.League || '').toLowerCase();
+      if (!leagues.includes(league)) return;
+      
+      const day = dateInfo.dateOnly;
+      if (!dailyAccuracies[day]) dailyAccuracies[day] = {};
+      if (!dailyAccuracies[day][league]) dailyAccuracies[day][league] = [];
+      dailyAccuracies[day][league].push(row.Accuracy);
+    });
+    
+    const sortedDays = Object.keys(dailyAccuracies).sort();
+    const x = sortedDays.map(d => new Date(d + 'T00:00:00'));
+    
+    const traces = leagues.map(league => {
+      const y = sortedDays.map(day => {
+        const accuracies = dailyAccuracies[day]?.[league] || [];
+        return accuracies.length > 0 ? accuracies.reduce((a, b) => a + b, 0) / accuracies.length : null;
+      });
+      
+      return {
+        x: x,
+        y: y,
+        type: 'scatter',
+        mode: 'lines+markers',
+        name: league.charAt(0).toUpperCase() + league.slice(1),
+        line: { color: colors[league] || colors.primary, width: 2.5 },
+        marker: { size: 4, color: colors[league] || colors.primary },
+        hovertemplate: `<b>%{fullData.name}</b><br>%{x|%b %d}<br>Avg Accuracy: %{y:.1f}%<extra></extra>`
+      };
+    });
+    
+    const layout = {
+      ...plotlyTheme,
+      xaxis: { ...plotlyTheme.xaxis, title: { text: 'Date', font: { color: '#6b7280', size: 12 } } },
+      yaxis: { ...plotlyTheme.yaxis, title: { text: 'Average Accuracy (%)', font: { color: '#6b7280', size: 12 } }, range: [0, 100] }
+    };
+    
+    Plotly.newPlot(el, traces, layout, { responsive: true, displayModeBar: true });
+  }
+  
+  // Create Accuracy Distribution Chart
+  function createAccuracyDistributionChart(data) {
+    const ctx = document.getElementById('accuracyDistributionChart');
+    if (!ctx) return;
+    
+    const leagues = ['boulder', 'cascade', 'volcano', 'earth', 'custom'];
+    const stats = leagues.map(league => {
+      const accuracies = data
+        .filter(row => String(row.League || '').toLowerCase() === league && row.Accuracy > 0)
+        .map(row => row.Accuracy)
+        .sort((a, b) => a - b);
+      
+      if (accuracies.length === 0) {
+        return { league: league.charAt(0).toUpperCase() + league.slice(1), avg: 0, median: 0 };
+      }
+      
+      const medianIdx = Math.floor(accuracies.length * 0.5);
+      return {
+        league: league.charAt(0).toUpperCase() + league.slice(1),
+        avg: accuracies.reduce((a, b) => a + b, 0) / accuracies.length,
+        median: accuracies[medianIdx]
+      };
+    });
+    
+    if (charts.accuracyDistribution) {
+      charts.accuracyDistribution.data.labels = stats.map(s => s.league);
+      charts.accuracyDistribution.data.datasets[0].data = stats.map(s => s.avg);
+      charts.accuracyDistribution.data.datasets[1].data = stats.map(s => s.median);
+      charts.accuracyDistribution.update('none');
+    } else {
+      charts.accuracyDistribution = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: stats.map(s => s.league),
+          datasets: [
+            {
+              label: 'Average Accuracy',
+              data: stats.map(s => s.avg),
+              backgroundColor: leagues.map(l => (colors[l] || colors.primary) + '80'),
+              borderColor: leagues.map(l => colors[l] || colors.primary),
+              borderWidth: 1
+            },
+            {
+              label: 'Median Accuracy',
+              data: stats.map(s => s.median),
+              backgroundColor: leagues.map(l => (colors[l] || colors.primary) + '40'),
+              borderColor: leagues.map(l => colors[l] || colors.primary),
+              borderWidth: 1,
+              borderDash: [5, 5]
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { position: 'top' }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              grid: { color: '#f3f4f6' },
+              ticks: { color: '#6b7280', font: { size: 11 } },
+              title: { display: true, text: 'Accuracy (%)', color: '#6b7280', font: { size: 12 } }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: '#6b7280', font: { size: 11 } }
+            }
+          }
+        }
+      });
+    }
+  }
+  
+  // Create Score Trend Chart
+  function createScoreTrendChart(data) {
+    const el = document.getElementById('scoreTrendChart');
+    if (!el) return;
+    
+    const dailyScores = {};
+    data.forEach(row => {
+      const dateInfo = parseDate(row.Date);
+      if (!dateInfo || !row.Score || row.Score <= 0) return;
+      const day = dateInfo.dateOnly;
+      if (!dailyScores[day]) dailyScores[day] = [];
+      dailyScores[day].push(row.Score);
+    });
+    
+    const sortedDays = Object.keys(dailyScores).sort();
+    const x = sortedDays.map(d => new Date(d + 'T00:00:00'));
+    const y = sortedDays.map(day => {
+      const scores = dailyScores[day];
+      return scores.reduce((a, b) => a + b, 0) / scores.length;
+    });
+    
+    const trace = {
+      x: x,
+      y: y,
+      type: 'scatter',
+      mode: 'lines+markers',
+      name: 'Average Score',
+      line: { color: '#3b82f6', width: 3, shape: 'spline', smoothing: 1.3 },
+      marker: { size: 6, color: '#3b82f6' },
+      fill: 'tozeroy',
+      fillcolor: 'rgba(59, 130, 246, 0.1)',
+      hovertemplate: '<b>%{fullData.name}</b><br>%{x|%b %d, %Y}<br>Avg Score: %{y:,.0f}<extra></extra>'
+    };
+    
+    const layout = {
+      ...plotlyTheme,
+      xaxis: { ...plotlyTheme.xaxis, title: { text: 'Date', font: { color: '#6b7280', size: 12 } } },
+      yaxis: { ...plotlyTheme.yaxis, title: { text: 'Average Score', font: { color: '#6b7280', size: 12 } } },
+      showlegend: false
+    };
+    
+    Plotly.newPlot(el, [trace], layout, { responsive: true, displayModeBar: true });
+  }
+  
+  // Create Score Histogram Chart
+  function createScoreHistogramChart(data) {
+    const ctx = document.getElementById('scoreHistogramChart');
+    if (!ctx) return;
+    
+    const scores = data.map(d => d.Score || 0).filter(s => s > 0);
+    if (scores.length === 0) return;
+    
+    const maxScore = Math.max(...scores);
+    const binSize = Math.ceil(maxScore / 20);
+    const bins = {};
+    
+    scores.forEach(score => {
+      const bin = Math.floor(score / binSize) * binSize;
+      bins[bin] = (bins[bin] || 0) + 1;
+    });
+    
+    const sortedBins = Object.keys(bins).map(Number).sort((a, b) => a - b);
+    const labels = sortedBins.map(b => `${b}-${b + binSize}`);
+    const values = sortedBins.map(b => bins[b]);
+    
+    if (charts.scoreHistogram) {
+      charts.scoreHistogram.data.labels = labels;
+      charts.scoreHistogram.data.datasets[0].data = values;
+      charts.scoreHistogram.update('none');
+    } else {
+      charts.scoreHistogram = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Frequency',
+            data: values,
+            backgroundColor: '#3b82f6',
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: '#f3f4f6' },
+              ticks: { color: '#6b7280', font: { size: 11 } },
+              title: { display: true, text: 'Frequency', color: '#6b7280', font: { size: 12 } }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: '#6b7280', font: { size: 10 }, maxRotation: 45 }
+            }
+          }
+        }
+      });
+    }
+  }
+  
+  // Create Accuracy Histogram Chart
+  function createAccuracyHistogramChart(data) {
+    const ctx = document.getElementById('accuracyHistogramChart');
+    if (!ctx) return;
+    
+    const accuracies = data.map(d => d.Accuracy || 0).filter(a => a > 0);
+    if (accuracies.length === 0) return;
+    
+    const binSize = 5; // 5% bins
+    const bins = {};
+    
+    accuracies.forEach(acc => {
+      const bin = Math.floor(acc / binSize) * binSize;
+      bins[bin] = (bins[bin] || 0) + 1;
+    });
+    
+    const sortedBins = Object.keys(bins).map(Number).sort((a, b) => a - b);
+    const labels = sortedBins.map(b => `${b}-${b + binSize}%`);
+    const values = sortedBins.map(b => bins[b]);
+    
+    if (charts.accuracyHistogram) {
+      charts.accuracyHistogram.data.labels = labels;
+      charts.accuracyHistogram.data.datasets[0].data = values;
+      charts.accuracyHistogram.update('none');
+    } else {
+      charts.accuracyHistogram = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Frequency',
+            data: values,
+            backgroundColor: '#10b981',
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: '#f3f4f6' },
+              ticks: { color: '#6b7280', font: { size: 11 } },
+              title: { display: true, text: 'Frequency', color: '#6b7280', font: { size: 12 } }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: '#6b7280', font: { size: 10 } }
+            }
+          }
+        }
+      });
+    }
+  }
+  
+  // Create Player Progression Chart
+  function createPlayerProgressionChart(data) {
+    const el = document.getElementById('playerProgressionChart');
+    if (!el) return;
+    
+    const playerGames = {};
+    data.forEach(row => {
+      if (!row.Name || !row.Score || row.Score <= 0) return;
+      const dateInfo = parseDate(row.Date);
+      if (!dateInfo) return;
+      
+      if (!playerGames[row.Name]) playerGames[row.Name] = [];
+      playerGames[row.Name].push({
+        timestamp: dateInfo.timestamp,
+        score: row.Score,
+        gameNum: playerGames[row.Name].length + 1
+      });
+    });
+    
+    // Sample players (top 20 by game count) for readability
+    const topPlayers = Object.entries(playerGames)
+      .sort((a, b) => b[1].length - a[1].length)
+      .slice(0, 20);
+    
+    const traces = topPlayers.map(([name, games]) => {
+      const sortedGames = games.sort((a, b) => a.timestamp - b.timestamp);
+      return {
+        x: sortedGames.map(g => g.gameNum),
+        y: sortedGames.map(g => g.score),
+        type: 'scatter',
+        mode: 'lines',
+        name: name.length > 15 ? name.substring(0, 15) + '...' : name,
+        line: { width: 1.5, color: 'rgba(59, 130, 246, 0.3)' },
+        hovertemplate: `<b>%{fullData.name}</b><br>Game #%{x}<br>Score: %{y:,.0f}<extra></extra>`,
+        showlegend: false
+      };
+    });
+    
+    const layout = {
+      ...plotlyTheme,
+      xaxis: { ...plotlyTheme.xaxis, title: { text: 'Game Number', font: { color: '#6b7280', size: 12 } } },
+      yaxis: { ...plotlyTheme.yaxis, title: { text: 'Score', font: { color: '#6b7280', size: 12 } } }
+    };
+    
+    Plotly.newPlot(el, traces, layout, { responsive: true, displayModeBar: true });
+  }
+  
+  // Create Hour/Day Heatmap Chart
+  function createHourDayHeatmapChart(data) {
+    const el = document.getElementById('hourDayHeatmapChart');
+    if (!el) return;
+    
+    const heatmapData = {};
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    
+    data.forEach(row => {
+      const dateInfo = parseDate(row.Date);
+      if (!dateInfo) return;
+      const hour = dateInfo.hour;
+      const day = dateInfo.dayOfWeek;
+      const key = `${day}-${hour}`;
+      heatmapData[key] = (heatmapData[key] || 0) + 1;
+    });
+    
+    const z = [];
+    const y = days;
+    const x = Array.from({length: 24}, (_, i) => i);
+    
+    days.forEach((day, dayIdx) => {
+      const row = [];
+      x.forEach(hour => {
+        const key = `${dayIdx}-${hour}`;
+        row.push(heatmapData[key] || 0);
+      });
+      z.push(row);
+    });
+    
+    const trace = {
+      x: x,
+      y: y,
+      z: z,
+      type: 'heatmap',
+      colorscale: [[0, '#f3f4f6'], [0.5, '#93c5fd'], [1, '#3b82f6']],
+      showscale: true,
+      hovertemplate: '<b>%{y}</b><br>Hour: %{x}:00<br>Games: %{z}<extra></extra>'
+    };
+    
+    const layout = {
+      ...plotlyTheme,
+      xaxis: { ...plotlyTheme.xaxis, title: { text: 'Hour of Day', font: { color: '#6b7280', size: 12 } } },
+      yaxis: { ...plotlyTheme.yaxis, title: { text: 'Day of Week', font: { color: '#6b7280', size: 12 } } }
+    };
+    
+    Plotly.newPlot(el, [trace], layout, { responsive: true, displayModeBar: true });
+  }
+  
+  // Create Score By Hour Chart
+  function createScoreByHourChart(data) {
+    const ctx = document.getElementById('scoreByHourChart');
+    if (!ctx) return;
+    
+    const hourlyScores = Array(24).fill(0).map(() => []);
+    data.forEach(row => {
+      const dateInfo = parseDate(row.Date);
+      if (dateInfo && row.Score > 0) {
+        hourlyScores[dateInfo.hour].push(row.Score);
+      }
+    });
+    
+    const avgScores = hourlyScores.map(scores => 
+      scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0
+    );
+    const labels = Array.from({length: 24}, (_, i) => i + ':00');
+    
+    if (charts.scoreByHour) {
+      charts.scoreByHour.data.datasets[0].data = avgScores;
+      charts.scoreByHour.update('none');
+    } else {
+      charts.scoreByHour = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Average Score',
+            data: avgScores,
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            fill: true,
+            tension: 0.4,
+            pointRadius: 3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: '#f3f4f6' },
+              ticks: { color: '#6b7280', font: { size: 11 } },
+              title: { display: true, text: 'Average Score', color: '#6b7280', font: { size: 12 } }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: '#6b7280', font: { size: 10 } },
+              title: { display: true, text: 'Hour', color: '#6b7280', font: { size: 12 } }
+            }
+          }
+        }
+      });
+    }
+  }
+  
+  // Create Score By Day Chart
+  function createScoreByDayChart(data) {
+    const ctx = document.getElementById('scoreByDayChart');
+    if (!ctx) return;
+    
+    const dayScores = Array(7).fill(0).map(() => []);
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    
+    data.forEach(row => {
+      const dateInfo = parseDate(row.Date);
+      if (dateInfo && row.Score > 0) {
+        dayScores[dateInfo.dayOfWeek].push(row.Score);
+      }
+    });
+    
+    const avgScores = dayScores.map(scores => 
+      scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0
+    );
+    
+    if (charts.scoreByDay) {
+      charts.scoreByDay.data.datasets[0].data = avgScores;
+      charts.scoreByDay.update('none');
+    } else {
+      charts.scoreByDay = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: days,
+          datasets: [{
+            label: 'Average Score',
+            data: avgScores,
+            backgroundColor: '#3b82f6',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: '#f3f4f6' },
+              ticks: { color: '#6b7280', font: { size: 11 } },
+              title: { display: true, text: 'Average Score', color: '#6b7280', font: { size: 12 } }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: '#6b7280', font: { size: 11 } },
+              title: { display: true, text: 'Day of Week', color: '#6b7280', font: { size: 12 } }
+            }
+          }
+        }
+      });
+    }
+  }
+  
+  // Create Weekly Pattern Chart
+  function createWeeklyPatternChart(data) {
+    const el = document.getElementById('weeklyPatternChart');
+    if (!el) return;
+    
+    const weeklyData = {};
+    data.forEach(row => {
+      const dateInfo = parseDate(row.Date);
+      if (!dateInfo) return;
+      const weekStart = new Date(dateInfo.date);
+      weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+      weekStart.setHours(0, 0, 0, 0);
+      const weekKey = weekStart.toISOString().split('T')[0];
+      
+      if (!weeklyData[weekKey]) weeklyData[weekKey] = [];
+      weeklyData[weekKey].push(dateInfo.dateOnly);
+    });
+    
+    const sortedWeeks = Object.keys(weeklyData).sort();
+    const x = sortedWeeks.map(w => new Date(w + 'T00:00:00'));
+    const y = sortedWeeks.map(w => {
+      const days = weeklyData[w];
+      return new Set(days).size; // Unique days per week
+    });
+    
+    const trace = {
+      x: x,
+      y: y,
+      type: 'bar',
+      marker: {
+        color: y,
+        colorscale: [[0, '#dbeafe'], [1, '#3b82f6']],
+        showscale: false
+      },
+      hovertemplate: '<b>Week of %{x|%b %d}</b><br>Active Days: %{y}<extra></extra>'
+    };
+    
+    const layout = {
+      ...plotlyTheme,
+      xaxis: { ...plotlyTheme.xaxis, title: { text: 'Week', font: { color: '#6b7280', size: 12 } } },
+      yaxis: { ...plotlyTheme.yaxis, title: { text: 'Active Days per Week', font: { color: '#6b7280', size: 12 } }, range: [0, 7] },
+      showlegend: false
+    };
+    
+    Plotly.newPlot(el, [trace], layout, { responsive: true, displayModeBar: true });
+  }
+  
+  // Create overview charts
+  function createOverviewCharts(data) {
+    // League distribution for overview
+    const ctx1 = document.getElementById('overview-league-chart');
+    if (ctx1) {
+      const counts = {};
+      data.forEach(row => {
+        const league = String(row.League || 'Unknown').toLowerCase();
+        counts[league] = (counts[league] || 0) + 1;
+      });
+      
+      const labels = Object.keys(counts);
+      const values = Object.values(counts);
+      const bgColors = labels.map(l => colors[l] || colors.primary);
+      
+      if (charts.overviewLeague) {
+        charts.overviewLeague.data.labels = labels.map(l => l.charAt(0).toUpperCase() + l.slice(1));
+        charts.overviewLeague.data.datasets[0].data = values;
+        charts.overviewLeague.data.datasets[0].backgroundColor = bgColors;
+        charts.overviewLeague.update('none');
+      } else {
+        charts.overviewLeague = new Chart(ctx1, {
+          type: 'doughnut',
+          data: {
+            labels: labels.map(l => l.charAt(0).toUpperCase() + l.slice(1)),
+            datasets: [{
+              data: values,
+              backgroundColor: bgColors,
+              borderWidth: 0
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+              legend: { 
+                position: 'bottom',
+                labels: { padding: 12, font: { size: 11 } }
+              }
+            }
+          }
+        });
+      }
+    }
+    
+    // Hour distribution for overview
+    const ctx2 = document.getElementById('overview-hour-chart');
+    if (ctx2) {
+      const counts = Array(24).fill(0);
+      data.forEach(row => {
+        const dateInfo = parseDate(row.Date);
+        if (dateInfo) counts[dateInfo.hour]++;
+      });
+      
+      const labels = Array.from({length: 24}, (_, i) => i + ':00');
+      
+      if (charts.overviewHour) {
+        charts.overviewHour.data.datasets[0].data = counts;
+        charts.overviewHour.update('none');
+      } else {
+        charts.overviewHour = new Chart(ctx2, {
+          type: 'bar',
+          data: {
+            labels,
+            datasets: [{
+              label: 'Games',
+              data: counts,
+              backgroundColor: '#3b82f6',
+              borderWidth: 0,
+              borderRadius: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+              legend: { display: false }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: { color: '#f3f4f6' },
+                ticks: { color: '#6b7280', font: { size: 10 } }
+              },
+              x: {
+                grid: { display: false },
+                ticks: { color: '#6b7280', font: { size: 10 }, maxRotation: 45 }
+              }
+            }
+          }
+        });
+      }
+    }
+  }
+
+  function generateKeyInsights(data) {
+    const totalGames = allData.length;
+    const uniquePlayers = new Set(allData.map(d => d.Name).filter(Boolean)).size;
+    const scores = data.map(d => d.Score || 0).filter(s => s > 0);
+    const accuracies = data.map(d => d.Accuracy || 0).filter(a => a > 0);
+    
+    const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+    const avgAccuracy = accuracies.length > 0 ? accuracies.reduce((a, b) => a + b, 0) / accuracies.length : 0;
+    
+    // League analysis
+    const leagueCounts = {};
+    const leagueScores = {};
+    allData.forEach(row => {
+      const league = String(row.League || '').toLowerCase();
+      if (league) {
+        leagueCounts[league] = (leagueCounts[league] || 0) + 1;
+        if (row.Score > 0) {
+          if (!leagueScores[league]) leagueScores[league] = [];
+          leagueScores[league].push(row.Score);
+        }
+      }
+    });
+    
+    const totalWithLeague = Object.values(leagueCounts).reduce((a, b) => a + b, 0);
+    const mostPopularLeague = Object.keys(leagueCounts).reduce((a, b) => 
+      leagueCounts[a] > leagueCounts[b] ? a : b
+    ) || 'N/A';
+    
+    // Player engagement
+    const playerGameCounts = {};
+    allData.forEach(row => {
+      if (row.Name) {
+        playerGameCounts[row.Name] = (playerGameCounts[row.Name] || 0) + 1;
+      }
+    });
+    
+    const gameCounts = Object.values(playerGameCounts);
+    const gamesPerPlayer = uniquePlayers > 0 ? (totalGames / uniquePlayers).toFixed(1) : 0;
+    const medianGamesPerPlayer = gameCounts.length > 0 ? 
+      [...gameCounts].sort((a, b) => a - b)[Math.floor(gameCounts.length / 2)] : 0;
+    const top10Percent = Math.ceil(uniquePlayers * 0.1);
+    const topPlayers = Object.entries(playerGameCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, top10Percent);
+    const topPlayerGames = topPlayers.reduce((sum, [_, count]) => sum + count, 0);
+    const topPlayerPct = ((topPlayerGames / totalGames) * 100).toFixed(1);
+    
+    // Growth analysis
+    const sortedDates = allData
+      .map(row => ({ date: parseDate(row.Date), row }))
+      .filter(d => d.date)
+      .sort((a, b) => a.date.timestamp - b.date.timestamp);
+    
+    const firstWeek = sortedDates.slice(0, Math.min(100, sortedDates.length));
+    const lastWeek = sortedDates.slice(-Math.min(100, sortedDates.length));
+    const firstWeekGames = firstWeek.length;
+    const lastWeekGames = lastWeek.length;
+    const growthRate = firstWeekGames > 0 ? ((lastWeekGames - firstWeekGames) / firstWeekGames * 100).toFixed(1) : 0;
+    
+    // Retention analysis
+    const oneGamePlayers = gameCounts.filter(c => c === 1).length;
+    const multiGamePlayers = gameCounts.filter(c => c > 1).length;
+    const retentionRate = uniquePlayers > 0 ? ((multiGamePlayers / uniquePlayers) * 100).toFixed(1) : 0;
+    
+    // Performance trends
+    const recentScores = sortedDates.slice(-100).map(d => d.row.Score || 0).filter(s => s > 0);
+    const olderScores = sortedDates.slice(0, Math.min(100, sortedDates.length)).map(d => d.row.Score || 0).filter(s => s > 0);
+    const recentAvgScore = recentScores.length > 0 ? recentScores.reduce((a, b) => a + b, 0) / recentScores.length : 0;
+    const olderAvgScore = olderScores.length > 0 ? olderScores.reduce((a, b) => a + b, 0) / olderScores.length : 0;
+    const scoreTrend = olderAvgScore > 0 ? ((recentAvgScore - olderAvgScore) / olderAvgScore * 100).toFixed(1) : 0;
+    
+    return `
+      <div style="line-height: 1.8;">
+        <h4 style="margin-bottom: 1rem; color: #0a0a0f;"><i class="fas fa-chart-bar"></i> Engagement Metrics</h4>
+        <p><strong>Scale:</strong> ${totalGames.toLocaleString()} total games from ${uniquePlayers.toLocaleString()} unique players (avg ${gamesPerPlayer} games/player, median ${medianGamesPerPlayer}).</p>
+        <p><strong>Retention:</strong> ${retentionRate}% of players returned for multiple games. ${oneGamePlayers} one-time players vs ${multiGamePlayers} repeat players.</p>
+        <p><strong>Power Users:</strong> Top 10% of players (${top10Percent} players) account for ${topPlayerPct}% of all games, showing strong engagement from core user base.</p>
+        
+        <h4 style="margin-top: 1.5rem; margin-bottom: 1rem; color: #0a0a0f;"><i class="fas fa-trophy"></i> Performance Overview</h4>
+        <p><strong>Current Stats:</strong> Average score ${Math.round(avgScore).toLocaleString()} with ${avgAccuracy.toFixed(1)}% accuracy.</p>
+        <p><strong>Trend:</strong> ${Math.abs(scoreTrend) > 5 ? 
+          `Recent games show ${Math.abs(scoreTrend)}% ${scoreTrend > 0 ? 'improvement' : 'decline'} in average score compared to earlier games.` : 
+          'Performance remains stable over time.'}</p>
+        
+        <h4 style="margin-top: 1.5rem; margin-bottom: 1rem; color: #0a0a0f;"><i class="fas fa-bullseye"></i> League Distribution</h4>
+        <p><strong>Coverage:</strong> ${totalWithLeague.toLocaleString()} games (${((totalWithLeague/totalGames)*100).toFixed(1)}%) have league data. 
+        ${totalGames - totalWithLeague > 0 ? `${(totalGames - totalWithLeague).toLocaleString()} games missing league classification.` : 'All games properly classified.'}</p>
+        ${mostPopularLeague !== 'N/A' ? `<p><strong>Most Popular:</strong> ${mostPopularLeague.charAt(0).toUpperCase() + mostPopularLeague.slice(1)} league with ${leagueCounts[mostPopularLeague]} games (${((leagueCounts[mostPopularLeague]/totalWithLeague)*100).toFixed(1)}%).</p>` : ''}
+        
+        <h4 style="margin-top: 1.5rem; margin-bottom: 1rem; color: #0a0a0f;"><i class="fas fa-chart-line"></i> Growth Analysis</h4>
+        <p><strong>Activity Trend:</strong> ${Math.abs(growthRate) > 10 ? 
+          `Recent activity shows ${Math.abs(growthRate)}% ${growthRate > 0 ? 'growth' : 'decline'} compared to early period.` : 
+          'Activity levels remain consistent.'}</p>
+        
+        <h4 style="margin-top: 1.5rem; margin-bottom: 1rem; color: #0a0a0f;"><i class="fas fa-lightbulb"></i> Strategic Recommendations</h4>
+        <ul style="margin-left: 1.5rem; line-height: 2;">
+          <li>${retentionRate < 50 ? '<strong>Focus on retention:</strong> ' + retentionRate + '% retention rate suggests need for re-engagement campaigns.' : '<strong>Strong retention:</strong> ' + retentionRate + '% of players return - maintain current engagement strategies.'}</li>
+          <li>${topPlayerPct > 30 ? '<strong>Power user focus:</strong> Consider VIP features or rewards for top players to maintain their engagement.' : '<strong>Broad engagement:</strong> Activity is well-distributed - focus on converting one-time players.'}</li>
+          <li>${scoreTrend > 5 ? '<strong>Skill improvement:</strong> Players are getting better - consider increasing difficulty or adding new challenges.' : scoreTrend < -5 ? '<strong>Difficulty adjustment:</strong> Scores declining - may need to rebalance difficulty.' : '<strong>Stable performance:</strong> Maintain current difficulty balance.'}</li>
+          <li>${totalGames - totalWithLeague > totalGames * 0.1 ? '<strong>Data quality:</strong> Improve league classification to enable better analysis.' : '<strong>Data quality:</strong> League data is well-maintained.'}</li>
+        </ul>
+      </div>
+    `;
+  }
+  
+  // Create Users Over Time Chart with Plotly
+  function createUsersOverTimeChart(data) {
+    const el = document.getElementById('usersOverTimeChart');
+    if (!el) return;
+    
+    const hourlyUsers = {};
+    data.forEach(row => {
+      const dateInfo = parseDate(row.Date);
+      if (!dateInfo) return;
+      
+      const hourFloor = new Date(dateInfo.date);
+      hourFloor.setMinutes(0, 0, 0);
+      hourFloor.setSeconds(0, 0);
+      hourFloor.setMilliseconds(0);
+      const key = hourFloor.getTime();
+      
+      if (!hourlyUsers[key]) hourlyUsers[key] = new Set();
+      if (row.Name) hourlyUsers[key].add(row.Name);
+    });
+    
+    const sortedTimes = Object.keys(hourlyUsers).map(Number).sort((a, b) => a - b);
+    const x = sortedTimes.map(t => new Date(t));
+    const y = sortedTimes.map(t => hourlyUsers[t].size);
+    
+    const trace = {
+      x: x,
+      y: y,
+      type: 'scatter',
+      mode: 'lines',
+      name: 'Unique Users',
+      line: { 
+        color: '#3b82f6',
+        width: 2.5,
+        shape: 'spline',
+        smoothing: 1.3
+      },
+      fill: 'tozeroy',
+      fillcolor: 'rgba(59, 130, 246, 0.1)',
+      hovertemplate: '<b>%{fullData.name}</b><br>%{x|%b %d, %Y %I:%M %p}<br>Users: %{y}<extra></extra>'
+    };
+    
+    const layout = {
+      ...plotlyTheme,
+      xaxis: { 
+        ...plotlyTheme.xaxis,
+        title: { text: 'Date & Time', font: { color: '#6b7280', size: 12 } }
+      },
+      yaxis: { 
+        ...plotlyTheme.yaxis,
+        title: { text: 'Unique Users', font: { color: '#6b7280', size: 12 } }
+      },
+      hovermode: 'x unified',
+      showlegend: false
+    };
+    
+    Plotly.newPlot(el, [trace], layout, { responsive: true, displayModeBar: true });
+  }
+  
+  // Create League Over Time Chart with Plotly
+  function createLeagueOverTimeChart(data) {
+    const el = document.getElementById('leagueOverTimeChart');
+    if (!el) return;
+    
+    const leagues = ['boulder', 'cascade', 'volcano', 'earth', 'custom'];
+    const hourly = {};
+    
+    data.forEach(row => {
+      const dateInfo = parseDate(row.Date);
+      if (!dateInfo) return;
+      
+      const hourFloor = new Date(dateInfo.date);
+      hourFloor.setMinutes(0, 0, 0);
+      hourFloor.setSeconds(0, 0);
+      hourFloor.setMilliseconds(0);
+      const key = hourFloor.getTime();
+      const league = String(row.League || '').toLowerCase();
+      
+      if (!hourly[key]) hourly[key] = {};
+      hourly[key][league] = (hourly[key][league] || 0) + 1;
+    });
+    
+    const sortedTimes = Object.keys(hourly).map(Number).sort((a, b) => a - b);
+    const x = sortedTimes.map(t => new Date(t));
+    
+    const traces = leagues.map(league => ({
+      x: x,
+      y: sortedTimes.map(time => hourly[time][league] || 0),
+      type: 'scatter',
+      mode: 'lines',
+      name: league.charAt(0).toUpperCase() + league.slice(1),
+      line: { 
+        color: colors[league] || colors.primary,
+        width: 2.5,
+        shape: 'spline',
+        smoothing: 1.3
+      },
+      hovertemplate: `<b>%{fullData.name}</b><br>%{x|%b %d, %Y %I:%M %p}<br>Games: %{y}<extra></extra>`
+    }));
+    
+    const layout = {
+      ...plotlyTheme,
+      xaxis: { 
+        ...plotlyTheme.xaxis,
+        title: { text: 'Date & Time', font: { color: '#6b7280', size: 12 } }
+      },
+      yaxis: { 
+        ...plotlyTheme.yaxis,
+        title: { text: 'Number of Games', font: { color: '#6b7280', size: 12 } }
+      },
+      hovermode: 'x unified'
+    };
+    
+    Plotly.newPlot(el, traces, layout, { responsive: true, displayModeBar: true });
+  }
+  
+  // Create League Distribution Chart
+  function createLeagueDistributionChart(data) {
+    const ctx = document.getElementById('leagueDistributionChart');
+    if (!ctx) return;
+    
+    const counts = {};
+    data.forEach(row => {
+      const league = String(row.League || 'Unknown').toLowerCase();
+      counts[league] = (counts[league] || 0) + 1;
+    });
+    
+    const labels = Object.keys(counts);
+    const values = Object.values(counts);
+    const bgColors = labels.map(l => colors[l] || colors.primary);
+    
+    if (charts.leagueDistribution) {
+      charts.leagueDistribution.data.labels = labels;
+      charts.leagueDistribution.data.datasets[0].data = values;
+      charts.leagueDistribution.data.datasets[0].backgroundColor = bgColors;
+      charts.leagueDistribution.update('none');
+    } else {
+      charts.leagueDistribution = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels.map(l => l.charAt(0).toUpperCase() + l.slice(1)),
+          datasets: [{
+            data: values,
+            backgroundColor: bgColors,
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { 
+              position: 'bottom',
+              labels: {
+                padding: 15,
+                font: { size: 12, family: 'Inter' },
+                color: '#374151'
+              }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              padding: 12,
+              titleFont: { size: 13, weight: '600' },
+              bodyFont: { size: 12 },
+              borderColor: '#e5e7eb',
+              borderWidth: 1
+            }
+          }
+        }
+      });
+    }
+  }
+  
+  // Create Hour Distribution Chart
+  function createHourDistributionChart(data) {
+    const ctx = document.getElementById('hourDistributionChart');
+    if (!ctx) return;
+    
+    const counts = Array(24).fill(0);
+    data.forEach(row => {
+      const dateInfo = parseDate(row.Date);
+      if (dateInfo) {
+        counts[dateInfo.hour]++;
+      }
+    });
+    
+    const labels = Array.from({length: 24}, (_, i) => i + ':00');
+    
+    if (charts.hourDistribution) {
+      charts.hourDistribution.data.datasets[0].data = counts;
+      charts.hourDistribution.update('none');
+    } else {
+      charts.hourDistribution = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Games',
+            data: counts,
+            backgroundColor: '#3b82f6',
+            borderColor: '#3b82f6',
+            borderWidth: 0,
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              padding: 12
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: '#f3f4f6' },
+              ticks: { color: '#6b7280', font: { size: 11 } },
+              title: { display: true, text: 'Number of Games', color: '#6b7280', font: { size: 12 } }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: '#6b7280', font: { size: 11 } },
+              title: { display: true, text: 'Hour of Day', color: '#6b7280', font: { size: 12 } }
+            }
+          }
+        }
+      });
+    }
+  }
+  
+  // Create Score vs Accuracy Scatterplot with Plotly
+  function createScoreAccuracyChart(data) {
+    const el = document.getElementById('scoreAccuracyChart');
+    if (!el) return;
+    
+    const scatterData = data.filter(row => row.Score > 0 && row.Accuracy > 0);
+    const leagues = ['boulder', 'cascade', 'volcano', 'earth', 'custom'];
+    
+    const traces = leagues.map(league => {
+      const leagueData = scatterData.filter(row => 
+        String(row.League || '').toLowerCase() === league
+      );
+      
+      return {
+        x: leagueData.map(d => d.Accuracy),
+        y: leagueData.map(d => d.Score),
+        mode: 'markers',
+        type: 'scatter',
+        name: league.charAt(0).toUpperCase() + league.slice(1),
+        marker: {
+          size: 6,
+          color: colors[league] || colors.primary,
+          opacity: 0.6,
+          line: { width: 0 }
+        },
+        hovertemplate: `<b>%{fullData.name}</b><br>Accuracy: %{x}%<br>Score: %{y:,.0f}<extra></extra>`
+      };
+    });
+    
+    const layout = {
+      ...plotlyTheme,
+      xaxis: { 
+        ...plotlyTheme.xaxis,
+        title: { text: 'Accuracy (%)', font: { color: '#6b7280', size: 12 } },
+        range: [0, 100]
+      },
+      yaxis: { 
+        ...plotlyTheme.yaxis,
+        title: { text: 'Score', font: { color: '#6b7280', size: 12 } }
+      },
+      hovermode: 'closest'
+    };
+    
+    Plotly.newPlot(el, traces, layout, { responsive: true, displayModeBar: true });
+  }
+  
+  // Create Score Distribution by League
+  function createScoreDistributionChart(data) {
+    const ctx = document.getElementById('scoreDistributionChart');
+    if (!ctx) return;
+    
+    const leagues = ['boulder', 'cascade', 'volcano', 'earth', 'custom'];
+    
+    // Calculate statistics for each league
+    const stats = leagues.map(league => {
+      const scores = data
+        .filter(row => String(row.League || '').toLowerCase() === league && row.Score > 0)
+        .map(row => row.Score)
+        .sort((a, b) => a - b);
+      
+      if (scores.length === 0) {
+        return {
+          league: league.charAt(0).toUpperCase() + league.slice(1),
+          min: 0,
+          q1: 0,
+          median: 0,
+          q3: 0,
+          max: 0,
+          avg: 0
+        };
+      }
+      
+      const q1Idx = Math.floor(scores.length * 0.25);
+      const medianIdx = Math.floor(scores.length * 0.5);
+      const q3Idx = Math.floor(scores.length * 0.75);
+      
+      return {
+        league: league.charAt(0).toUpperCase() + league.slice(1),
+        min: scores[0],
+        q1: scores[q1Idx],
+        median: scores[medianIdx],
+        q3: scores[q3Idx],
+        max: scores[scores.length - 1],
+        avg: scores.reduce((a, b) => a + b, 0) / scores.length
+      };
+    });
+    
+    if (charts.scoreDistribution) {
+      charts.scoreDistribution.data.labels = stats.map(s => s.league);
+      charts.scoreDistribution.data.datasets[0].data = stats.map(s => s.avg);
+      charts.scoreDistribution.data.datasets[1].data = stats.map(s => s.median);
+      charts.scoreDistribution.update('none');
+    } else {
+      charts.scoreDistribution = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: stats.map(s => s.league),
+          datasets: [
+            {
+              label: 'Average Score',
+              data: stats.map(s => s.avg),
+              backgroundColor: leagues.map(l => (colors[l] || colors.primary) + '80'),
+              borderColor: leagues.map(l => colors[l] || colors.primary),
+              borderWidth: 1
+            },
+            {
+              label: 'Median Score',
+              data: stats.map(s => s.median),
+              backgroundColor: leagues.map(l => (colors[l] || colors.primary) + '40'),
+              borderColor: leagues.map(l => colors[l] || colors.primary),
+              borderWidth: 1,
+              borderDash: [5, 5]
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { position: 'top' },
+            tooltip: {
+              callbacks: {
+                afterLabel: (context) => {
+                  const stat = stats[context.dataIndex];
+                  return `Min: ${stat.min.toLocaleString()} | Max: ${stat.max.toLocaleString()}`;
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: { display: true, text: 'Score' }
+            }
+          }
+        }
+      });
+    }
+  }
+  
+  // Create League Metrics Chart
+  function createLeagueMetricsChart(data) {
+    const ctx = document.getElementById('leagueMetricsChart');
+    if (!ctx) return;
+    
+    const leagues = ['boulder', 'cascade', 'volcano', 'earth', 'custom'];
+    const metrics = leagues.map(league => {
+      const leagueData = data.filter(row => String(row.League || '').toLowerCase() === league);
+      const scores = leagueData.map(d => d.Score || 0).filter(s => s > 0);
+      const accuracies = leagueData.map(d => d.Accuracy || 0).filter(a => a > 0);
+      
+      return {
+        league: league.charAt(0).toUpperCase() + league.slice(1),
+        games: leagueData.length,
+        avgScore: scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0,
+        avgAccuracy: accuracies.length > 0 ? accuracies.reduce((a, b) => a + b, 0) / accuracies.length : 0
+      };
+    });
+    
+    if (charts.leagueMetrics) {
+      charts.leagueMetrics.data.datasets[0].data = metrics.map(m => m.avgScore);
+      charts.leagueMetrics.data.datasets[1].data = metrics.map(m => m.avgAccuracy);
+      charts.leagueMetrics.update('none');
+    } else {
+      charts.leagueMetrics = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: metrics.map(m => m.league),
+          datasets: [
+            {
+              label: 'Average Score',
+              data: metrics.map(m => m.avgScore),
+              backgroundColor: colors.primary + '80',
+              yAxisID: 'y'
+            },
+            {
+              label: 'Average Accuracy (%)',
+              data: metrics.map(m => m.avgAccuracy),
+              backgroundColor: colors.success + '80',
+              type: 'line',
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { position: 'top' }
+          },
+          scales: {
+            y: {
+              type: 'linear',
+              position: 'left',
+              title: { display: true, text: 'Average Score' },
+              beginAtZero: true
+            },
+            y1: {
+              type: 'linear',
+              position: 'right',
+              title: { display: true, text: 'Average Accuracy (%)' },
+              beginAtZero: true,
+              max: 100,
+              grid: { drawOnChartArea: false }
+            }
+          }
+        }
+      });
+    }
+  }
+  
+  // Create Games Per Day Chart with Plotly
+  function createGamesPerDayChart(data) {
+    const el = document.getElementById('gamesPerDayChart');
+    if (!el) return;
+    
+    const daily = {};
+    data.forEach(row => {
+      const dateInfo = parseDate(row.Date);
+      if (!dateInfo) return;
+      const key = dateInfo.dateOnly;
+      daily[key] = (daily[key] || 0) + 1;
+    });
+    
+    const sortedDates = Object.keys(daily).sort();
+    const x = sortedDates.map(d => new Date(d + 'T00:00:00'));
+    const y = sortedDates.map(d => daily[d]);
+    
+    const trace = {
+      x: x,
+      y: y,
+      type: 'bar',
+      marker: {
+        color: '#3b82f6',
+        line: { width: 0 }
+      },
+      hovertemplate: '<b>%{x|%b %d, %Y}</b><br>Games: %{y}<extra></extra>'
+    };
+    
+    const layout = {
+      ...plotlyTheme,
+      xaxis: { 
+        ...plotlyTheme.xaxis,
+        title: { text: 'Date', font: { color: '#6b7280', size: 12 } }
+      },
+      yaxis: { 
+        ...plotlyTheme.yaxis,
+        title: { text: 'Number of Games', font: { color: '#6b7280', size: 12 } }
+      },
+      showlegend: false
+    };
+    
+    Plotly.newPlot(el, [trace], layout, { responsive: true, displayModeBar: true });
+  }
+  
+  // Create Day of Week Chart
+  function createDayOfWeekChart(data) {
+    const ctx = document.getElementById('dayOfWeekChart');
+    if (!ctx) return;
+    
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const counts = Array(7).fill(0);
+    
+    data.forEach(row => {
+      const dateInfo = parseDate(row.Date);
+      if (dateInfo) {
+        counts[dateInfo.dayOfWeek]++;
+      }
+    });
+    
+    if (charts.dayOfWeek) {
+      charts.dayOfWeek.data.datasets[0].data = counts;
+      charts.dayOfWeek.update('none');
+    } else {
+      charts.dayOfWeek = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: days,
+          datasets: [{
+            label: 'Games',
+            data: counts,
+            backgroundColor: colors.danger + '80',
+            borderColor: colors.danger,
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: { display: true, text: 'Number of Games' }
+            },
+            x: {
+              title: { display: true, text: 'Day of Week' }
+            }
+          }
+        }
+      });
+    }
   }
   
   // Main function to update all charts
   async function updateAllCharts() {
     try {
-      console.log("Fetching fresh data from Google Sheets...");
+      console.log("🔄 Fetching fresh data from Google Sheets...");
       const response = await fetch(CSV_URL);
       const csvText = await response.text();
-      const freshData = parseCSV(csvText);
+      allData = parseCSV(csvText);
+      filteredData = filterData(allData);
       
-      console.log(`Loaded ${freshData.length} games`);
+      console.log(`✅ Loaded ${allData.length} total games (${filteredData.length} after filters)`);
+      console.log(`   Raw CSV rows: ${csvText.split('\n').length - 1} (excluding header)`);
       
-      // Update last updated timestamp
+      // Update metrics and timestamp
+      updateSummaryMetrics(filteredData);
       updateLastUpdatedTimestamp();
       
-      // Wait for Highcharts to be ready
-      if (typeof Highcharts === "undefined" || !Highcharts.charts) {
-        console.log("Waiting for Highcharts to load...");
+      // Wait for libraries to be ready
+      if (typeof Chart === "undefined" || typeof Plotly === "undefined") {
+        console.log("⏳ Waiting for libraries to load...");
         setTimeout(updateAllCharts, 500);
         return;
       }
       
-      // Update all charts
-      Highcharts.charts.forEach((chart, idx) => {
-        if (!chart) return;
-        
-        try {
-          const container = chart.renderTo;
-          const title = chart.options.title?.text || "";
-          
-          // Identify chart type and update accordingly
-          if (title.includes("Over Time") || title.includes("Timeline") || title.includes("Games Played")) {
-            // For timeline, we need to aggregate fresh data by hour
-            updateTimelineChart(chart, freshData);
-          } else if (title.includes("Hour") && !title.includes("Over Time")) {
-            // Bar chart for hour of day (not timeline)
-            updateBarChart(chart, freshData, "Date_Hour", "League");
-          } else if (title.includes("Day of Week") || title.includes("Weekday")) {
-            updateBarChart(chart, freshData, "Date_Weekday", "League");
-          } else if (title.includes("Total Games by League")) {
-            updateSimpleBarChart(chart, freshData, "League");
-          }
-        } catch (error) {
-          console.warn(`Error updating chart ${idx}:`, error);
-        }
-      });
+      // Create/update all charts with filtered data
+      createUsersOverTimeChart(filteredData);
+      createLeagueOverTimeChart(filteredData);
+      createLeagueDistributionChart(filteredData);
+      createHourDistributionChart(filteredData);
+      createScoreAccuracyChart(filteredData);
+      createScoreDistributionChart(filteredData);
+      createLeagueMetricsChart(filteredData);
+      createGamesPerDayChart(filteredData);
+      createDayOfWeekChart(filteredData);
       
-      // Update summary metrics if they exist
-      updateSummaryMetrics(freshData);
+      // Create overview charts
+      createOverviewCharts(filteredData);
       
-      console.log("✅ Charts updated with fresh data!");
-      console.log("   Updated", Highcharts.charts.filter(c => c).length, "charts");
+      // Create new additional charts
+      createNewReturningUsersChart(filteredData);
+      createUserEngagementChart(filteredData);
+      createDailyActiveUsersChart(filteredData);
+      createPlayersPerLeagueChart(filteredData);
+      createLeagueScoreTrendChart(filteredData);
+      createLeagueAccuracyTrendChart(filteredData);
+      createAccuracyDistributionChart(filteredData);
+      createScoreTrendChart(filteredData);
+      createScoreHistogramChart(filteredData);
+      createAccuracyHistogramChart(filteredData);
+      createPlayerProgressionChart(filteredData);
+      createHourDayHeatmapChart(filteredData);
+      createScoreByHourChart(filteredData);
+      createScoreByDayChart(filteredData);
+      createWeeklyPatternChart(filteredData);
+      
+      // Generate insights
+      generateInsights(filteredData);
+      
+      console.log("✅ All charts updated!");
       
     } catch (error) {
       console.error("❌ Error loading fresh data:", error);
+      document.getElementById('last-updated').innerHTML = '<strong>Error</strong>: Could not load data. Please refresh the page.';
     }
   }
   
-  // Update summary metrics
-  function updateSummaryMetrics(data) {
-    const totalGames = data.length;
-    const uniquePlayers = new Set(data.map(d => d.Name)).size;
-    const avgScore = Math.round(data.reduce((sum, d) => sum + (d.Score || 0), 0) / totalGames);
-    const avgAccuracy = (data.reduce((sum, d) => sum + (d.Accuracy || 0), 0) / totalGames).toFixed(1);
+  // Add filter event listeners
+  function setupFilters() {
+    const leagueFilter = document.getElementById('filter-league');
+    const timeFilter = document.getElementById('filter-time');
     
-    // Try to update metric elements (adjust selectors based on actual structure)
-    document.querySelectorAll(".metric-value, [class*="value"]").forEach((el, idx) => {
-      const values = [totalGames, uniquePlayers, avgScore, avgAccuracy + "%"];
-      if (values[idx]) {
-        el.textContent = values[idx];
-      }
-    });
+    if (leagueFilter) {
+      leagueFilter.addEventListener('change', () => {
+        filteredData = filterData(allData);
+        updateAllCharts();
+      });
+    }
+    
+    if (timeFilter) {
+      timeFilter.addEventListener('change', () => {
+        filteredData = filterData(allData);
+        updateAllCharts();
+      });
+    }
   }
   
   // Initialize when page loads
-  function initDynamicUpdates() {
-    console.log("🔄 Dynamic data loader initialized");
-    console.log("   Will fetch fresh data from:", CSV_URL);
+  function initDashboard() {
+    console.log("🚀 Stunning Dashboard initializing...");
     
-    // Wait for Highcharts to be ready, then update
+    // Setup navigation
+    setupNavigation();
+    
+    // Setup filters
+    setupFilters();
+    
+    // Wait for libraries to be ready
     function waitAndUpdate() {
-      if (typeof Highcharts !== "undefined" && Highcharts.charts && Highcharts.charts.length > 0) {
-        console.log("   Highcharts ready, updating charts...");
+      if (typeof Chart !== "undefined" && typeof Plotly !== "undefined") {
+        console.log("✅ Libraries ready, loading data...");
         updateAllCharts();
       } else {
-        console.log("   Waiting for Highcharts...");
-        setTimeout(waitAndUpdate, 500);
+        console.log("⏳ Waiting for libraries...");
+        setTimeout(waitAndUpdate, 100);
       }
     }
     
-    // Start checking after a short delay
-    setTimeout(waitAndUpdate, 1500);
+    // Start after a short delay
+    setTimeout(waitAndUpdate, 500);
     
-    // Also update every 5 minutes
-    setInterval(function() {
+    // Update every 5 minutes
+    setInterval(() => {
       console.log("⏰ Scheduled update (every 5 minutes)");
       updateAllCharts();
     }, 5 * 60 * 1000);
   }
   
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initDynamicUpdates);
+    document.addEventListener("DOMContentLoaded", initDashboard);
   } else {
-    initDynamicUpdates();
+    initDashboard();
   }
   
 })();
 </script>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-What’s Inside
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Explore the dashboard to see:</p>
-<ul>
-<li><strong>Games Over Time</strong>: Daily trends and hourly patterns</li>
-<li><strong>League Analysis</strong>: Performance metrics by difficulty level</li>
-<li><strong>Player Insights</strong>: Score distributions and accuracy trends</li>
-</ul>
-</div>
-</div>
 
 
 <!-- -->
