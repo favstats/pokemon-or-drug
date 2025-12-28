@@ -40,6 +40,11 @@ jobs:
       - name: Build
         run: npm run build
       
+      - name: Copy analytics folder to dist
+        run: |
+          cp -r analytics dist/analytics
+          echo "Analytics folder copied to dist"
+      
       - name: Setup Pages
         uses: actions/configure-pages@v4
       
