@@ -267,11 +267,12 @@ function GameOver() {
   const completedAllRounds = state.currentRound > state.settings.totalRounds;
   const lostAllLives = rankedPlayers.some(p => p.lives <= 0);
 
-  // Load all global scores for stats comparison and daily scores for default tab
+  // Load scores for the league that was just played
   useEffect(() => {
-    actions.loadGlobalScores(null);
-    actions.loadDailyScores(null);
-  }, []);
+    const league = state.selectedLeague || 'boulder';
+    actions.loadGlobalScores(league);
+    actions.loadDailyScores(league);
+  }, [state.selectedLeague]);
 
   // Award medals when player reaches top 10 (only for league games)
   useEffect(() => {
@@ -737,7 +738,7 @@ function GameOver() {
               state.dailyScoresLoading ? (
                 <div className="loading-scores">Loading today's scores...</div>
               ) : state.dailyScores.length > 0 ? (
-                getUniquePlayerScores(state.dailyScores).slice(0, 10).map((entry, index) => (
+                getUniquePlayerScores(state.dailyScores.filter(s => s.league === leagueFilter)).slice(0, 10).map((entry, index) => (
                   <div key={index} className={`highscore-entry ${index < 3 ? getMedalClass(index) : ''}`} title={
                     entry.timestamp || entry.date || entry.createdAt ?
                       `Submitted: ${new Date((entry.timestamp || entry.date || entry.createdAt)).toLocaleString('en-US', { timeZone: 'Europe/Berlin' })}` :
@@ -767,7 +768,7 @@ function GameOver() {
               state.globalScoresLoading ? (
                 <div className="loading-scores">Loading...</div>
               ) : state.globalScores.length > 0 ? (
-                getUniquePlayerScores(state.globalScores).slice(0, 10).map((entry, index) => (
+                getUniquePlayerScores(state.globalScores.filter(s => s.league === leagueFilter)).slice(0, 10).map((entry, index) => (
                   <div key={index} className={`highscore-entry ${index < 3 ? getMedalClass(index) : ''}`} title={
                     entry.timestamp || entry.date || entry.createdAt ?
                       `Submitted: ${new Date((entry.timestamp || entry.date || entry.createdAt)).toLocaleString('en-US', { timeZone: 'Europe/Berlin' })}` :

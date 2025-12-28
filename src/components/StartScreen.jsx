@@ -367,7 +367,7 @@ function StartScreen() {
                   state.dailyScoresLoading ? (
                     <p className="loading-scores"><FontAwesomeIcon icon={faSync} spin /> Loading today's scores...</p>
                   ) : state.dailyScores.length > 0 ? (
-                    getUniquePlayerScores(state.dailyScores).slice(0, 10).map((entry, index) => (
+                    getUniquePlayerScores(state.dailyScores.filter(s => s.league === leagueFilter)).slice(0, 10).map((entry, index) => (
                       <div key={entry.id || index} className="highscore-item" title={
                         entry.timestamp || entry.date || entry.createdAt ?
                           `Submitted: ${new Date((entry.timestamp || entry.date || entry.createdAt)).toLocaleString('en-US', { timeZone: 'Europe/Berlin' })}` :
@@ -397,7 +397,7 @@ function StartScreen() {
                   state.globalScoresLoading ? (
                     <p className="loading-scores"><FontAwesomeIcon icon={faSync} spin /> Loading...</p>
                   ) : state.globalScores.length > 0 ? (
-                    getUniquePlayerScores(state.globalScores).slice(0, 10).map((entry, index) => (
+                    getUniquePlayerScores(state.globalScores.filter(s => s.league === leagueFilter)).slice(0, 10).map((entry, index) => (
                       <div key={entry.id || index} className="highscore-item" title={
                         entry.timestamp || entry.date || entry.createdAt ?
                           `Submitted: ${new Date((entry.timestamp || entry.date || entry.createdAt)).toLocaleString('en-US', { timeZone: 'Europe/Berlin' })}` :
