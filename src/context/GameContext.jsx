@@ -250,6 +250,9 @@ const initialState = {
   highScores: JSON.parse(localStorage.getItem('pord_highscores') || '[]'),
   globalScores: [],
   globalScoresLoading: true, // Start as loading
+  dailyScores: [],
+  dailyScoresLoading: true, // Start as loading
+  medals: JSON.parse(localStorage.getItem('pord_medals') || '[]'),
   // Bonus round state
   bonusRound: {
     active: false,
@@ -293,6 +296,9 @@ const ACTIONS = {
   // Global scores
   SET_GLOBAL_SCORES: 'SET_GLOBAL_SCORES',
   SET_GLOBAL_LOADING: 'SET_GLOBAL_LOADING',
+  SET_DAILY_SCORES: 'SET_DAILY_SCORES',
+  SET_DAILY_LOADING: 'SET_DAILY_LOADING',
+  SET_MEDALS: 'SET_MEDALS',
 };
 
 // Reducer
@@ -899,6 +905,25 @@ function gameReducer(state, action) {
         ...state,
         globalScoresLoading: action.payload,
       };
+
+    case ACTIONS.SET_DAILY_SCORES:
+      return {
+        ...state,
+        dailyScores: action.payload,
+        dailyScoresLoading: false,
+      };
+
+    case ACTIONS.SET_DAILY_LOADING:
+      return {
+        ...state,
+        dailyScoresLoading: action.payload,
+      };
+
+    case ACTIONS.SET_MEDALS:
+      return {
+        ...state,
+        medals: action.payload,
+      };
     
     default:
       return state;
@@ -951,6 +976,29 @@ export function GameProvider({ children }) {
       dispatch({ type: ACTIONS.SET_GLOBAL_LOADING, payload: true });
       const scores = await fetchGlobalScores(false, league);
       dispatch({ type: ACTIONS.SET_GLOBAL_SCORES, payload: scores });
+    },
+    loadDailyScores: async (league = null) => {
+      dispatch({ type: ACTIONS.SET_DAILY_LOADING, payload: true });
+      const scores = await fetchGlobalScores(false, league, 'daily');
+      dispatch({ type: ACTIONS.SET_DAILY_SCORES, payload: scores });
+    },
+    awardMedal: (medalData) => {
+      const existingMedals = JSON.parse(localStorage.getItem('pord_medals') || '[]');
+      const medalKey = `${medalData.type}_${medalData.league}_${medalData.isDaily ? 'daily' : 'alltime'}_${medalData.date.split('T')[0]}`;
+
+      // Check if this medal was already awarded
+      const alreadyAwarded = existingMedals.some(medal => medal.key === medalKey);
+
+      if (!alreadyAwarded) {
+        const newMedal = { ...medalData, key: medalKey };
+        existingMedals.push(newMedal);
+        localStorage.setItem('pord_medals', JSON.stringify(existingMedals));
+        dispatch({ type: ACTIONS.SET_MEDALS, payload: existingMedals });
+      }
+    },
+    setMedals: (medals) => {
+      localStorage.setItem('pord_medals', JSON.stringify(medals));
+      dispatch({ type: ACTIONS.SET_MEDALS, payload: medals });
     },
     submitToGlobalLeaderboard: async (scoreData) => {
       const updatedScores = await submitGlobalScore(scoreData);

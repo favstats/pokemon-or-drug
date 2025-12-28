@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faUser, 
-  faUsers, 
-  faPlay, 
-  faPlus, 
-  faMinus, 
-  faGamepad, 
-  faVolumeUp, 
-  faVolumeMute, 
-  faCog, 
+import {
+  faUser,
+  faUsers,
+  faPlay,
+  faPlus,
+  faMinus,
+  faGamepad,
+  faVolumeUp,
+  faVolumeMute,
+  faCog,
   faChevronLeft,
   faTrophy,
   faTrash,
@@ -28,11 +28,14 @@ import {
   faToggleOff,
   faInfoCircle,
   faEnvelope,
-  faCoffee
+  faCoffee,
+  faCalendarAlt,
+  faStar
 } from '@fortawesome/free-solid-svg-icons';
 import { faPaypal } from '@fortawesome/free-brands-svg-icons';
 import { useGame, LEAGUES } from '../context/GameContext';
 import { useSound } from '../context/SoundContext';
+import PrizeCabinet from './PrizeCabinet';
 
 // Import badge SVGs
 import BoulderBadge from '../assets/badges/boulder.svg';
@@ -72,7 +75,8 @@ function StartScreen() {
   const [showSettings, setShowSettings] = useState(false);
   const [showScoreboard, setShowScoreboard] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
-  const [scoreTab, setScoreTab] = useState('global'); // 'global' or 'local'
+  const [showPrizeCabinet, setShowPrizeCabinet] = useState(false);
+  const [scoreTab, setScoreTab] = useState('daily'); // 'daily', 'global' or 'local'
   const [leagueFilter, setLeagueFilter] = useState('all'); // 'all' or league id
 
   // Show mobile hint for first-time visitors
@@ -92,6 +96,20 @@ function StartScreen() {
       };
     }
   }, [isFirstIconVisit, state.gameMode]);
+
+  // Load scores on mount
+  useEffect(() => {
+    actions.loadGlobalScores(null);
+    actions.loadDailyScores(null);
+
+    // One-time cleanup of demo medals (remove after first run)
+    const cleanupDone = localStorage.getItem('pord_demo_cleanup');
+    if (!cleanupDone) {
+      localStorage.removeItem('pord_medals');
+      actions.setMedals([]);
+      localStorage.setItem('pord_demo_cleanup', 'true');
+    }
+  }, []);
 
   const handleModeSelect = (mode) => {
     play('select');
@@ -169,33 +187,36 @@ function StartScreen() {
   return (
     <div className="start-screen">
       <div className="top-controls">
-        <button 
-          className="scoreboard-toggle" 
+        <button
+          className="scoreboard-toggle"
           onClick={() => {
             setShowScoreboard(!showScoreboard);
             setShowSettings(false);
+            setShowPrizeCabinet(false);
           }}
           title="High Scores"
         >
           <FontAwesomeIcon icon={faTrophy} />
         </button>
-        <button 
-          className="settings-toggle" 
+        <button
+          className="settings-toggle"
           onClick={() => {
             setShowSettings(!showSettings);
             setShowScoreboard(false);
             setShowAbout(false);
+            setShowPrizeCabinet(false);
           }}
           title="Settings"
         >
           <FontAwesomeIcon icon={faCog} />
         </button>
-        <button 
-          className="about-toggle" 
+        <button
+          className="about-toggle"
           onClick={() => {
             setShowAbout(!showAbout);
             setShowSettings(false);
             setShowScoreboard(false);
+            setShowPrizeCabinet(false);
           }}
           title="About"
         >
@@ -222,37 +243,88 @@ function StartScreen() {
 
       {showScoreboard ? (
         <div className="settings-panel scoreboard-panel">
-          <h2><FontAwesomeIcon icon={faTrophy} /> High Scores</h2>
+          <div className="scoreboard-header">
+            <h2><FontAwesomeIcon icon={faTrophy} /> High Scores</h2>
+            <button
+              className="prize-header-btn"
+              onClick={() => {
+                setShowPrizeCabinet(true);
+                setShowScoreboard(false);
+              }}
+              title="View your medal collection"
+            >
+              <FontAwesomeIcon icon={faStar} /> Medals
+            </button>
+          </div>
           
           <div className="score-tabs">
-            <button 
+            <button
+              className={`score-tab ${scoreTab === 'daily' ? 'active' : ''}`}
+              onClick={() => setScoreTab('daily')}
+            >
+              <FontAwesomeIcon icon={faCalendarAlt} /> Daily
+            </button>
+            <button
               className={`score-tab ${scoreTab === 'global' ? 'active' : ''}`}
               onClick={() => setScoreTab('global')}
             >
               <FontAwesomeIcon icon={faGlobe} /> Global
             </button>
-            <button 
+            <button
               className={`score-tab ${scoreTab === 'local' ? 'active' : ''}`}
               onClick={() => setScoreTab('local')}
             >
               <FontAwesomeIcon icon={faHome} /> Local
             </button>
           </div>
-          
-          {scoreTab === 'global' ? (
+
+          {scoreTab === 'daily' && (
+            <div className="daily-date-display">
+              <FontAwesomeIcon icon={faCalendarAlt} />
+              <span>{(() => {
+                try {
+                  return new Date().toLocaleDateString('en-US', {
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric',
+                    timeZone: 'Europe/Berlin'
+                  });
+                } catch (e) {
+                  console.error('Date formatting error:', e);
+                  return 'December 28, 2025'; // fallback
+                }
+              })()}</span>
+            </div>
+          )}
+
+          {(scoreTab === 'global' || scoreTab === 'daily') ? (
             <>
               <div className="league-filter-tabs">
-                <button 
+                <button
                   className={`league-filter-tab ${leagueFilter === 'all' ? 'active' : ''}`}
-                  onClick={() => { setLeagueFilter('all'); actions.loadGlobalScores(null); }}
+                  onClick={() => {
+                    setLeagueFilter('all');
+                    if (scoreTab === 'global') {
+                      actions.loadGlobalScores(null);
+                    } else {
+                      actions.loadDailyScores(null);
+                    }
+                  }}
                 >
                   All
                 </button>
                 {Object.keys(LEAGUES).map(leagueId => (
-                  <button 
+                  <button
                     key={leagueId}
                     className={`league-filter-tab ${leagueFilter === leagueId ? 'active' : ''}`}
-                    onClick={() => { setLeagueFilter(leagueId); actions.loadGlobalScores(leagueId); }}
+                    onClick={() => {
+                      setLeagueFilter(leagueId);
+                      if (scoreTab === 'global') {
+                        actions.loadGlobalScores(leagueId);
+                      } else {
+                        actions.loadDailyScores(leagueId);
+                      }
+                    }}
                     title={LEAGUES[leagueId].name}
                   >
                     <img src={badgeImages[leagueId]} alt={LEAGUES[leagueId].badge} className="filter-badge" />
@@ -260,30 +332,66 @@ function StartScreen() {
                 ))}
               </div>
               <div className="highscore-list">
-                {state.globalScoresLoading ? (
-                  <p className="loading-scores"><FontAwesomeIcon icon={faSync} spin /> Loading...</p>
-                ) : state.globalScores.length > 0 ? (
-                  state.globalScores.slice(0, 10).map((entry, index) => (
-                    <div key={entry.id || index} className="highscore-item">
-                      <span className="highscore-rank">#{index + 1}</span>
-                      {entry.league && badgeImages[entry.league] && (
-                        <img src={badgeImages[entry.league]} alt="" className="score-badge" />
-                      )}
-                      <span className="highscore-name">
-                        {entry.icon && <span className="highscore-icon">{entry.icon}</span>}
-                        {entry.name}
-                      </span>
-                      <span className="highscore-val">{entry.score}</span>
-                      {entry.accuracy !== undefined && (
-                        <span className="highscore-accuracy">{entry.accuracy}%</span>
-                      )}
-                      {entry.avgSpeed && (
-                        <span className="highscore-speed">{(entry.avgSpeed / 1000).toFixed(1)}s</span>
-                      )}
-                    </div>
-                  ))
+                {scoreTab === 'daily' ? (
+                  state.dailyScoresLoading ? (
+                    <p className="loading-scores"><FontAwesomeIcon icon={faSync} spin /> Loading today's scores...</p>
+                  ) : state.dailyScores.length > 0 ? (
+                    state.dailyScores.slice(0, 10).map((entry, index) => (
+                      <div key={entry.id || index} className="highscore-item" title={
+                        entry.timestamp || entry.date || entry.createdAt ?
+                          `Submitted: ${new Date((entry.timestamp || entry.date || entry.createdAt)).toLocaleString('en-US', { timeZone: 'Europe/Berlin' })}` :
+                          'No submission date available'
+                      }>
+                        <span className="highscore-rank">#{index + 1}</span>
+                        {entry.league && badgeImages[entry.league] && (
+                          <img src={badgeImages[entry.league]} alt="" className="score-badge" />
+                        )}
+                        <span className="highscore-name">
+                          {entry.icon && <span className="highscore-icon">{entry.icon}</span>}
+                          {entry.name}
+                        </span>
+                        <span className="highscore-val">{entry.score}</span>
+                        {entry.accuracy !== undefined && (
+                          <span className="highscore-accuracy">{entry.accuracy}%</span>
+                        )}
+                        {entry.avgSpeed && (
+                          <span className="highscore-speed">{(entry.avgSpeed / 1000).toFixed(1)}s</span>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="no-scores">No scores today yet! Be the first!</p>
+                  )
                 ) : (
-                  <p className="no-scores">No scores yet! Be the first!</p>
+                  state.globalScoresLoading ? (
+                    <p className="loading-scores"><FontAwesomeIcon icon={faSync} spin /> Loading...</p>
+                  ) : state.globalScores.length > 0 ? (
+                    state.globalScores.slice(0, 10).map((entry, index) => (
+                      <div key={entry.id || index} className="highscore-item" title={
+                        entry.timestamp || entry.date || entry.createdAt ?
+                          `Submitted: ${new Date((entry.timestamp || entry.date || entry.createdAt)).toLocaleString('en-US', { timeZone: 'Europe/Berlin' })}` :
+                          'No submission date available'
+                      }>
+                        <span className="highscore-rank">#{index + 1}</span>
+                        {entry.league && badgeImages[entry.league] && (
+                          <img src={badgeImages[entry.league]} alt="" className="score-badge" />
+                        )}
+                        <span className="highscore-name">
+                          {entry.icon && <span className="highscore-icon">{entry.icon}</span>}
+                          {entry.name}
+                        </span>
+                        <span className="highscore-val">{entry.score}</span>
+                        {entry.accuracy !== undefined && (
+                          <span className="highscore-accuracy">{entry.accuracy}%</span>
+                        )}
+                        {entry.avgSpeed && (
+                          <span className="highscore-speed">{(entry.avgSpeed / 1000).toFixed(1)}s</span>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="no-scores">No scores yet! Be the first!</p>
+                  )
                 )}
               </div>
             </>
@@ -610,6 +718,11 @@ function StartScreen() {
         <div className="floating-pill pill-3">🔴</div>
         <div className="floating-pill pill-4">💜</div>
       </div>
+
+      <PrizeCabinet
+        isOpen={showPrizeCabinet}
+        onClose={() => setShowPrizeCabinet(false)}
+      />
     </div>
   );
 }

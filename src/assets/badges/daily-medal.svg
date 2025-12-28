@@ -1,0 +1,77 @@
+<svg width="100" height="130" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Silver/Platinum gradient for medal body -->
+    <linearGradient id="silverMedal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F8F9FA"/>
+      <stop offset="20%" stop-color="#E8E9EA"/>
+      <stop offset="50%" stop-color="#C0C5CE"/>
+      <stop offset="80%" stop-color="#E8E9EA"/>
+      <stop offset="100%" stop-color="#F8F9FA"/>
+    </linearGradient>
+    
+    <!-- Inner silver shine -->
+    <radialGradient id="silverShine" cx="30%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#B8C5D6"/>
+    </radialGradient>
+    
+    <!-- Blue ribbon gradient -->
+    <linearGradient id="ribbonBlue" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1E3A8A"/>
+      <stop offset="50%" stop-color="#3B82F6"/>
+      <stop offset="100%" stop-color="#1E3A8A"/>
+    </linearGradient>
+    
+    <!-- Shadow filter -->
+    <filter id="dailyShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="4" stdDeviation="3" flood-opacity="0.4"/>
+    </filter>
+    
+    <!-- Glow effect -->
+    <filter id="blueGlow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Ribbon tails -->
+  <path d="M30 15 L25 45 L35 35 L45 45 L40 15" fill="url(#ribbonBlue)"/>
+  <path d="M60 15 L55 45 L65 35 L75 45 L70 15" fill="url(#ribbonBlue)"/>
+  
+  <!-- Ribbon top band -->
+  <rect x="28" y="5" width="44" height="20" rx="3" fill="url(#ribbonBlue)" filter="url(#dailyShadow)"/>
+  <rect x="32" y="9" width="36" height="12" rx="2" fill="#60A5FA" opacity="0.3"/>
+  
+  <!-- Medal body -->
+  <circle cx="50" cy="75" r="40" fill="url(#silverMedal)" filter="url(#dailyShadow)" stroke="#6B7280" stroke-width="3"/>
+  
+  <!-- Medal inner ring -->
+  <circle cx="50" cy="75" r="32" fill="url(#silverShine)" stroke="#9CA3AF" stroke-width="2"/>
+  
+  <!-- Sun symbol in center -->
+  <circle cx="50" cy="75" r="14" fill="#3B82F6" stroke="#1E3A8A" stroke-width="2"/>
+  
+  <!-- Sun rays -->
+  <g stroke="#3B82F6" stroke-width="3" stroke-linecap="round" filter="url(#blueGlow)">
+    <line x1="50" y1="55" x2="50" y2="47"/>
+    <line x1="50" y1="95" x2="50" y2="103"/>
+    <line x1="30" y1="75" x2="22" y2="75"/>
+    <line x1="70" y1="75" x2="78" y2="75"/>
+    <line x1="35.9" y1="60.9" x2="30.2" y2="55.2"/>
+    <line x1="64.1" y1="89.1" x2="69.8" y2="94.8"/>
+    <line x1="35.9" y1="89.1" x2="30.2" y2="94.8"/>
+    <line x1="64.1" y1="60.9" x2="69.8" y2="55.2"/>
+  </g>
+  
+  <!-- Inner sun highlight -->
+  <circle cx="46" cy="71" r="5" fill="#93C5FD" opacity="0.7"/>
+  
+  <!-- Decorative dots around edge -->
+  <circle cx="50" cy="38" r="2.5" fill="#6B7280"/>
+  <circle cx="87" cy="75" r="2.5" fill="#6B7280"/>
+  <circle cx="50" cy="112" r="2.5" fill="#6B7280"/>
+  <circle cx="13" cy="75" r="2.5" fill="#6B7280"/>
+</svg>

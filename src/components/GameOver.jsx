@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faTrophy, 
-  faMedal, 
-  faRedo, 
+import {
+  faTrophy,
+  faMedal,
+  faRedo,
   faHome,
   faStar,
   faCheck,
@@ -16,7 +16,9 @@ import {
   faShareAlt,
   faCoffee,
   faChartLine,
-  faHeartBroken
+  faHeartBroken,
+  faCalendarAlt,
+  faGlobe
 } from '@fortawesome/free-solid-svg-icons';
 import { faPaypal } from '@fortawesome/free-brands-svg-icons';
 import confetti from 'canvas-confetti';
@@ -37,6 +39,14 @@ const badgeImages = {
   volcano: VolcanoBadge,
   earth: EarthBadge,
 };
+
+// ========== DEBUG MODE ==========
+// Set to true to force winning a medal on next game
+// Set DEBUG_MEDAL_TYPE to 'global', 'daily', or 'both'
+const DEBUG_FORCE_MEDAL = false; // <-- SET TO true TO ENABLE
+const DEBUG_MEDAL_TYPE = 'both'; // 'global', 'daily', or 'both'
+const DEBUG_MEDAL_RANK = 3; // What rank to simulate (1-10)
+// ================================
 
 // Bell Curve Component
 function BellCurve({ percentile, label, color }) {
@@ -100,7 +110,7 @@ function GameOver() {
   const { play } = useSound();
   const confettiFired = useRef(false);
   const scoresSaved = useRef(false);
-  const [scoreTab, setScoreTab] = useState('global');
+  const [scoreTab, setScoreTab] = useState('daily');
   const [leagueFilter, setLeagueFilter] = useState(state.selectedLeague || 'all');
   const [showShareModal, setShowShareModal] = useState(false);
   const [sharePlayer, setSharePlayer] = useState(null); // Which player to share
@@ -112,27 +122,31 @@ function GameOver() {
   // Calculate percentiles from global scores and top 10 feedback
   const playerStats = useMemo(() => {
     const player = winner; // Use winner (top player) for top 10 calculations
-    const scores = state.globalScores;
-    
+    const globalScores = state.globalScores;
+    const dailyScores = state.dailyScores;
+
     if (!player) {
       return { scorePercentile: 50, speedPercentile: 50, totalPlayers: 0, loading: false };
     }
-    
-    if (!scores.length) {
-      return { 
-        scorePercentile: 50, 
-        speedPercentile: 50, 
-        totalPlayers: 0, 
+
+    if (!globalScores.length) {
+      return {
+        scorePercentile: 50,
+        speedPercentile: 50,
+        totalPlayers: 0,
         loading: state.globalScoresLoading,
         playerScore: player.score,
         playerSpeed: player.avgResponseTime,
         top10Rank: null,
+        dailyTop10Rank: null,
         pointsFromTop10: null,
+        dailyPointsFromTop10: null,
+        dailyPlayerRank: null,
       };
     }
     
     // Use all scores - we compare against everyone
-    const leagueScores = scores;
+    const leagueScores = globalScores;
     
     // Calculate score percentile
     const scoresBelowPlayer = leagueScores.filter(s => s.score < player.score).length;
@@ -163,20 +177,49 @@ function GameOver() {
       const top10Score = sortedScores[9].score;
       pointsFromTop10 = Math.max(0, top10Score - player.score + 1);
     }
+
+    // Calculate points needed for daily top 10
+    let dailyPointsFromTop10 = null;
+    let dailyTop10Rank = null;
+    let dailyPlayerRank = null;
+    if (dailyScores.length > 0) {
+      const dailySortedScores = [...dailyScores].sort((a, b) => b.score - a.score);
+      const dailyPlayersWithHigherScore = dailySortedScores.filter(s => s.score > player.score).length;
+      dailyPlayerRank = dailyPlayersWithHigherScore + 1;
+      const dailyIsInTop10 = dailyPlayerRank <= 10 || dailySortedScores.length < 10;
+
+      if (dailyIsInTop10) {
+        dailyTop10Rank = dailyPlayerRank;
+      }
+
+      if (!dailyIsInTop10 && dailySortedScores.length >= 10) {
+        const dailyTop10Score = dailySortedScores[9].score;
+        dailyPointsFromTop10 = Math.max(0, dailyTop10Score - player.score + 1);
+      }
+    }
+    
+    // DEBUG: Force top 10 rank for testing medal display
+    const debugTop10Rank = DEBUG_FORCE_MEDAL && (DEBUG_MEDAL_TYPE === 'global' || DEBUG_MEDAL_TYPE === 'both') 
+      ? DEBUG_MEDAL_RANK : top10Rank;
+    const debugDailyTop10Rank = DEBUG_FORCE_MEDAL && (DEBUG_MEDAL_TYPE === 'daily' || DEBUG_MEDAL_TYPE === 'both') 
+      ? DEBUG_MEDAL_RANK : dailyTop10Rank;
     
     return { 
       scorePercentile, 
       speedPercentile, 
-      totalPlayers: leagueScores.length,
+      totalPlayers: DEBUG_FORCE_MEDAL ? Math.max(leagueScores.length, 100) : leagueScores.length,
       playerScore: player.score,
       playerSpeed: player.avgResponseTime,
-      avgScore: Math.round(leagueScores.reduce((a, b) => a + b.score, 0) / leagueScores.length),
+      avgScore: Math.round(leagueScores.reduce((a, b) => a + b.score, 0) / (leagueScores.length || 1)),
       avgSpeed: speedScores.length > 0 
         ? Math.round(speedScores.reduce((a, b) => a + b.avgSpeed, 0) / speedScores.length) 
         : null,
-      top10Rank,
-      pointsFromTop10,
-      playerRank, // Include player rank for display
+      top10Rank: debugTop10Rank,
+      dailyTop10Rank: debugDailyTop10Rank,
+      pointsFromTop10: DEBUG_FORCE_MEDAL ? null : pointsFromTop10,
+      dailyPointsFromTop10: DEBUG_FORCE_MEDAL ? null : dailyPointsFromTop10,
+      playerRank: DEBUG_FORCE_MEDAL ? DEBUG_MEDAL_RANK : playerRank,
+      dailyPlayerRank: DEBUG_FORCE_MEDAL ? DEBUG_MEDAL_RANK : dailyPlayerRank,
       loading: false,
     };
   }, [state.globalScores, state.globalScoresLoading, state.players, winner]);
@@ -190,10 +233,46 @@ function GameOver() {
   const completedAllRounds = state.currentRound > state.settings.totalRounds;
   const lostAllLives = rankedPlayers.some(p => p.lives <= 0);
 
-  // Load all global scores for stats comparison
+  // Load all global scores for stats comparison and daily scores for default tab
   useEffect(() => {
     actions.loadGlobalScores(null);
+    actions.loadDailyScores(null);
   }, []);
+
+  // Award medals when player reaches top 10
+  useEffect(() => {
+    const shouldAwardGlobal = DEBUG_FORCE_MEDAL && (DEBUG_MEDAL_TYPE === 'global' || DEBUG_MEDAL_TYPE === 'both');
+    const actualRank = shouldAwardGlobal ? DEBUG_MEDAL_RANK : playerStats.top10Rank;
+    
+    if (actualRank && actualRank <= 10) {
+      const medalData = {
+        type: 'top10',
+        league: state.selectedLeague,
+        rank: actualRank,
+        date: new Date().toISOString(),
+        score: playerStats.playerScore || 1000,
+        isDaily: false
+      };
+      actions.awardMedal(medalData);
+    }
+  }, [playerStats.top10Rank, state.selectedLeague, playerStats.playerScore]);
+
+  useEffect(() => {
+    const shouldAwardDaily = DEBUG_FORCE_MEDAL && (DEBUG_MEDAL_TYPE === 'daily' || DEBUG_MEDAL_TYPE === 'both');
+    const actualRank = shouldAwardDaily ? DEBUG_MEDAL_RANK : playerStats.dailyTop10Rank;
+    
+    if (actualRank && actualRank <= 10) {
+      const medalData = {
+        type: 'dailyTop10',
+        league: state.selectedLeague,
+        rank: actualRank,
+        date: new Date().toISOString(),
+        score: playerStats.playerScore || 1000,
+        isDaily: true
+      };
+      actions.awardMedal(medalData);
+    }
+  }, [playerStats.dailyTop10Rank, state.selectedLeague, playerStats.playerScore]);
 
   // Save scores once (local + global if enabled)
   useEffect(() => {
@@ -311,7 +390,7 @@ function GameOver() {
   };
 
   return (
-    <motion.div 
+    <motion.div
       className="gameover-screen"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -407,45 +486,6 @@ function GameOver() {
           ))}
         </motion.div>
 
-        {/* Stats Summary */}
-        <motion.div 
-          className="game-stats"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-        >
-          <div className="stat-box">
-            <span className="stat-value">{state.currentRound}</span>
-            <span className="stat-label">Rounds Played</span>
-          </div>
-          <div className="stat-box">
-            <span className="stat-value">
-              {rankedPlayers.reduce((sum, p) => sum + p.correctAnswers, 0)}
-            </span>
-            <span className="stat-label">Total Correct</span>
-          </div>
-          <div className="stat-box">
-            <span className="stat-value">
-              {Math.round(
-                (rankedPlayers.reduce((sum, p) => sum + p.correctAnswers, 0) / 
-                (rankedPlayers.reduce((sum, p) => sum + p.correctAnswers + p.wrongAnswers, 0) || 1)) * 100
-              )}%
-            </span>
-            <span className="stat-label">Accuracy</span>
-          </div>
-          {(() => {
-            const allFastest = rankedPlayers
-              .filter(p => p.fastestResponse !== null)
-              .map(p => p.fastestResponse);
-            const fastest = allFastest.length > 0 ? Math.min(...allFastest) : null;
-            return fastest !== null ? (
-              <div className="stat-box fastest-stat">
-                <span className="stat-value">{(fastest / 1000).toFixed(2)}s</span>
-                <span className="stat-label">Fastest Click</span>
-              </div>
-            ) : null;
-          })()}
-        </motion.div>
 
         {/* Top 10 Feedback */}
         {isLeagueGame && !playerStats.loading && playerStats.totalPlayers > 0 && (
@@ -457,10 +497,45 @@ function GameOver() {
           >
             {playerStats.top10Rank ? (
               <div className="top10-success">
-                <span className="top10-icon">🏆</span>
+                <div className="medal-earned-celebration">
+                  <motion.div 
+                    className="medal-earned-visual"
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.3 }}
+                  >
+                    <div className="medal-glow"></div>
+                    <div className="medal-badge">
+                      {state.selectedLeague && badgeImages[state.selectedLeague] && (
+                        <img 
+                          src={badgeImages[state.selectedLeague]} 
+                          alt={LEAGUES[state.selectedLeague]?.name} 
+                          className="medal-league-badge"
+                        />
+                      )}
+                    </div>
+                    <div className="medal-rank-ribbon">
+                      <span>#{scoreTab === 'daily' ? (playerStats.dailyTop10Rank || playerStats.top10Rank) : playerStats.top10Rank}</span>
+                    </div>
+                  </motion.div>
+                  <motion.div 
+                    className="medal-earned-text"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 }}
+                  >
+                    <span className="medal-earned-title">🎖️ BADGE EARNED! 🎖️</span>
+                    <span className="medal-earned-type">
+                      {scoreTab === 'daily' ? '☀️ Daily Champion' : '🌟 Global Legend'}
+                    </span>
+                    <span className="medal-earned-hint">
+                      View in your Trophy Cabinet from the main menu
+                    </span>
+                  </motion.div>
+                </div>
                 <div className="top10-message">
                   <strong>Congratulations, {winner.name}!</strong>
-                  <p>You've earned your place in the Hall of Fame for the <span className="league-highlight">{LEAGUES[state.selectedLeague]?.name}</span>! Ranked #{playerStats.top10Rank} out of {playerStats.totalPlayers} trainers. Your dedication has been recognized by the Pokémon League!</p>
+                  <p>You've earned your place in <span className={scoreTab === 'daily' ? 'todays-highlight' : 'alltime-highlight'}>{scoreTab === 'daily' ? 'today\'s' : 'the all-time'}</span> Hall of Fame for the <span className="league-highlight">{LEAGUES[state.selectedLeague]?.name}</span>! Ranked #{scoreTab === 'daily' ? (playerStats.dailyTop10Rank || playerStats.top10Rank) : playerStats.top10Rank} out of {playerStats.totalPlayers} trainers. Your dedication has been recognized by the Pokémon League!</p>
                 </div>
               </div>
             ) : playerStats.pointsFromTop10 !== null ? (
@@ -476,7 +551,11 @@ function GameOver() {
                 )}
                 <div className="top10-message">
                   <strong>Keep Training, {winner.name}!</strong>
-                  <p>You're just <span className="points-highlight">{playerStats.pointsFromTop10}</span> points away from entering the Top 10 for the <span className="league-highlight">{LEAGUES[state.selectedLeague]?.name}</span>{playerStats.playerRank && ` (#${playerStats.playerRank})`}! Like a Pokémon evolving, you're getting stronger with each battle. Train harder and <span className="very-best-highlight">you'll be the very best!</span></p>
+                  <p>You're just <span className="points-highlight">{
+                    scoreTab === 'daily'
+                      ? (playerStats.dailyPointsFromTop10 || playerStats.pointsFromTop10)
+                      : playerStats.pointsFromTop10
+                  }</span> points away from entering <span className={scoreTab === 'daily' ? 'todays-highlight' : 'alltime-highlight'}>{scoreTab === 'daily' ? 'today\'s' : 'the all-time'}</span> Top 10 for the <span className="league-highlight">{LEAGUES[state.selectedLeague]?.name}</span>{(scoreTab === 'daily' ? playerStats.dailyPlayerRank : playerStats.playerRank) && ` (#${scoreTab === 'daily' ? playerStats.dailyPlayerRank : playerStats.playerRank})`}! Like a Pokémon evolving, you're getting stronger with each battle. Train harder and <span className="very-best-highlight">you'll be the very best!</span></p>
                 </div>
               </div>
             ) : null}
@@ -493,19 +572,25 @@ function GameOver() {
           <div className="highscores-header">
             <h3><FontAwesomeIcon icon={faTrophy} /> Leaderboard</h3>
             <div className="score-tabs">
-              <button 
+              <button
+                className={`score-tab ${scoreTab === 'daily' ? 'active' : ''}`}
+                onClick={() => { setScoreTab('daily'); actions.loadDailyScores(null); }}
+              >
+                <FontAwesomeIcon icon={faCalendarAlt} /> Daily
+              </button>
+              <button
                 className={`score-tab ${scoreTab === 'global' ? 'active' : ''}`}
                 onClick={() => setScoreTab('global')}
               >
-                Global
+                <FontAwesomeIcon icon={faGlobe} /> Global
               </button>
-              <button 
+              <button
                 className={`score-tab ${scoreTab === 'local' ? 'active' : ''}`}
                 onClick={() => setScoreTab('local')}
               >
-                Local
+                <FontAwesomeIcon icon={faHome} /> Local
               </button>
-              <button 
+              <button
                 className={`score-tab ${scoreTab === 'stats' ? 'active' : ''}`}
                 onClick={() => { setScoreTab('stats'); actions.loadGlobalScores(null); }}
               >
@@ -513,20 +598,53 @@ function GameOver() {
               </button>
             </div>
           </div>
-          
-          {scoreTab === 'global' && (
+
+          {scoreTab === 'daily' && (
+            <div className="daily-date-display">
+              <FontAwesomeIcon icon={faCalendarAlt} />
+              <span>{(() => {
+                try {
+                  return new Date().toLocaleDateString('en-US', {
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric',
+                    timeZone: 'Europe/Berlin'
+                  });
+                } catch (e) {
+                  console.error('Date formatting error:', e);
+                  return 'December 28, 2025'; // fallback
+                }
+              })()}</span>
+            </div>
+          )}
+
+          {(scoreTab === 'global' || scoreTab === 'daily') && (
             <div className="league-filter-tabs">
-              <button 
+              <button
                 className={`league-filter-tab ${leagueFilter === 'all' ? 'active' : ''}`}
-                onClick={() => { setLeagueFilter('all'); actions.loadGlobalScores(null); }}
+                onClick={() => {
+                  setLeagueFilter('all');
+                  if (scoreTab === 'global') {
+                    actions.loadGlobalScores(null);
+                  } else {
+                    actions.loadDailyScores(null);
+                  }
+                }}
               >
                 All
               </button>
               {Object.keys(LEAGUES).map(leagueId => (
-                <button 
+                <button
                   key={leagueId}
                   className={`league-filter-tab ${leagueFilter === leagueId ? 'active' : ''}`}
-                  onClick={() => { setLeagueFilter(leagueId); actions.loadGlobalScores(leagueId); }}
+                  onClick={() => {
+                    setLeagueFilter(leagueId);
+                    if (scoreTab === 'global') {
+                      actions.loadGlobalScores(leagueId);
+                    } else {
+                      actions.loadDailyScores(leagueId);
+                    }
+                  }}
                   title={LEAGUES[leagueId].name}
                 >
                   <img src={badgeImages[leagueId]} alt={LEAGUES[leagueId].badge} className="filter-badge" />
@@ -588,12 +706,46 @@ function GameOver() {
                   </div>
                 )}
               </div>
+            ) : scoreTab === 'daily' ? (
+              state.dailyScoresLoading ? (
+                <div className="loading-scores">Loading today's scores...</div>
+              ) : state.dailyScores.length > 0 ? (
+                state.dailyScores.slice(0, 10).map((entry, index) => (
+                  <div key={index} className={`highscore-entry ${index < 3 ? getMedalClass(index) : ''}`} title={
+                    entry.timestamp || entry.date || entry.createdAt ?
+                      `Submitted: ${new Date((entry.timestamp || entry.date || entry.createdAt)).toLocaleString('en-US', { timeZone: 'Europe/Berlin' })}` :
+                      'No submission date available'
+                  }>
+                    <span className="hs-rank">#{index + 1}</span>
+                    {entry.league && badgeImages[entry.league] && (
+                      <img src={badgeImages[entry.league]} alt="" className="score-badge" />
+                    )}
+                    <span className="hs-name">
+                      {entry.icon && <span className="hs-icon">{entry.icon}</span>}
+                      {entry.name}
+                    </span>
+                    <span className="hs-score">{entry.score}</span>
+                    {entry.accuracy !== undefined && (
+                      <span className="hs-accuracy">{entry.accuracy}%</span>
+                    )}
+                    {entry.avgSpeed && (
+                      <span className="hs-speed">{(entry.avgSpeed / 1000).toFixed(1)}s</span>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="no-scores">No scores today yet!</div>
+              )
             ) : scoreTab === 'global' ? (
               state.globalScoresLoading ? (
                 <div className="loading-scores">Loading...</div>
               ) : state.globalScores.length > 0 ? (
                 state.globalScores.slice(0, 10).map((entry, index) => (
-                  <div key={index} className={`highscore-entry ${index < 3 ? getMedalClass(index) : ''}`}>
+                  <div key={index} className={`highscore-entry ${index < 3 ? getMedalClass(index) : ''}`} title={
+                    entry.timestamp || entry.date || entry.createdAt ?
+                      `Submitted: ${new Date((entry.timestamp || entry.date || entry.createdAt)).toLocaleString('en-US', { timeZone: 'Europe/Berlin' })}` :
+                      'No submission date available'
+                  }>
                     <span className="hs-rank">#{index + 1}</span>
                     {entry.league && badgeImages[entry.league] && (
                       <img src={badgeImages[entry.league]} alt="" className="score-badge" />
@@ -617,7 +769,11 @@ function GameOver() {
             ) : (
               state.highScores.length > 0 ? (
                 state.highScores.slice(0, 10).map((entry, index) => (
-                  <div key={index} className={`highscore-entry ${index < 3 ? getMedalClass(index) : ''}`}>
+                  <div key={index} className={`highscore-entry ${index < 3 ? getMedalClass(index) : ''}`} title={
+                    entry.date ?
+                      `Submitted: ${new Date(entry.date).toLocaleString('en-US', { timeZone: 'Europe/Berlin' })}` :
+                      'No submission date available'
+                  }>
                     <span className="hs-rank">#{index + 1}</span>
                     <span className="hs-name">{entry.name}</span>
                     <span className="hs-score">{entry.score}</span>

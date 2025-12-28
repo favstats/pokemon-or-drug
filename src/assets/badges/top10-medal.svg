@@ -1,0 +1,81 @@
+<svg width="100" height="130" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gold gradient for medal body -->
+    <linearGradient id="goldMedal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF6D5"/>
+      <stop offset="20%" stop-color="#FFD700"/>
+      <stop offset="50%" stop-color="#FFA500"/>
+      <stop offset="80%" stop-color="#FFD700"/>
+      <stop offset="100%" stop-color="#FFF6D5"/>
+    </linearGradient>
+    
+    <!-- Inner gold shine -->
+    <radialGradient id="goldShine" cx="30%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#FFFAF0"/>
+      <stop offset="100%" stop-color="#FFD700"/>
+    </radialGradient>
+    
+    <!-- Ribbon gradient -->
+    <linearGradient id="ribbonGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#8B0000"/>
+      <stop offset="50%" stop-color="#DC143C"/>
+      <stop offset="100%" stop-color="#8B0000"/>
+    </linearGradient>
+    
+    <!-- Shadow filter -->
+    <filter id="medalShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="4" stdDeviation="3" flood-opacity="0.4"/>
+    </filter>
+    
+    <!-- Glow effect -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Ribbon tails -->
+  <path d="M30 15 L25 45 L35 35 L45 45 L40 15" fill="url(#ribbonGold)"/>
+  <path d="M60 15 L55 45 L65 35 L75 45 L70 15" fill="url(#ribbonGold)"/>
+  
+  <!-- Ribbon top band -->
+  <rect x="28" y="5" width="44" height="20" rx="3" fill="url(#ribbonGold)" filter="url(#medalShadow)"/>
+  <rect x="32" y="9" width="36" height="12" rx="2" fill="#FFD700" opacity="0.3"/>
+  
+  <!-- Medal body -->
+  <circle cx="50" cy="75" r="40" fill="url(#goldMedal)" filter="url(#medalShadow)" stroke="#B8860B" stroke-width="3"/>
+  
+  <!-- Medal inner ring -->
+  <circle cx="50" cy="75" r="32" fill="url(#goldShine)" stroke="#DAA520" stroke-width="2"/>
+  
+  <!-- Large star design in center -->
+  <polygon 
+    points="50,45 55,60 71,60 58,70 63,85 50,76 37,85 42,70 29,60 45,60" 
+    fill="#FFD700" 
+    stroke="#B8860B" 
+    stroke-width="1.5"
+    filter="url(#glow)"
+  />
+  
+  <!-- Inner star highlight -->
+  <polygon 
+    points="50,52 53,61 62,61 55,67 58,76 50,71 42,76 45,67 38,61 47,61" 
+    fill="#FFA500" 
+    opacity="0.6"
+  />
+  
+  <!-- Decorative laurel leaves -->
+  <path d="M20 75 Q25 65 30 75 Q25 85 20 75" fill="#B8860B" opacity="0.6"/>
+  <path d="M80 75 Q75 65 70 75 Q75 85 80 75" fill="#B8860B" opacity="0.6"/>
+  <path d="M22 82 Q27 72 32 82 Q27 92 22 82" fill="#B8860B" opacity="0.5"/>
+  <path d="M78 82 Q73 72 68 82 Q73 92 78 82" fill="#B8860B" opacity="0.5"/>
+  
+  <!-- Decorative dots around edge -->
+  <circle cx="50" cy="38" r="2.5" fill="#B8860B"/>
+  <circle cx="87" cy="75" r="2.5" fill="#B8860B"/>
+  <circle cx="50" cy="112" r="2.5" fill="#B8860B"/>
+  <circle cx="13" cy="75" r="2.5" fill="#B8860B"/>
+</svg>

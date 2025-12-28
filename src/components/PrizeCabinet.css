@@ -1,0 +1,1058 @@
+/* Prize Cabinet Styles - Trophy Case Design */
+.prize-cabinet-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.prize-cabinet {
+  /* Wooden cabinet frame */
+  background: linear-gradient(180deg, #5D4037 0%, #4E342E 5%, #3E2723 100%);
+  border-radius: 12px;
+  border: 8px solid #6D4C41;
+  box-shadow: 
+    0 25px 80px rgba(0, 0, 0, 0.7),
+    inset 0 2px 4px rgba(255, 255, 255, 0.1),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+    0 0 0 4px #4E342E,
+    0 0 0 8px #3E2723;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Wood grain texture overlay */
+.prize-cabinet::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px
+    );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.cabinet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  /* Ornate top piece */
+  background: linear-gradient(180deg, #8D6E63 0%, #6D4C41 50%, #5D4037 100%);
+  border-bottom: 4px solid #4E342E;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Decorative brass corners */
+.cabinet-header::before,
+.cabinet-header::after {
+  content: '◆';
+  position: absolute;
+  color: #D4AF37;
+  font-size: 1rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.cabinet-header::before {
+  left: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.cabinet-header::after {
+  right: 3.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.cabinet-header h2 {
+  color: #FFD700;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(255, 215, 0, 0.3);
+  letter-spacing: 1px;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.cabinet-header h2 svg {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.close-btn {
+  background: linear-gradient(145deg, #8D6E63 0%, #5D4037 100%);
+  border: 2px solid #D4AF37;
+  color: #D4AF37;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.close-btn:hover {
+  background: linear-gradient(145deg, #5D4037 0%, #3E2723 100%);
+  transform: scale(1.1);
+}
+
+.cabinet-content {
+  /* Glass display case interior */
+  background: linear-gradient(180deg, 
+    rgba(20, 30, 48, 0.95) 0%, 
+    rgba(15, 25, 40, 0.98) 100%
+  );
+  padding: 0;
+  max-height: calc(90vh - 100px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  z-index: 1;
+  /* Glass reflection effect */
+  box-shadow: 
+    inset 0 20px 60px rgba(255, 255, 255, 0.05),
+    inset 0 -20px 60px rgba(0, 0, 0, 0.3);
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Glass shine overlay */
+.cabinet-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: linear-gradient(180deg, 
+    rgba(255, 255, 255, 0.08) 0%, 
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Medal Count - Brass plaque */
+.medal-count {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: #3E2723;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin: 1rem auto 0;
+  padding: 0.5rem 1.5rem;
+  background: linear-gradient(145deg, #D4AF37 0%, #B8860B 50%, #D4AF37 100%);
+  border: 2px solid #8B7355;
+  border-radius: 4px;
+  width: fit-content;
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family: Georgia, serif;
+}
+
+.medal-count svg {
+  color: #3E2723;
+}
+
+/* Empty State */
+.empty-cabinet {
+  text-align: center;
+  color: #a0aec0;
+  padding: 4rem 2rem;
+}
+
+.empty-icon {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 1.5rem;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed rgba(212, 175, 55, 0.4);
+}
+
+.empty-icon svg {
+  font-size: 3rem;
+  color: rgba(212, 175, 55, 0.5);
+}
+
+.empty-cabinet h3 {
+  color: #e2e8f0;
+  font-size: 1.4rem;
+  margin: 0 0 0.75rem 0;
+  font-family: Georgia, serif;
+}
+
+.empty-cabinet p {
+  font-size: 1rem;
+  max-width: 350px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Medal Shelf - Wooden cabinet interior */
+.medal-shelf {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 1rem 0 0;
+}
+
+/* Shelf Unit - Contains medals and shelf plank */
+.shelf-unit {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Medals row on shelf */
+.shelf-medals {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 1.25rem;
+  padding: 1.25rem 1.5rem 1rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* Wooden shelf plank */
+.shelf-plank {
+  height: 18px;
+  background: linear-gradient(180deg, 
+    #A1887F 0%,
+    #8D6E63 15%, 
+    #6D4C41 50%, 
+    #5D4037 85%,
+    #4E342E 100%
+  );
+  border-top: 2px solid #BCAAA4;
+  box-shadow: 
+    0 8px 20px rgba(0, 0, 0, 0.6),
+    0 4px 8px rgba(0, 0, 0, 0.4),
+    inset 0 2px 0 rgba(255, 255, 255, 0.15);
+  position: relative;
+  margin: 0 0.5rem;
+  border-radius: 0 0 2px 2px;
+}
+
+/* Shelf brackets */
+.shelf-bracket {
+  position: absolute;
+  bottom: -20px;
+  width: 12px;
+  height: 20px;
+  background: linear-gradient(90deg, #5D4037 0%, #6D4C41 50%, #5D4037 100%);
+  border: 1px solid #4E342E;
+  border-radius: 0 0 3px 3px;
+}
+
+.shelf-bracket.left {
+  left: 30px;
+}
+
+.shelf-bracket.right {
+  right: 30px;
+}
+
+/* Wood grain on shelf */
+.shelf-plank::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 20px,
+    rgba(0, 0, 0, 0.05) 20px,
+    rgba(0, 0, 0, 0.05) 40px
+  );
+  pointer-events: none;
+}
+
+/* Medal Card - Glass display pedestal */
+.medal-card {
+  background: linear-gradient(180deg, 
+    rgba(255, 255, 255, 0.08) 0%, 
+    rgba(255, 255, 255, 0.03) 50%,
+    rgba(0, 0, 0, 0.1) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 0.5rem 0.6rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: visible;
+  width: 145px;
+  flex-shrink: 0;
+  /* Glass effect */
+  backdrop-filter: blur(4px);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Velvet base pad */
+.medal-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #4A1C40 0%, #6B2C5A 50%, #4A1C40 100%);
+  border-radius: 0 0 10px 10px;
+  opacity: 0.8;
+}
+
+.medal-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 
+    0 12px 30px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(255, 215, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  border-color: rgba(212, 175, 55, 0.4);
+}
+
+.medal-card.selected {
+  border-color: #D4AF37;
+  box-shadow: 
+    0 12px 30px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(212, 175, 55, 0.3);
+}
+
+/* Rank Badge - Brass engraved plaque */
+.rank-badge {
+  position: absolute;
+  top: -12px;
+  right: -8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+  border: 2px solid;
+  font-weight: 800;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  z-index: 5;
+}
+
+.rank-emoji {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.rank-number {
+  font-size: 0.8rem;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+}
+
+/* Medal Visual - League Badge as Centerpiece */
+.medal-visual {
+  position: relative;
+  margin: 0;
+  width: 90px;
+  height: 95px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Ribbon */
+.medal-ribbon {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 30px;
+  z-index: 1;
+}
+
+.ribbon-band {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 16px;
+  background: linear-gradient(180deg, 
+    var(--ribbon-primary) 0%, 
+    var(--ribbon-secondary) 100%
+  );
+  border-radius: 3px 3px 0 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.ribbon-band::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+}
+
+.ribbon-tail {
+  position: absolute;
+  top: 6px;
+  width: 14px;
+  height: 22px;
+  background: linear-gradient(180deg, 
+    var(--ribbon-primary) 0%, 
+    var(--ribbon-secondary) 100%
+  );
+}
+
+.ribbon-tail.left {
+  left: 22px;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 75%, 0 100%);
+}
+
+.ribbon-tail.right {
+  right: 22px;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 75%, 0 100%);
+}
+
+/* Medal Frame */
+.medal-frame {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.medal-frame.top10 {
+  background: linear-gradient(145deg, #C9A961 0%, #A68B4B 50%, #C9A961 100%);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.25),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.medal-frame.dailyTop10 {
+  background: linear-gradient(145deg, #9CA3AF 0%, #6B7280 50%, #9CA3AF 100%);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.25),
+    inset 0 1px 2px rgba(255, 255, 255, 0.25),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.medal-ring {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.medal-ring.outer {
+  width: 56px;
+  height: 56px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+}
+
+.medal-ring.inner {
+  width: 50px;
+  height: 50px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+/* League Badge - Centerpiece */
+.league-badge-center {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  z-index: 3;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  transition: all 0.3s ease;
+}
+
+.medal-card:hover .league-badge-center {
+  transform: scale(1.1);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+}
+
+.medal-card:hover .medal-visual {
+  transform: scale(1.05) rotate(-2deg);
+}
+
+/* Medal Info - Elegant brass plaque */
+.medal-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  text-align: center;
+  background: linear-gradient(180deg, 
+    #D4AF37 0%,
+    #C9A227 50%,
+    #B8960F 100%
+  );
+  padding: 0.35rem 0.5rem;
+  border-radius: 3px;
+  border: 1px solid #8B7355;
+  width: 100%;
+  margin-top: 0.25rem;
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+}
+
+.medal-rank {
+  font-size: 0.8rem;
+  color: #3E2723;
+  font-weight: 800;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+  line-height: 1.2;
+}
+
+.medal-score {
+  font-size: 0.75rem;
+  color: #5D4037;
+  font-weight: 700;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+  line-height: 1.2;
+}
+
+/* Medal Details Panel - Display Shelf */
+.medal-details {
+  margin: 1.5rem 0.5rem;
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
+  position: relative;
+  padding-bottom: 2rem;
+}
+
+/* Wooden shelf backdrop */
+.medal-details::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -0.5rem;
+  right: -0.5rem;
+  bottom: -1rem;
+  background: linear-gradient(180deg, 
+    #8D6E63 0%,
+    #6D4C41 20%,
+    #5D4037 60%,
+    #4E342E 100%
+  );
+  border-radius: 4px;
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.5),
+    inset 0 2px 4px rgba(255, 255, 255, 0.1);
+  z-index: 0;
+}
+
+/* Shelf edge */
+.medal-details::after {
+  content: '';
+  position: absolute;
+  bottom: -1rem;
+  left: -0.5rem;
+  right: -0.5rem;
+  height: 20px;
+  background: linear-gradient(180deg, 
+    #A1887F 0%,
+    #8D6E63 15%, 
+    #6D4C41 50%, 
+    #5D4037 85%,
+    #4E342E 100%
+  );
+  border-top: 2px solid #BCAAA4;
+  box-shadow: 
+    0 8px 20px rgba(0, 0, 0, 0.6),
+    0 4px 8px rgba(0, 0, 0, 0.4),
+    inset 0 2px 0 rgba(255, 255, 255, 0.15);
+  z-index: 1;
+}
+
+.details-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: calc(100% + 1rem);
+  margin: 0 -0.5rem 1rem;
+  padding: 0.6rem 1rem;
+  background: linear-gradient(180deg, #5D4037 0%, #4E342E 100%);
+  border: none;
+  border-bottom: 2px solid #6D4C41;
+  color: #BCAAA4;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.details-close-btn:hover {
+  background: linear-gradient(180deg, #6D4C41 0%, #5D4037 100%);
+  color: #FFD700;
+}
+
+.details-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  padding: 1.5rem 2rem 2rem;
+  background: transparent;
+  position: relative;
+  z-index: 2;
+}
+
+.details-visual {
+  position: relative;
+  flex-shrink: 0;
+  /* Display pedestal on shelf */
+  background: radial-gradient(ellipse at center bottom, 
+    rgba(107, 44, 90, 0.3) 0%, 
+    rgba(74, 28, 64, 0.2) 40%,
+    transparent 100%
+  );
+  padding: 1rem 1.5rem 1.5rem;
+  border-radius: 8px 8px 0 0;
+  width: 140px;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  /* Shelf lighting effect */
+  box-shadow: 
+    inset 0 -20px 40px rgba(0, 0, 0, 0.2),
+    0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Details Ribbon */
+.details-ribbon {
+  position: absolute;
+  top: 10px;
+  width: 100%;
+  height: 60px;
+  z-index: 1;
+}
+
+.details-ribbon .ribbon-band {
+  width: 60px;
+  height: 26px;
+}
+
+.details-ribbon .ribbon-band::after {
+  width: 48px;
+  height: 16px;
+}
+
+.details-ribbon .ribbon-tail {
+  width: 22px;
+  height: 45px;
+}
+
+.details-ribbon .ribbon-tail.left {
+  left: 22px;
+}
+
+.details-ribbon .ribbon-tail.right {
+  right: 22px;
+}
+
+/* Details Medal Frame */
+.details-medal-frame {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.details-medal-frame.top10 {
+  background: linear-gradient(145deg, #C9A961 0%, #A68B4B 50%, #C9A961 100%);
+  box-shadow: 
+    0 6px 20px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.details-medal-frame.dailyTop10 {
+  background: linear-gradient(145deg, #9CA3AF 0%, #6B7280 50%, #9CA3AF 100%);
+  box-shadow: 
+    0 6px 20px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.3),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.details-medal-frame .medal-ring.outer {
+  width: 84px;
+  height: 84px;
+}
+
+.details-medal-frame .medal-ring.inner {
+  width: 74px;
+  height: 74px;
+}
+
+.details-league-badge {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  z-index: 3;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
+}
+
+.details-rank {
+  margin-top: auto;
+  padding: 0.5rem 0.9rem;
+  border-radius: 6px;
+  border: 2px solid;
+  font-weight: 800;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  z-index: 5;
+}
+
+.details-text {
+  flex: 1;
+  background: linear-gradient(180deg, 
+    rgba(30, 30, 40, 0.95) 0%,
+    rgba(20, 20, 30, 0.98) 100%
+  );
+  padding: 1.25rem 1.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.details-text h3 {
+  color: #FFD700;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: Georgia, serif;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.details-league {
+  color: #E2E8F0;
+  font-size: 1rem;
+  margin: 0 0 1.25rem 0;
+  font-family: Georgia, serif;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.details-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.stat-item:last-child {
+  border-bottom: none;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #BCAAA4;
+  font-weight: 600;
+  min-width: 60px;
+}
+
+.stat-value {
+  font-size: 1rem;
+  color: #E2E8F0;
+  font-weight: 700;
+  text-align: right;
+  flex: 1;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+  .prize-cabinet {
+    margin: 0.5rem;
+    max-height: calc(100vh - 1rem);
+    border-radius: 10px;
+    border-width: 5px;
+  }
+
+  .cabinet-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .cabinet-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .cabinet-header::before,
+  .cabinet-header::after {
+    display: none;
+  }
+
+  .medal-shelf {
+    padding: 1rem;
+  }
+
+  .medal-card {
+    width: 120px;
+    padding: 0.4rem 0.4rem 0.4rem;
+  }
+
+  .shelf-medals {
+    gap: 0.75rem;
+    padding: 0.75rem 0.75rem 0.5rem;
+  }
+
+  .medal-visual {
+    width: 75px;
+    height: 80px;
+  }
+
+  .medal-frame {
+    width: 50px;
+    height: 50px;
+    top: 14px;
+  }
+
+  .league-badge-center {
+    width: 32px;
+    height: 32px;
+  }
+
+  .medal-ring.outer {
+    width: 46px;
+    height: 46px;
+  }
+
+  .medal-ring.inner {
+    width: 42px;
+    height: 42px;
+  }
+
+  .ribbon-band {
+    width: 32px;
+    height: 12px;
+  }
+
+  .ribbon-tail {
+    width: 12px;
+    height: 18px;
+    top: 5px;
+  }
+
+  .ribbon-tail.left {
+    left: 18px;
+  }
+
+  .ribbon-tail.right {
+    right: 18px;
+  }
+
+  .medal-info {
+    padding: 0.5rem 0.6rem;
+  }
+
+  .medal-rank {
+    font-size: 0.75rem;
+  }
+
+  .medal-score {
+    font-size: 0.7rem;
+  }
+
+  .medal-details {
+    margin: 1rem 0.25rem;
+  }
+
+  .medal-details::before,
+  .medal-details::after {
+    left: -0.25rem;
+    right: -0.25rem;
+  }
+
+  .details-close-btn {
+    width: calc(100% + 0.5rem);
+    margin: 0 -0.25rem 1rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .details-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+    padding: 1rem 1rem 1.5rem;
+  }
+
+  .details-visual {
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+    min-height: 160px;
+    padding: 1rem;
+    margin: 0 auto;
+  }
+
+  .details-medal-frame {
+    width: 80px;
+    height: 80px;
+    top: 40px;
+    margin: 0 auto;
+  }
+
+  .details-league-badge {
+    width: 54px;
+    height: 54px;
+  }
+
+  .details-ribbon {
+    width: 100%;
+  }
+
+  .details-ribbon .ribbon-band {
+    width: 60px;
+    height: 24px;
+  }
+
+  .details-ribbon .ribbon-tail {
+    width: 20px;
+    height: 40px;
+  }
+
+  .details-ribbon .ribbon-tail.left {
+    left: calc(50% - 50px);
+  }
+
+  .details-ribbon .ribbon-tail.right {
+    right: calc(50% - 50px);
+  }
+
+  .details-rank {
+    margin-top: 0.75rem;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .details-text {
+    padding: 1rem;
+    text-align: left;
+  }
+
+  .details-text h3 {
+    justify-content: flex-start;
+    font-size: 1.1rem;
+  }
+
+  .details-league {
+    text-align: left;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+  }
+
+  .details-stats {
+    gap: 0.6rem;
+    margin-top: 0.75rem;
+  }
+
+  .stat-item {
+    padding: 0.4rem 0;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+    min-width: 50px;
+  }
+
+  .stat-value {
+    font-size: 0.9rem;
+    text-align: right;
+  }
+
+  .stat-item {
+    align-items: center;
+  }
+}

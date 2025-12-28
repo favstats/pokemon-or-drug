@@ -5,15 +5,16 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbx2xuBfJE6j4b44xHR7MTqT
 const CACHE_KEY_PREFIX = 'pord_global_scores_cache';
 const CACHE_DURATION = 60 * 1000; // 1 minute cache
 
-// Get cache key for a specific league
-function getCacheKey(league) {
-  return `${CACHE_KEY_PREFIX}_${league || 'all'}`;
+// Get cache key for a specific league and period
+function getCacheKey(league, period = null) {
+  const timezone = period === 'daily' ? '_cet' : '';
+  return `${CACHE_KEY_PREFIX}_${league || 'all'}_${period || 'alltime'}${timezone}`;
 }
 
 // Get cached scores if still valid
-function getCachedScores(league) {
+function getCachedScores(league, period = null) {
   try {
-    const cached = localStorage.getItem(getCacheKey(league));
+    const cached = localStorage.getItem(getCacheKey(league, period));
     if (cached) {
       const { scores, timestamp } = JSON.parse(cached);
       if (Date.now() - timestamp < CACHE_DURATION) {
@@ -27,9 +28,9 @@ function getCachedScores(league) {
 }
 
 // Save scores to cache
-function setCachedScores(scores, league) {
+function setCachedScores(scores, league, period = null) {
   try {
-    localStorage.setItem(getCacheKey(league), JSON.stringify({
+    localStorage.setItem(getCacheKey(league, period), JSON.stringify({
       scores,
       timestamp: Date.now()
     }));
@@ -39,42 +40,94 @@ function setCachedScores(scores, league) {
 }
 
 // Fetch global high scores (with caching and optional league filter)
-export async function fetchGlobalScores(forceRefresh = false, league = null) {
+export async function fetchGlobalScores(forceRefresh = false, league = null, period = null) {
   // Return cached if available and not forcing refresh
   if (!forceRefresh) {
-    const cached = getCachedScores(league);
+    const cached = getCachedScores(league, period);
     if (cached) {
       return cached;
     }
   }
-  
+
   try {
-    // Build URL with league parameter if specified
+    // Build URL with league and period parameters if specified
     let url = API_URL;
+    const params = new URLSearchParams();
+
     if (league) {
-      url += `?league=${encodeURIComponent(league)}`;
+      params.append('league', league);
     }
-    
+
+    if (period) {
+      params.append('period', period);
+      // For daily filtering, specify German timezone (CET/CEST)
+      if (period === 'daily') {
+        params.append('timezone', 'Europe/Berlin');
+      }
+    }
+
+    if (params.toString()) {
+      url += `?${params.toString()}`;
+    }
+
     const response = await fetch(url, {
       method: 'GET',
     });
-    
+
     if (!response.ok) {
       console.warn('Could not fetch global scores');
-      return getCachedScores(league) || [];
+      return getCachedScores(league, period) || [];
     }
-    
+
     const data = await response.json();
     const scores = data.success ? data.scores : [];
-    
+
+    // For daily filtering, apply client-side date filtering as fallback
+    let filteredScores = scores;
+    if (period === 'daily') {
+      try {
+        const now = new Date();
+        const germanTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Berlin' }));
+        const today = new Date(germanTime.getFullYear(), germanTime.getMonth(), germanTime.getDate());
+
+        filteredScores = scores.filter(entry => {
+          let entryDate = null;
+
+          // Try different timestamp fields
+          if (entry.timestamp) {
+            entryDate = new Date(entry.timestamp);
+          } else if (entry.date) {
+            entryDate = new Date(entry.date);
+          } else if (entry.createdAt) {
+            entryDate = new Date(entry.createdAt);
+          }
+
+          if (entryDate && !isNaN(entryDate.getTime())) {
+            // Convert to German timezone for comparison
+            const germanEntryDate = new Date(entryDate.toLocaleString('en-US', { timeZone: 'Europe/Berlin' }));
+            const entryDay = new Date(germanEntryDate.getFullYear(), germanEntryDate.getMonth(), germanEntryDate.getDate());
+
+            const isToday = entryDay.getTime() === today.getTime();
+            return isToday;
+          } else {
+            // Keep entries without valid timestamps (backwards compatibility)
+            return true;
+          }
+        });
+      } catch (error) {
+        console.error('Error in daily filtering:', error);
+        filteredScores = scores; // Fallback to original scores if filtering fails
+      }
+    }
+
     // Cache the results
-    setCachedScores(scores, league);
-    
-    return scores;
+    setCachedScores(filteredScores, league, period);
+
+    return filteredScores;
   } catch (error) {
     console.warn('Error fetching global scores:', error);
     // Return cached scores as fallback
-    return getCachedScores(league) || [];
+    return getCachedScores(league, period) || [];
   }
 }
 
@@ -114,7 +167,7 @@ export async function submitGlobalScore(scoreData) {
     }
     
     // Fetch updated scores after submission (force refresh for this league)
-    return await fetchGlobalScores(true, scoreData.league);
+    return await fetchGlobalScores(true, scoreData.league, null);
   } catch (error) {
     console.warn('Error submitting global score:', error);
     return [];
