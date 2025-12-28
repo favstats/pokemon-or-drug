@@ -136,8 +136,21 @@ function StartScreen() {
   const handleModeSelect = (mode) => {
     play('select');
     if (mode === 'single') {
-      setPlayerNames(['']);
-      setPlayerIcons(['🎮']);
+      // Load cached single player info
+      const cachedPlayer = localStorage.getItem('pord_last_player');
+      if (cachedPlayer) {
+        try {
+          const { name, icon } = JSON.parse(cachedPlayer);
+          setPlayerNames([name || '']);
+          setPlayerIcons([icon || '🎮']);
+        } catch {
+          setPlayerNames(['']);
+          setPlayerIcons(['🎮']);
+        }
+      } else {
+        setPlayerNames(['']);
+        setPlayerIcons(['🎮']);
+      }
     }
     actions.setGameMode(mode);
   };
@@ -190,6 +203,15 @@ function StartScreen() {
       icon: playerIcons[index] || '🎮'
     }));
     actions.setPlayers(playersWithIcons);
+    
+    // Cache single player info for next time
+    if (state.gameMode === 'single' && playerNames[0]) {
+      localStorage.setItem('pord_last_player', JSON.stringify({
+        name: playerNames[0],
+        icon: playerIcons[0] || '🎮'
+      }));
+    }
+    
     // Go to league selection instead of directly starting
     actions.goToLeagueSelect();
   };
