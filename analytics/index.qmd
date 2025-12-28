@@ -121,6 +121,14 @@ This dashboard provides insights into game play patterns, league preferences, an
 <div class='card mb-3' style='border-left: 4px solid #2E8B57;'>  <div class='card-body'>    <div class='d-flex justify-content-between align-items-start'>      <div>        <h6 class='card-subtitle mb-2 text-muted'>Average Accuracy</h6>        <h2 class='card-title mb-1'>93.4%</h2>                </div>      <div class='text-primary'>{{< iconify ph:target size=2em >}}</div>    </div>  </div></div>
 ```
 
+```{=html}
+<div class='card mb-3' style='border-left: 4px solid #6A4C93;'>  <div class='card-body'>    <div class='d-flex justify-content-between align-items-start'>      <div>        <h6 class='card-subtitle mb-2 text-muted'>Games Today</h6>        <h2 class='card-title mb-1' id='games-today'>-</h2>                </div>      <div class='text-primary'>{{< iconify ph:calendar size=2em >}}</div>    </div>  </div></div>
+```
+
+```{=html}
+<div class='card mb-3' style='border-left: 4px solid #FF6B6B;'>  <div class='card-body'>    <div class='d-flex justify-content-between align-items-start'>      <div>        <h6 class='card-subtitle mb-2 text-muted'>Games Last Hour</h6>        <h2 class='card-title mb-1' id='games-last-hour'>-</h2>                </div>      <div class='text-primary'>{{< iconify ph:clock size=2em >}}</div>    </div>  </div></div>
+```
+
 
 <div style='height: 1rem;'></div>
 
@@ -449,13 +457,41 @@ This dashboard provides insights into game play patterns, league preferences, an
     const avgScore = Math.round(data.reduce((sum, d) => sum + (d.Score || 0), 0) / totalGames);
     const avgAccuracy = (data.reduce((sum, d) => sum + (d.Accuracy || 0), 0) / totalGames).toFixed(1);
     
-    // Try to update metric elements (adjust selectors based on actual structure)
+    // Calculate games today
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const gamesToday = data.filter(d => {
+      if (!d.Date) return false;
+      const gameDate = new Date(d.Date);
+      return gameDate >= todayStart;
+    }).length;
+    
+    // Calculate games in last hour
+    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+    const gamesLastHour = data.filter(d => {
+      if (!d.Date) return false;
+      const gameDate = new Date(d.Date);
+      return gameDate >= oneHourAgo;
+    }).length;
+    
+    // Update metric elements
     document.querySelectorAll(".metric-value, [class*="value"]").forEach((el, idx) => {
       const values = [totalGames, uniquePlayers, avgScore, avgAccuracy + "%"];
       if (values[idx]) {
         el.textContent = values[idx];
       }
     });
+    
+    // Update games today and last hour
+    const gamesTodayEl = document.getElementById('games-today');
+    if (gamesTodayEl) {
+      gamesTodayEl.textContent = gamesToday;
+    }
+    
+    const gamesLastHourEl = document.getElementById('games-last-hour');
+    if (gamesLastHourEl) {
+      gamesLastHourEl.textContent = gamesLastHour;
+    }
   }
   
   // Initialize when page loads

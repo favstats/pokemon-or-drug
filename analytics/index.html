@@ -463,6 +463,8 @@ section {
   .stat-card:nth-child(2) .stat-icon-wrapper { background: #fce7f3; color: #be185d; }
   .stat-card:nth-child(3) .stat-icon-wrapper { background: #fef3c7; color: #d97706; }
   .stat-card:nth-child(4) .stat-icon-wrapper { background: #d1fae5; color: #059669; }
+  .stat-card:nth-child(5) .stat-icon-wrapper { background: #e9d5ff; color: #7c3aed; }
+  .stat-card:nth-child(6) .stat-icon-wrapper { background: #fee2e2; color: #dc2626; }
 
   .stat-label {
     font-size: 0.8125rem;
@@ -777,6 +779,25 @@ section {
                 <div class="stat-value" id="metric-avg-accuracy">-</div>
               </div>
               <div class="stat-icon-wrapper"><i class="fas fa-bullseye"></i></div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-header">
+              <div>
+                <div class="stat-label">Games Today</div>
+                <div class="stat-value" id="metric-games-today">-</div>
+                <div class="stat-comparison" id="metric-games-today-comparison" style="font-size: 0.75rem; margin-top: 0.25rem; color: #6b7280;"></div>
+              </div>
+              <div class="stat-icon-wrapper"><i class="fas fa-calendar-day"></i></div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-header">
+              <div>
+                <div class="stat-label">Games Last Hour</div>
+                <div class="stat-value" id="metric-games-last-hour">-</div>
+              </div>
+              <div class="stat-icon-wrapper"><i class="fas fa-clock"></i></div>
             </div>
           </div>
   </div>
@@ -1291,16 +1312,72 @@ section {
     const avgScore = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
     const avgAccuracy = accuracies.length > 0 ? (accuracies.reduce((a, b) => a + b, 0) / accuracies.length).toFixed(1) : 0;
     
+    // Calculate games today
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const gamesToday = allData.filter(d => {
+      if (!d.Date) return false;
+      const gameDate = new Date(d.Date);
+      return gameDate >= todayStart;
+    }).length;
+    
+    // Calculate games yesterday at the same time point
+    const yesterdayStart = new Date(todayStart);
+    yesterdayStart.setDate(yesterdayStart.getDate() - 1);
+    const yesterdayEnd = new Date(now);
+    yesterdayEnd.setDate(yesterdayEnd.getDate() - 1);
+    const gamesYesterday = allData.filter(d => {
+      if (!d.Date) return false;
+      const gameDate = new Date(d.Date);
+      return gameDate >= yesterdayStart && gameDate <= yesterdayEnd;
+    }).length;
+    
+    // Calculate games in last hour
+    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+    const gamesLastHour = allData.filter(d => {
+      if (!d.Date) return false;
+      const gameDate = new Date(d.Date);
+      return gameDate >= oneHourAgo;
+    }).length;
+    
     document.getElementById('metric-total-games').textContent = totalGames.toLocaleString();
     document.getElementById('metric-unique-players').textContent = uniquePlayers.toLocaleString();
     document.getElementById('metric-avg-score').textContent = avgScore.toLocaleString();
     document.getElementById('metric-avg-accuracy').textContent = avgAccuracy + '%';
+    
+    // Update new metrics
+    const gamesTodayEl = document.getElementById('metric-games-today');
+    if (gamesTodayEl) {
+      gamesTodayEl.textContent = gamesToday.toLocaleString();
+    }
+    
+    // Update comparison with yesterday
+    const gamesTodayComparisonEl = document.getElementById('metric-games-today-comparison');
+    if (gamesTodayComparisonEl && gamesYesterday > 0) {
+      const difference = gamesToday - gamesYesterday;
+      const percentChange = ((difference / gamesYesterday) * 100).toFixed(1);
+      const isPositive = difference >= 0;
+      const sign = isPositive ? '+' : '';
+      const color = isPositive ? '#059669' : '#dc2626';
+      const arrow = isPositive ? '↑' : '↓';
+      gamesTodayComparisonEl.innerHTML = `<span style="color: ${color};">${arrow} ${sign}${difference.toLocaleString()} (${sign}${percentChange}%)</span> vs yesterday`;
+    } else if (gamesTodayComparisonEl) {
+      gamesTodayComparisonEl.textContent = 'No data for yesterday';
+    }
+    
+    const gamesLastHourEl = document.getElementById('metric-games-last-hour');
+    if (gamesLastHourEl) {
+      gamesLastHourEl.textContent = gamesLastHour.toLocaleString();
+    }
     
     console.log(`📈 Summary Metrics:
       Total Games: ${totalGames}
       Unique Players: ${uniquePlayers}
       Avg Score: ${avgScore}
       Avg Accuracy: ${avgAccuracy}%
+      Games Today: ${gamesToday}
+      Games Yesterday (same time): ${gamesYesterday}
+      Games Last Hour: ${gamesLastHour}
       Filtered Games: ${filteredData.length}
     `);
   }
