@@ -98,7 +98,7 @@ cat('hourly_agg loaded:', nrow(hourly_agg), 'rows,', ncol(hourly_agg), 'columns\
 ```
 
 
-**Last Updated**: 2025-12-27 11:58:54 CET (data fetched from Google Sheets)
+**Last Updated**: 2025-12-27 12:00:20 CET (data fetched from Google Sheets)
 
 
 ## time

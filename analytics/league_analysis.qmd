@@ -100,7 +100,7 @@ table_obj_1 <- readRDS('table_obj_1.rds')
 
 # League Performance Statistics
 
-**Last Updated**: 2025-12-27 11:58:54 CET (data fetched from Google Sheets)
+**Last Updated**: 2025-12-27 12:00:20 CET (data fetched from Google Sheets)
 
 The table below shows aggregated statistics for each league:
 
