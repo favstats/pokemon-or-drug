@@ -615,13 +615,13 @@ function GameOver() {
             <div className="score-tabs">
               <button
                 className={`score-tab ${scoreTab === 'daily' ? 'active' : ''}`}
-                onClick={() => { setScoreTab('daily'); actions.loadDailyScores(null); }}
+                onClick={() => { setScoreTab('daily'); actions.loadDailyScores(leagueFilter); }}
               >
                 <FontAwesomeIcon icon={faCalendarAlt} /> Daily
               </button>
               <button
                 className={`score-tab ${scoreTab === 'global' ? 'active' : ''}`}
-                onClick={() => setScoreTab('global')}
+                onClick={() => { setScoreTab('global'); actions.loadGlobalScores(leagueFilter); }}
               >
                 <FontAwesomeIcon icon={faGlobe} /> Global
               </button>
@@ -633,7 +633,7 @@ function GameOver() {
               </button>
               <button
                 className={`score-tab ${scoreTab === 'stats' ? 'active' : ''}`}
-                onClick={() => { setScoreTab('stats'); actions.loadGlobalScores(null); }}
+                onClick={() => { setScoreTab('stats'); actions.loadGlobalScores(leagueFilter); }}
               >
                 <FontAwesomeIcon icon={faChartLine} /> Stats
               </button>
@@ -690,7 +690,7 @@ function GameOver() {
                   <>
                     <div className="stats-intro">
                       <span className="stats-count">
-                        Compared to <strong>{playerStats.totalPlayers}</strong> players globally
+                        Compared to <strong>{playerStats.totalPlayers}</strong> players {state.selectedLeague ? `in ${LEAGUES[state.selectedLeague]?.name || 'this league'}` : 'globally'}
                       </span>
                     </div>
                     <div className="bell-curves">
