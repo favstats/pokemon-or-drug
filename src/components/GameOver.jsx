@@ -536,7 +536,7 @@ function GameOver() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.75 }}
           >
-            {playerStats.top10Rank && completedAllRounds ? (
+            {(playerStats.top10Rank || playerStats.dailyTop10Rank) && completedAllRounds ? (
               <div className="top10-success">
                 <div className="medal-earned-celebration">
                   <motion.div 
@@ -556,7 +556,7 @@ function GameOver() {
                       )}
                     </div>
                     <div className="medal-rank-ribbon">
-                      <span>#{scoreTab === 'daily' ? (playerStats.dailyTop10Rank || playerStats.top10Rank) : playerStats.top10Rank}</span>
+                      <span>#{playerStats.dailyTop10Rank || playerStats.top10Rank}</span>
                     </div>
                   </motion.div>
                   <motion.div 
@@ -567,7 +567,7 @@ function GameOver() {
                   >
                     <span className="medal-earned-title">🎖️ BADGE EARNED! 🎖️</span>
                     <span className="medal-earned-type">
-                      {scoreTab === 'daily' ? '☀️ Daily Champion' : '🌟 Global Legend'}
+                      {playerStats.dailyTop10Rank ? '☀️ Daily Champion' : '🌟 Global Legend'}
                     </span>
                     <span className="medal-earned-hint">
                       View in your Trophy Cabinet from the main menu
@@ -576,7 +576,7 @@ function GameOver() {
                 </div>
                 <div className="top10-message">
                   <strong>Congratulations, {winner.name}!</strong>
-                  <p>You've earned your place in <span className={scoreTab === 'daily' ? 'todays-highlight' : 'alltime-highlight'}>{scoreTab === 'daily' ? 'today\'s' : 'the all-time'}</span> Hall of Fame for the <span className="league-highlight">{LEAGUES[state.selectedLeague]?.name}</span>! Ranked #{scoreTab === 'daily' ? (playerStats.dailyTop10Rank || playerStats.top10Rank) : playerStats.top10Rank} out of {playerStats.totalPlayers} trainers. Your dedication has been recognized by the Pokémon League!</p>
+                  <p>You've earned your place in <span className={playerStats.dailyTop10Rank ? 'todays-highlight' : 'alltime-highlight'}>{playerStats.dailyTop10Rank ? 'today\'s' : 'the all-time'}</span> Hall of Fame for the <span className="league-highlight">{LEAGUES[state.selectedLeague]?.name}</span>! Ranked #{playerStats.dailyTop10Rank || playerStats.top10Rank} out of {playerStats.totalPlayers} trainers. Your dedication has been recognized by the Pokémon League!</p>
                 </div>
               </div>
             ) : (playerStats.top10Rank || playerStats.dailyTop10Rank) && !completedAllRounds ? (
@@ -595,7 +595,7 @@ function GameOver() {
                   <p>You reached a <span className="points-highlight">Top 10 score</span> (#{scoreTab === 'daily' ? (playerStats.dailyTop10Rank || playerStats.top10Rank) : playerStats.top10Rank}) for the <span className="league-highlight">{LEAGUES[state.selectedLeague]?.name}</span>, but you need to <span className="complete-highlight">complete all rounds</span> to earn your badge. You're so close – <span className="very-best-highlight">keep training!</span></p>
                 </div>
               </div>
-            ) : playerStats.pointsFromTop10 !== null ? (
+            ) : (playerStats.dailyPointsFromTop10 !== null || playerStats.pointsFromTop10 !== null) ? (
               <div className="top10-encouragement">
                 {state.selectedLeague && badgeImages[state.selectedLeague] ? (
                   <img 
@@ -609,10 +609,10 @@ function GameOver() {
                 <div className="top10-message">
                   <strong>Keep Training, {winner.name}!</strong>
                   <p>You're just <span className="points-highlight">{
-                    scoreTab === 'daily'
-                      ? (playerStats.dailyPointsFromTop10 || playerStats.pointsFromTop10)
+                    playerStats.dailyPointsFromTop10 !== null 
+                      ? playerStats.dailyPointsFromTop10 
                       : playerStats.pointsFromTop10
-                  }</span> points away from entering <span className={scoreTab === 'daily' ? 'todays-highlight' : 'alltime-highlight'}>{scoreTab === 'daily' ? 'today\'s' : 'the all-time'}</span> Top 10 for the <span className="league-highlight">{LEAGUES[state.selectedLeague]?.name}</span>{(scoreTab === 'daily' ? playerStats.dailyPlayerRank : playerStats.playerRank) && ` (#${scoreTab === 'daily' ? playerStats.dailyPlayerRank : playerStats.playerRank})`}! Like a Pokémon evolving, you're getting stronger with each battle. Train harder and <span className="very-best-highlight">you'll be the very best!</span></p>
+                  }</span> points away from entering <span className={playerStats.dailyPointsFromTop10 !== null ? 'todays-highlight' : 'alltime-highlight'}>{playerStats.dailyPointsFromTop10 !== null ? 'today\'s' : 'the all-time'}</span> Top 10 for the <span className="league-highlight">{LEAGUES[state.selectedLeague]?.name}</span>{playerStats.dailyPlayerRank && ` (#${playerStats.dailyPlayerRank})`}! Like a Pokémon evolving, you're getting stronger with each battle. Train harder and <span className="very-best-highlight">you'll be the very best!</span></p>
                 </div>
               </div>
             ) : null}
