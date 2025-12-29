@@ -588,6 +588,7 @@ function gameReducer(state, action) {
       if (nextRound > state.settings.totalRounds || (!noLivesMode && alivePlayers.length === 0)) {
         return {
           ...state,
+          currentRound: nextRound, // Update so GameOver can detect completed all rounds
           gameStatus: 'gameover',
           gameMetadata: {
             ...state.gameMetadata,
