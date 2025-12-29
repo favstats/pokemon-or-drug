@@ -531,6 +531,11 @@
   font-weight: 700;
 }
 
+.top10-message .complete-highlight {
+  color: #FF6B6B;
+  font-weight: 700;
+}
+
 .top10-message .league-highlight {
   color: #FFE066;
   font-weight: 700;

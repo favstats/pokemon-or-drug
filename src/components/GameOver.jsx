@@ -274,10 +274,10 @@ function GameOver() {
     actions.loadDailyScores(league);
   }, [state.selectedLeague]);
 
-  // Award medals when player reaches top 10 (only for league games)
+  // Award medals when player reaches top 10 (only for league games AND completed all rounds)
   useEffect(() => {
-    // Only award medals if we're playing a league game
-    if (!state.selectedLeague) return;
+    // Only award medals if we're playing a league game AND completed all rounds
+    if (!state.selectedLeague || !completedAllRounds) return;
     
     const shouldAwardGlobal = DEBUG_FORCE_MEDAL && (DEBUG_MEDAL_TYPE === 'global' || DEBUG_MEDAL_TYPE === 'both');
     const actualRank = shouldAwardGlobal ? DEBUG_MEDAL_RANK : playerStats.top10Rank;
@@ -293,11 +293,11 @@ function GameOver() {
       };
       actions.awardMedal(medalData);
     }
-  }, [playerStats.top10Rank, state.selectedLeague, playerStats.playerScore]);
+  }, [playerStats.top10Rank, state.selectedLeague, playerStats.playerScore, completedAllRounds]);
 
   useEffect(() => {
-    // Only award medals if we're playing a league game
-    if (!state.selectedLeague) return;
+    // Only award medals if we're playing a league game AND completed all rounds
+    if (!state.selectedLeague || !completedAllRounds) return;
     
     const shouldAwardDaily = DEBUG_FORCE_MEDAL && (DEBUG_MEDAL_TYPE === 'daily' || DEBUG_MEDAL_TYPE === 'both');
     const actualRank = shouldAwardDaily ? DEBUG_MEDAL_RANK : playerStats.dailyTop10Rank;
@@ -313,7 +313,7 @@ function GameOver() {
       };
       actions.awardMedal(medalData);
     }
-  }, [playerStats.dailyTop10Rank, state.selectedLeague, playerStats.playerScore]);
+  }, [playerStats.dailyTop10Rank, state.selectedLeague, playerStats.playerScore, completedAllRounds]);
 
   // Save scores once (local + global if enabled)
   useEffect(() => {
@@ -536,7 +536,7 @@ function GameOver() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.75 }}
           >
-            {playerStats.top10Rank ? (
+            {playerStats.top10Rank && completedAllRounds ? (
               <div className="top10-success">
                 <div className="medal-earned-celebration">
                   <motion.div 
@@ -577,6 +577,22 @@ function GameOver() {
                 <div className="top10-message">
                   <strong>Congratulations, {winner.name}!</strong>
                   <p>You've earned your place in <span className={scoreTab === 'daily' ? 'todays-highlight' : 'alltime-highlight'}>{scoreTab === 'daily' ? 'today\'s' : 'the all-time'}</span> Hall of Fame for the <span className="league-highlight">{LEAGUES[state.selectedLeague]?.name}</span>! Ranked #{scoreTab === 'daily' ? (playerStats.dailyTop10Rank || playerStats.top10Rank) : playerStats.top10Rank} out of {playerStats.totalPlayers} trainers. Your dedication has been recognized by the Pokémon League!</p>
+                </div>
+              </div>
+            ) : (playerStats.top10Rank || playerStats.dailyTop10Rank) && !completedAllRounds ? (
+              <div className="top10-encouragement top10-almost">
+                {state.selectedLeague && badgeImages[state.selectedLeague] ? (
+                  <img 
+                    src={badgeImages[state.selectedLeague]} 
+                    alt={LEAGUES[state.selectedLeague]?.name} 
+                    className="top10-icon badge-icon" 
+                  />
+                ) : (
+                  <span className="top10-icon">🎯</span>
+                )}
+                <div className="top10-message">
+                  <strong>🎯 Top 10 Score, {winner.name}!</strong>
+                  <p>You reached a <span className="points-highlight">Top 10 score</span> (#{scoreTab === 'daily' ? (playerStats.dailyTop10Rank || playerStats.top10Rank) : playerStats.top10Rank}) for the <span className="league-highlight">{LEAGUES[state.selectedLeague]?.name}</span>, but you need to <span className="complete-highlight">complete all rounds</span> to earn your badge. You're so close – <span className="very-best-highlight">keep training!</span></p>
                 </div>
               </div>
             ) : playerStats.pointsFromTop10 !== null ? (
