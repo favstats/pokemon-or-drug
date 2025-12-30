@@ -36,6 +36,7 @@ import { faPaypal } from '@fortawesome/free-brands-svg-icons';
 import { useGame, LEAGUES } from '../context/GameContext';
 import { useSound } from '../context/SoundContext';
 import PrizeCabinet from './PrizeCabinet';
+import PlayerProfile from './PlayerProfile';
 
 // Import badge SVGs
 import BoulderBadge from '../assets/badges/boulder.svg';
@@ -100,6 +101,7 @@ function StartScreen() {
   const [showPrizeCabinet, setShowPrizeCabinet] = useState(false);
   const [scoreTab, setScoreTab] = useState('daily'); // 'daily', 'global' or 'local'
   const [leagueFilter, setLeagueFilter] = useState('boulder'); // league id (boulder, cascade, volcano, earth)
+  const [selectedPlayer, setSelectedPlayer] = useState(null); // { player, rank } for profile modal
 
   // Show mobile hint for first-time visitors
   useEffect(() => {
@@ -362,31 +364,54 @@ function StartScreen() {
                   </button>
                 ))}
               </div>
+              
+              {/* League title and unique player count display */}
+              {(() => {
+                const scores = scoreTab === 'daily' 
+                  ? state.dailyScores.filter(s => s.league === leagueFilter)
+                  : state.globalScores.filter(s => s.league === leagueFilter);
+                const uniqueCount = getUniquePlayerScores(scores).length;
+                const isLoading = scoreTab === 'daily' ? state.dailyScoresLoading : state.globalScoresLoading;
+                const leagueInfo = LEAGUES[leagueFilter];
+                
+                return (
+                  <div className="league-info-section">
+                    <div className="league-title-display">
+                      {badgeImages[leagueFilter] && (
+                        <img src={badgeImages[leagueFilter]} alt={leagueInfo?.badge} className="league-title-badge" />
+                      )}
+                      <span className="league-title-name">{leagueInfo?.name || 'League'}</span>
+                    </div>
+                    {!isLoading && uniqueCount > 0 && (
+                      <div className="unique-players-count">
+                        <FontAwesomeIcon icon={faUsers} />
+                        <span>{uniqueCount} trainer{uniqueCount !== 1 ? 's' : ''} competing</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
               <div className="highscore-list">
                 {scoreTab === 'daily' ? (
                   state.dailyScoresLoading ? (
                     <p className="loading-scores"><FontAwesomeIcon icon={faSync} spin /> Loading today's scores...</p>
                   ) : state.dailyScores.length > 0 ? (
                     getUniquePlayerScores(state.dailyScores.filter(s => s.league === leagueFilter)).slice(0, 10).map((entry, index) => (
-                      <div key={entry.id || index} className="highscore-item" title={
-                        entry.timestamp || entry.date || entry.createdAt ?
-                          `Submitted: ${new Date((entry.timestamp || entry.date || entry.createdAt)).toLocaleString('en-US', { timeZone: 'Europe/Berlin' })}` :
-                          'No submission date available'
-                      }>
+                      <div 
+                        key={entry.id || index} 
+                        className="highscore-item clickable" 
+                        onClick={() => setSelectedPlayer({ player: entry, rank: index + 1 })}
+                        title="Click to view profile"
+                      >
                         <span className="highscore-rank">#{index + 1}</span>
-                        {entry.league && badgeImages[entry.league] && (
-                          <img src={badgeImages[entry.league]} alt="" className="score-badge" />
-                        )}
                         <span className="highscore-name">
                           {entry.icon && <span className="highscore-icon">{entry.icon}</span>}
-                          {entry.name}
+                          <span className="highscore-name-text">{entry.name}</span>
                         </span>
                         <span className="highscore-val">{entry.score}</span>
-                        {entry.accuracy !== undefined && (
-                          <span className="highscore-accuracy">{entry.accuracy}%</span>
-                        )}
                         {entry.avgSpeed && (
-                          <span className="highscore-speed">{(entry.avgSpeed / 1000).toFixed(1)}s</span>
+                          <span className="highscore-speed">{(entry.avgSpeed / 1000).toFixed(2)}s</span>
                         )}
                       </div>
                     ))
@@ -398,25 +423,20 @@ function StartScreen() {
                     <p className="loading-scores"><FontAwesomeIcon icon={faSync} spin /> Loading...</p>
                   ) : state.globalScores.length > 0 ? (
                     getUniquePlayerScores(state.globalScores.filter(s => s.league === leagueFilter)).slice(0, 10).map((entry, index) => (
-                      <div key={entry.id || index} className="highscore-item" title={
-                        entry.timestamp || entry.date || entry.createdAt ?
-                          `Submitted: ${new Date((entry.timestamp || entry.date || entry.createdAt)).toLocaleString('en-US', { timeZone: 'Europe/Berlin' })}` :
-                          'No submission date available'
-                      }>
+                      <div 
+                        key={entry.id || index} 
+                        className="highscore-item clickable" 
+                        onClick={() => setSelectedPlayer({ player: entry, rank: index + 1 })}
+                        title="Click to view profile"
+                      >
                         <span className="highscore-rank">#{index + 1}</span>
-                        {entry.league && badgeImages[entry.league] && (
-                          <img src={badgeImages[entry.league]} alt="" className="score-badge" />
-                        )}
                         <span className="highscore-name">
                           {entry.icon && <span className="highscore-icon">{entry.icon}</span>}
-                          {entry.name}
+                          <span className="highscore-name-text">{entry.name}</span>
                         </span>
                         <span className="highscore-val">{entry.score}</span>
-                        {entry.accuracy !== undefined && (
-                          <span className="highscore-accuracy">{entry.accuracy}%</span>
-                        )}
                         {entry.avgSpeed && (
-                          <span className="highscore-speed">{(entry.avgSpeed / 1000).toFixed(1)}s</span>
+                          <span className="highscore-speed">{(entry.avgSpeed / 1000).toFixed(2)}s</span>
                         )}
                       </div>
                     ))
@@ -432,7 +452,7 @@ function StartScreen() {
                 state.highScores.map((entry, index) => (
                   <div key={index} className="highscore-item">
                     <span className="highscore-rank">#{index + 1}</span>
-                    <span className="highscore-name">{entry.name}</span>
+                    <span className="highscore-name"><span className="highscore-name-text">{entry.name}</span></span>
                     <span className="highscore-val">{entry.score}</span>
                   </div>
                 ))
@@ -753,6 +773,15 @@ function StartScreen() {
       <PrizeCabinet
         isOpen={showPrizeCabinet}
         onClose={() => setShowPrizeCabinet(false)}
+      />
+
+      <PlayerProfile
+        isOpen={!!selectedPlayer}
+        onClose={() => setSelectedPlayer(null)}
+        player={selectedPlayer?.player}
+        rank={selectedPlayer?.rank}
+        allScores={[...state.dailyScores, ...state.globalScores]}
+        period={scoreTab}
       />
     </div>
   );

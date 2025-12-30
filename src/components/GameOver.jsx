@@ -18,7 +18,8 @@ import {
   faChartLine,
   faHeartBroken,
   faCalendarAlt,
-  faGlobe
+  faGlobe,
+  faUsers
 } from '@fortawesome/free-solid-svg-icons';
 import { faPaypal } from '@fortawesome/free-brands-svg-icons';
 import confetti from 'canvas-confetti';
@@ -696,6 +697,24 @@ function GameOver() {
               ))}
             </div>
           )}
+
+          {/* Unique player count display */}
+          {(scoreTab === 'global' || scoreTab === 'daily') && (() => {
+            const scores = scoreTab === 'daily' 
+              ? state.dailyScores.filter(s => s.league === leagueFilter)
+              : state.globalScores.filter(s => s.league === leagueFilter);
+            const uniqueCount = getUniquePlayerScores(scores).length;
+            const isLoading = scoreTab === 'daily' ? state.dailyScoresLoading : state.globalScoresLoading;
+            
+            if (isLoading || uniqueCount === 0) return null;
+            
+            return (
+              <div className="unique-players-count">
+                <FontAwesomeIcon icon={faUsers} />
+                <span>{uniqueCount} trainer{uniqueCount !== 1 ? 's' : ''} competing</span>
+              </div>
+            );
+          })()}
           
           <div className="highscores-list">
             {scoreTab === 'stats' ? (
@@ -761,19 +780,13 @@ function GameOver() {
                       'No submission date available'
                   }>
                     <span className="hs-rank">#{index + 1}</span>
-                    {entry.league && badgeImages[entry.league] && (
-                      <img src={badgeImages[entry.league]} alt="" className="score-badge" />
-                    )}
                     <span className="hs-name">
                       {entry.icon && <span className="hs-icon">{entry.icon}</span>}
-                      {entry.name}
+                      <span className="hs-name-text">{entry.name}</span>
                     </span>
                     <span className="hs-score">{entry.score}</span>
-                    {entry.accuracy !== undefined && (
-                      <span className="hs-accuracy">{entry.accuracy}%</span>
-                    )}
                     {entry.avgSpeed && (
-                      <span className="hs-speed">{(entry.avgSpeed / 1000).toFixed(1)}s</span>
+                      <span className="hs-speed">{(entry.avgSpeed / 1000).toFixed(2)}s</span>
                     )}
                   </div>
                 ))
@@ -791,19 +804,13 @@ function GameOver() {
                       'No submission date available'
                   }>
                     <span className="hs-rank">#{index + 1}</span>
-                    {entry.league && badgeImages[entry.league] && (
-                      <img src={badgeImages[entry.league]} alt="" className="score-badge" />
-                    )}
                     <span className="hs-name">
                       {entry.icon && <span className="hs-icon">{entry.icon}</span>}
-                      {entry.name}
+                      <span className="hs-name-text">{entry.name}</span>
                     </span>
                     <span className="hs-score">{entry.score}</span>
-                    {entry.accuracy !== undefined && (
-                      <span className="hs-accuracy">{entry.accuracy}%</span>
-                    )}
                     {entry.avgSpeed && (
-                      <span className="hs-speed">{(entry.avgSpeed / 1000).toFixed(1)}s</span>
+                      <span className="hs-speed">{(entry.avgSpeed / 1000).toFixed(2)}s</span>
                     )}
                   </div>
                 ))
@@ -819,7 +826,7 @@ function GameOver() {
                       'No submission date available'
                   }>
                     <span className="hs-rank">#{index + 1}</span>
-                    <span className="hs-name">{entry.name}</span>
+                    <span className="hs-name"><span className="hs-name-text">{entry.name}</span></span>
                     <span className="hs-score">{entry.score}</span>
                   </div>
                 ))

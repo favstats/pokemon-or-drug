@@ -1007,11 +1007,48 @@ export function GameProvider({ children }) {
     },
   }), [actions, dispatch]);
 
-  // Fetch global scores on mount
+  // Preload ALL scores for ALL leagues on mount (background fetch)
   useEffect(() => {
-    fetchGlobalScores().then(scores => {
-      dispatch({ type: ACTIONS.SET_GLOBAL_SCORES, payload: scores });
-    });
+    const preloadAllScores = async () => {
+      try {
+        // Fetch all leagues in parallel for both daily and global
+        const leagueIds = Object.keys(LEAGUES);
+        
+        // Fetch daily scores for all leagues in parallel
+        const dailyPromises = leagueIds.map(league => 
+          fetchGlobalScores(false, league, 'daily').catch(() => [])
+        );
+        
+        // Fetch global scores for all leagues in parallel  
+        const globalPromises = leagueIds.map(league => 
+          fetchGlobalScores(false, league).catch(() => [])
+        );
+        
+        // Wait for all fetches to complete
+        const [dailyResults, globalResults] = await Promise.all([
+          Promise.all(dailyPromises),
+          Promise.all(globalPromises)
+        ]);
+        
+        // Combine all daily scores
+        const allDailyScores = dailyResults.flat();
+        dispatch({ type: ACTIONS.SET_DAILY_SCORES, payload: allDailyScores });
+        
+        // Combine all global scores
+        const allGlobalScores = globalResults.flat();
+        dispatch({ type: ACTIONS.SET_GLOBAL_SCORES, payload: allGlobalScores });
+        
+        console.log(`Preloaded ${allDailyScores.length} daily and ${allGlobalScores.length} global scores`);
+      } catch (error) {
+        console.warn('Background score preload failed:', error);
+        // Set loading to false even on error
+        dispatch({ type: ACTIONS.SET_DAILY_LOADING, payload: false });
+        dispatch({ type: ACTIONS.SET_GLOBAL_LOADING, payload: false });
+      }
+    };
+    
+    // Start preloading immediately in background
+    preloadAllScores();
   }, []);
   
   const contextValue = useMemo(() => ({

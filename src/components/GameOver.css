@@ -300,6 +300,7 @@
   background: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
   font-size: 0.95rem;
+  flex-wrap: nowrap;
 }
 
 .highscore-entry.gold {
@@ -327,15 +328,36 @@
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.hs-name-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .hs-icon {
   font-size: 1.1rem;
+  flex-shrink: 0;
 }
 
 .hs-score {
   font-weight: 800;
   color: var(--success-green);
+  flex-shrink: 0;
+  min-width: 45px;
+  text-align: right;
+}
+
+.hs-speed {
+  font-size: 0.8rem;
+  color: #fbbf24;
+  font-weight: 600;
+  flex-shrink: 0;
+  min-width: 36px;
+  text-align: right;
 }
 
 /* Action Buttons */
@@ -792,17 +814,7 @@
   color: var(--pokemon-yellow);
 }
 
-.hs-accuracy {
-  font-size: 0.75rem;
-  color: var(--pokemon-yellow);
-  opacity: 0.8;
-}
-
-.hs-speed {
-  font-size: 0.75rem;
-  color: var(--success-green);
-  opacity: 0.8;
-}
+/* Accuracy removed - always 100% for completed games */
 
 /* League Filter Tabs */
 .league-filter-tabs {
@@ -852,6 +864,26 @@
   object-fit: contain;
   margin-right: 0.25rem;
   flex-shrink: 0;
+}
+
+/* Unique players count */
+.unique-players-count {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(102, 126, 234, 0.15);
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  color: #a5b4fc;
+  margin-bottom: 0.75rem;
+}
+
+.unique-players-count svg {
+  font-size: 0.9rem;
+  color: #818cf8;
 }
 
 /* Highscores header with tabs */
@@ -1060,18 +1092,38 @@
   }
   
   .highscore-entry {
-    padding: 0.6rem 0.75rem;
-    gap: 0.5rem;
-    font-size: 0.85rem;
+    padding: 0.5rem 0.6rem;
+    gap: 0.35rem;
+    font-size: 0.75rem;
   }
   
   .hs-rank {
-    min-width: 28px;
+    min-width: 22px;
+    font-size: 0.7rem;
   }
   
-  .hs-accuracy,
+  .score-badge {
+    width: 14px;
+    height: 14px;
+    margin-right: 0.15rem;
+  }
+  
+  .hs-name {
+    gap: 0.25rem;
+  }
+  
+  .hs-icon {
+    font-size: 0.85rem;
+  }
+  
+  .hs-score {
+    font-size: 0.75rem;
+    min-width: 38px;
+  }
+  
   .hs-speed {
     font-size: 0.7rem;
+    min-width: 32px;
   }
   
   .league-filter-tabs {
