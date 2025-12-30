@@ -121,12 +121,20 @@ function StartScreen() {
     }
   }, [isFirstIconVisit, state.gameMode]);
 
-  // Load scores on mount (default to boulder league)
+  // Lazy load scores only when scoreboard is opened
   useEffect(() => {
-    actions.loadGlobalScores('boulder');
-    actions.loadDailyScores('boulder');
+    if (showScoreboard) {
+      // Fetch scores for current league and tab
+      if (scoreTab === 'daily') {
+        actions.loadDailyScores(leagueFilter);
+      } else if (scoreTab === 'global') {
+        actions.loadGlobalScores(leagueFilter);
+      }
+    }
+  }, [showScoreboard, scoreTab, leagueFilter]);
 
-    // One-time cleanup of demo medals (remove after first run)
+  // One-time cleanup of demo medals
+  useEffect(() => {
     const cleanupDone = localStorage.getItem('pord_demo_cleanup');
     if (!cleanupDone) {
       localStorage.removeItem('pord_medals');

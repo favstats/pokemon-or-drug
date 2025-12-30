@@ -1,20 +1,18 @@
 // Global High Scores using Google Sheets + Apps Script
-// Free, permanent, no limits!
+// LAZY LOADING: Only fetch what's needed, when needed
 
 const API_URL = 'https://script.google.com/macros/s/AKfycbx2xuBfJE6j4b44xHR7MTqT-ZTLyyK1nrFzT_EPtuzjKZaDrAyKki0M_yMOj9Ns3fTk/exec';
-const CACHE_KEY_PREFIX = 'pord_global_scores_cache';
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minute cache (increased from 1 min)
-const STALE_DURATION = 30 * 60 * 1000; // Serve stale data up to 30 minutes while refreshing
+const CACHE_DURATION = 10 * 60 * 1000; // 10 minute cache
 const MAX_RETRIES = 3;
-const INITIAL_RETRY_DELAY = 500; // 500ms
+const INITIAL_RETRY_DELAY = 1000; // 1 second
 
-// In-memory cache for instant access (no localStorage parsing overhead)
-const memoryCache = new Map();
+// In-memory cache: Map of "league_period" -> { scores, timestamp }
+const cache = new Map();
 
-// Track ongoing fetch promises to prevent duplicate requests
+// Track pending fetches to prevent duplicates
 const pendingFetches = new Map();
 
-// Retry fetch with exponential backoff (helps with intermittent CORS issues)
+// Retry fetch with exponential backoff
 async function fetchWithRetry(url, options = {}, retries = MAX_RETRIES) {
   let lastError;
   
@@ -29,16 +27,10 @@ async function fetchWithRetry(url, options = {}, retries = MAX_RETRIES) {
         return response;
       }
       
-      // If response is not OK but we got a response, might still work
-      if (response.status === 200) {
-        return response;
-      }
-      
       lastError = new Error(`HTTP ${response.status}`);
     } catch (error) {
       lastError = error;
       
-      // If this isn't the last attempt, wait before retrying
       if (attempt < retries - 1) {
         const delay = INITIAL_RETRY_DELAY * Math.pow(2, attempt);
         console.log(`Fetch attempt ${attempt + 1} failed, retrying in ${delay}ms...`);
@@ -50,210 +42,142 @@ async function fetchWithRetry(url, options = {}, retries = MAX_RETRIES) {
   throw lastError;
 }
 
-// Get cache key for a specific league and period
-function getCacheKey(league, period = null) {
-  const timezone = period === 'daily' ? '_cet' : '';
-  return `${CACHE_KEY_PREFIX}_${league || 'all'}_${period || 'alltime'}${timezone}`;
+// Get cache key
+function getCacheKey(league, period) {
+  return `${league || 'all'}_${period || 'global'}`;
 }
 
-// Get cached scores - checks memory first, then localStorage
-function getCachedScores(league, period = null, allowStale = false) {
+// Get cached data if still fresh
+function getCached(league, period) {
   const key = getCacheKey(league, period);
-  const maxAge = allowStale ? STALE_DURATION : CACHE_DURATION;
+  const cached = cache.get(key);
   
-  // Check memory cache first (instant access)
-  if (memoryCache.has(key)) {
-    const { scores, timestamp } = memoryCache.get(key);
-    if (Date.now() - timestamp < maxAge) {
-      return { scores, isStale: Date.now() - timestamp >= CACHE_DURATION };
-    }
+  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    return cached.scores;
   }
   
-  // Fallback to localStorage
+  // Also try localStorage as backup
   try {
-    const cached = localStorage.getItem(key);
-    if (cached) {
-      const { scores, timestamp } = JSON.parse(cached);
-      if (Date.now() - timestamp < maxAge) {
-        // Populate memory cache from localStorage
-        memoryCache.set(key, { scores, timestamp });
-        return { scores, isStale: Date.now() - timestamp >= CACHE_DURATION };
+    const stored = localStorage.getItem(`pord_scores_${key}`);
+    if (stored) {
+      const { scores, timestamp } = JSON.parse(stored);
+      if (Date.now() - timestamp < CACHE_DURATION) {
+        cache.set(key, { scores, timestamp });
+        return scores;
       }
     }
   } catch (e) {
-    // Ignore cache errors
+    // Ignore
   }
+  
   return null;
 }
 
-// Save scores to both memory and localStorage cache
-function setCachedScores(scores, league, period = null) {
+// Save to cache
+function setCache(league, period, scores) {
   const key = getCacheKey(league, period);
-  const cacheData = { scores, timestamp: Date.now() };
+  const data = { scores, timestamp: Date.now() };
   
-  // Save to memory cache (instant)
-  memoryCache.set(key, cacheData);
+  cache.set(key, data);
   
-  // Save to localStorage (persistent)
   try {
-    localStorage.setItem(key, JSON.stringify(cacheData));
+    localStorage.setItem(`pord_scores_${key}`, JSON.stringify(data));
   } catch (e) {
-    // Ignore cache errors
+    // Ignore quota errors
   }
 }
 
-// Actual fetch implementation
-async function doFetchScores(league, period) {
-  // Build URL with league and period parameters if specified
-  let url = API_URL;
-  const params = new URLSearchParams();
+// Filter for today's scores (German timezone)
+function filterDaily(scores) {
+  const now = new Date();
+  const germanTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Berlin' }));
+  const today = new Date(germanTime.getFullYear(), germanTime.getMonth(), germanTime.getDate());
 
-  if (league) {
-    params.append('league', league);
-  }
-
-  if (period) {
-    params.append('period', period);
-    // For daily filtering, specify German timezone (CET/CEST)
-    if (period === 'daily') {
-      params.append('timezone', 'Europe/Berlin');
-    }
-  }
-
-  if (params.toString()) {
-    url += `?${params.toString()}`;
-  }
-
-  const response = await fetchWithRetry(url, {
-    method: 'GET',
+  return scores.filter(entry => {
+    let entryDate = entry.timestamp || entry.date || entry.createdAt;
+    if (!entryDate) return false;
+    
+    entryDate = new Date(entryDate);
+    if (isNaN(entryDate.getTime())) return false;
+    
+    const germanEntry = new Date(entryDate.toLocaleString('en-US', { timeZone: 'Europe/Berlin' }));
+    const entryDay = new Date(germanEntry.getFullYear(), germanEntry.getMonth(), germanEntry.getDate());
+    return entryDay.getTime() === today.getTime();
   });
-
-  if (!response.ok) {
-    throw new Error('Could not fetch global scores');
-  }
-
-  const data = await response.json();
-  const scores = data.success ? data.scores : [];
-
-  // For daily filtering, apply client-side date filtering as fallback
-  let filteredScores = scores;
-  if (period === 'daily') {
-    try {
-      const now = new Date();
-      const germanTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Berlin' }));
-      const today = new Date(germanTime.getFullYear(), germanTime.getMonth(), germanTime.getDate());
-
-      filteredScores = scores.filter(entry => {
-        let entryDate = null;
-
-        // Try different timestamp fields
-        if (entry.timestamp) {
-          entryDate = new Date(entry.timestamp);
-        } else if (entry.date) {
-          entryDate = new Date(entry.date);
-        } else if (entry.createdAt) {
-          entryDate = new Date(entry.createdAt);
-        }
-
-        if (entryDate && !isNaN(entryDate.getTime())) {
-          // Convert to German timezone for comparison
-          const germanEntryDate = new Date(entryDate.toLocaleString('en-US', { timeZone: 'Europe/Berlin' }));
-          const entryDay = new Date(germanEntryDate.getFullYear(), germanEntryDate.getMonth(), germanEntryDate.getDate());
-
-          const isToday = entryDay.getTime() === today.getTime();
-          return isToday;
-        } else {
-          // Keep entries without valid timestamps (backwards compatibility)
-          return true;
-        }
-      });
-    } catch (error) {
-      console.error('Error in daily filtering:', error);
-      filteredScores = scores; // Fallback to original scores if filtering fails
-    }
-  }
-
-  return filteredScores;
 }
 
-// Fetch global high scores with stale-while-revalidate caching
+// Fetch scores for a specific league (lazy loading)
 export async function fetchGlobalScores(forceRefresh = false, league = null, period = null) {
-  const cacheKey = getCacheKey(league, period);
-  
-  // Check for fresh cache first
+  // Check cache first
   if (!forceRefresh) {
-    const cached = getCachedScores(league, period, true); // Allow stale data
+    const cached = getCached(league, period);
     if (cached) {
-      // If data is fresh, return immediately
-      if (!cached.isStale) {
-        return cached.scores;
-      }
-      
-      // If data is stale but usable, return it AND refresh in background
-      // Prevent duplicate fetches using pendingFetches map
-      if (!pendingFetches.has(cacheKey)) {
-        const refreshPromise = doFetchScores(league, period)
-          .then(freshScores => {
-            setCachedScores(freshScores, league, period);
-            pendingFetches.delete(cacheKey);
-            return freshScores;
-          })
-          .catch(err => {
-            console.warn('Background refresh failed:', err);
-            pendingFetches.delete(cacheKey);
-          });
-        pendingFetches.set(cacheKey, refreshPromise);
-      }
-      
-      // Return stale data immediately while refreshing in background
-      return cached.scores;
+      console.log(`Cache hit for ${league || 'all'} ${period || 'global'}`);
+      return cached;
     }
   }
-
-  // No cache or force refresh - need to fetch
-  // Check if there's already a pending fetch for this key
-  if (pendingFetches.has(cacheKey)) {
-    return pendingFetches.get(cacheKey);
-  }
-
-  // Create new fetch promise
-  const fetchPromise = doFetchScores(league, period)
-    .then(scores => {
-      setCachedScores(scores, league, period);
-      pendingFetches.delete(cacheKey);
-      return scores;
-    })
-    .catch(error => {
-      console.warn('Error fetching global scores:', error);
-      pendingFetches.delete(cacheKey);
-      // Return any cached data as fallback
-      const fallback = getCachedScores(league, period, true);
-      return fallback?.scores || [];
-    });
   
-  pendingFetches.set(cacheKey, fetchPromise);
+  // Check if already fetching
+  const fetchKey = getCacheKey(league, period);
+  if (pendingFetches.has(fetchKey)) {
+    return pendingFetches.get(fetchKey);
+  }
+  
+  // Build URL
+  const params = new URLSearchParams();
+  if (league) params.append('league', league);
+  
+  const url = params.toString() ? `${API_URL}?${params}` : API_URL;
+  
+  console.log(`Fetching ${league || 'all'} ${period || 'global'}...`);
+  
+  const fetchPromise = (async () => {
+    try {
+      const response = await fetchWithRetry(url);
+      const data = await response.json();
+      let scores = data.success ? data.scores : [];
+      
+      // Filter for daily if needed
+      if (period === 'daily') {
+        scores = filterDaily(scores);
+      }
+      
+      // Cache the results
+      setCache(league, period, scores);
+      
+      console.log(`Fetched ${scores.length} scores for ${league || 'all'} ${period || 'global'}`);
+      return scores;
+    } catch (error) {
+      console.warn(`Failed to fetch ${league} ${period}:`, error);
+      // Return cached data as fallback (even if stale)
+      const stale = getCached(league, period);
+      return stale || [];
+    } finally {
+      pendingFetches.delete(fetchKey);
+    }
+  })();
+  
+  pendingFetches.set(fetchKey, fetchPromise);
   return fetchPromise;
 }
 
-// Submit a new score to global leaderboard
+// Submit a new score
 export async function submitGlobalScore(scoreData) {
   try {
     const response = await fetchWithRetry(API_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'text/plain', // Apps Script needs this for CORS
+        'Content-Type': 'text/plain',
       },
       body: JSON.stringify({
-        // Core score data
         name: scoreData.name,
         icon: scoreData.icon || '🎮',
         score: scoreData.score,
         accuracy: scoreData.accuracy || 0,
         avgSpeed: scoreData.avgSpeed || null,
         league: scoreData.league || null,
-        // Game metadata
         gameId: scoreData.gameId || null,
-        gameDuration: scoreData.gameDuration || null, // in milliseconds
+        gameDuration: scoreData.gameDuration || null,
         playerCount: scoreData.playerCount || 1,
         livesLost: scoreData.livesLost || 0,
         totalRounds: scoreData.totalRounds || null,
@@ -266,14 +190,18 @@ export async function submitGlobalScore(scoreData) {
     });
     
     if (!response.ok) {
-      console.warn('Could not save global score');
+      console.warn('Could not save score');
       return [];
     }
     
-    // Fetch updated scores after submission (force refresh for this league)
-    return await fetchGlobalScores(true, scoreData.league, null);
+    // Clear cache for this league so next view gets fresh data
+    const key = getCacheKey(scoreData.league, null);
+    cache.delete(key);
+    cache.delete(getCacheKey(scoreData.league, 'daily'));
+    
+    return await fetchGlobalScores(true, scoreData.league);
   } catch (error) {
-    console.warn('Error submitting global score:', error);
+    console.warn('Error submitting score:', error);
     return [];
   }
 }

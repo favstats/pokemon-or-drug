@@ -249,9 +249,9 @@ const initialState = {
   questionIndex: 0,
   highScores: JSON.parse(localStorage.getItem('pord_highscores') || '[]'),
   globalScores: [],
-  globalScoresLoading: true, // Start as loading
+  globalScoresLoading: false, // Lazy load when user opens High Scores
   dailyScores: [],
-  dailyScoresLoading: true, // Start as loading
+  dailyScoresLoading: false, // Lazy load when user opens High Scores
   medals: JSON.parse(localStorage.getItem('pord_medals') || '[]'),
   // Bonus round state
   bonusRound: {
@@ -1007,49 +1007,8 @@ export function GameProvider({ children }) {
     },
   }), [actions, dispatch]);
 
-  // Preload ALL scores for ALL leagues on mount (background fetch)
-  useEffect(() => {
-    const preloadAllScores = async () => {
-      try {
-        // Fetch all leagues in parallel for both daily and global
-        const leagueIds = Object.keys(LEAGUES);
-        
-        // Fetch daily scores for all leagues in parallel
-        const dailyPromises = leagueIds.map(league => 
-          fetchGlobalScores(false, league, 'daily').catch(() => [])
-        );
-        
-        // Fetch global scores for all leagues in parallel  
-        const globalPromises = leagueIds.map(league => 
-          fetchGlobalScores(false, league).catch(() => [])
-        );
-        
-        // Wait for all fetches to complete
-        const [dailyResults, globalResults] = await Promise.all([
-          Promise.all(dailyPromises),
-          Promise.all(globalPromises)
-        ]);
-        
-        // Combine all daily scores
-        const allDailyScores = dailyResults.flat();
-        dispatch({ type: ACTIONS.SET_DAILY_SCORES, payload: allDailyScores });
-        
-        // Combine all global scores
-        const allGlobalScores = globalResults.flat();
-        dispatch({ type: ACTIONS.SET_GLOBAL_SCORES, payload: allGlobalScores });
-        
-        console.log(`Preloaded ${allDailyScores.length} daily and ${allGlobalScores.length} global scores`);
-      } catch (error) {
-        console.warn('Background score preload failed:', error);
-        // Set loading to false even on error
-        dispatch({ type: ACTIONS.SET_DAILY_LOADING, payload: false });
-        dispatch({ type: ACTIONS.SET_GLOBAL_LOADING, payload: false });
-      }
-    };
-    
-    // Start preloading immediately in background
-    preloadAllScores();
-  }, []);
+  // NO preloading on startup - lazy load when user opens High Scores
+  // This saves mobile data and reduces API calls
   
   const contextValue = useMemo(() => ({
     state,
